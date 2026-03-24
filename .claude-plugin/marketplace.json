@@ -1,0 +1,30 @@
+{
+  "name": "nexa-claude-marketplace",
+  "owner": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  },
+  "plugins": [
+    {
+      "name": "nexa-claude-core",
+      "source": "./nexa-claude-core",
+      "description": "Nexa Agentic Engineering - stack-agnostic core SDLC methodology"
+    },
+    {
+      "name": "nexa-claude-vaadin-jooq",
+      "source": "./nexa-claude-vaadin-jooq",
+      "description": "Nexa Agentic Engineering plugin for the Vaadin/jOOQ stack"
+    },
+    {
+      "name": "nexa-claude-nestjs-nextjs",
+      "source": "./nexa-claude-nestjs-nextjs",
+      "description": "Nexa Agentic Engineering plugin for the NestJS/Next.js stack"
+    },
+    {
+      "name": "nexa-claude-nextjs",
+      "source": "./nexa-claude-nextjs",
+      "description": "Nexa Agentic Engineering plugin for the Next.js stack"
+    }
+  ]
+}

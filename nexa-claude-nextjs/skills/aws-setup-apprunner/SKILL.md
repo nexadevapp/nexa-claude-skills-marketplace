@@ -28,21 +28,22 @@ $ARGUMENTS may specify the app name, region, or special requirements.
    - Check the existing Dockerfile to determine the exposed port
    - Check for any existing AWS infrastructure files in `infra/`
    - Ask the user for: app name, AWS region (default: `eu-central-1`), AWS account ID
+   - **Ask the user what secrets the application needs** (e.g., `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, API keys). For each secret, collect the environment variable name and a description. These will be prompted for during script execution.
 
 2. **Create the deployment script** at `infra/aws.apprunner/deploy-apprunner.sh`:
    - Interactive prompts for app name, region, account ID, ECR repo, port, CPU/memory, image tag
-   - **Step 1 — Test Secret**: Create a Secrets Manager secret to verify the integration
+   - **Step 1 — Application Secrets**: For each secret the user specified, prompt for the value at runtime and create/update it in AWS Secrets Manager under `<app-name>/<SECRET_NAME>`. Build the IAM policy to grant `secretsmanager:GetSecretValue` on all created secret ARNs. Build the `RuntimeEnvironmentSecrets` map for the App Runner service configuration.
    - **Step 2 — IAM Roles**:
      - Access Role: allows App Runner to pull images from ECR (trust `build.apprunner.amazonaws.com`)
      - Instance Role: allows the container to read secrets at runtime (trust `tasks.apprunner.amazonaws.com`)
-     - Inline policy granting `secretsmanager:GetSecretValue` scoped to the test secret ARN
+     - Inline policy granting `secretsmanager:GetSecretValue` scoped to all application secret ARNs
    - **Step 3 — App Runner Service**:
      - Source configuration pointing to the ECR image
-     - Runtime environment secrets mapping
+     - Runtime environment secrets mapping (all secrets from Step 1)
      - Auto-deployments enabled (redeploy on new ECR image push)
      - Health check configuration (HTTP on `/`, 20s interval)
      - Instance configuration (CPU, memory, instance role)
-   - Support `--teardown` flag to cleanly delete all created resources
+   - Support `--teardown` flag to cleanly delete all created resources (including all application secrets)
    - Wait loops with status output for service creation/deletion
    - Print the service URL on successful deployment
    - Make the script executable (`chmod +x`)

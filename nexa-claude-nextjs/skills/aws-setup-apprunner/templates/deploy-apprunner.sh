@@ -4,10 +4,18 @@ set -euo pipefail
 usage() {
   echo "Usage: $0 [--teardown]"
   echo ""
-  echo "  (no flag)    Create the App Runner service with ECR, a test secret, and IAM roles"
+  echo "  (no flag)    Create the App Runner service with ECR, secrets, and IAM roles"
   echo "  --teardown   Delete the App Runner service, IAM roles, ECR repo, and secrets"
   exit 1
 }
+
+# --- Application Secrets Definition ---
+# Each entry: ENV_VAR_NAME:description
+# Customize this array for your application's secrets.
+SECRETS=(
+  "DATABASE_URL:Database connection string (pooled)"
+  "DIRECT_URL:Direct database connection string (non-pooled, for migrations)"
+)
 
 MODE="create"
 if [[ "${1:-}" == "--teardown" ]]; then
@@ -17,7 +25,7 @@ elif [[ -n "${1:-}" ]]; then
 fi
 
 # --- Common prompts ---
-echo "=== Hello World App Runner Deployment (TypeScript) ==="
+echo "=== App Runner Deployment ==="
 echo ""
 read -rp "App Name (lowercase, hyphens only): " APP_NAME
 read -rp "AWS Region [eu-central-1]: " AWS_REGION
@@ -48,7 +56,10 @@ if [[ "$MODE" == "teardown" ]]; then
   echo "This will PERMANENTLY DELETE:"
   echo "  - App Runner service: $SERVICE_NAME"
   echo "  - IAM roles: $ACCESS_ROLE_NAME, $INSTANCE_ROLE_NAME"
-  echo "  - Secrets Manager secret: ${APP_NAME}/test-secret"
+  for entry in "${SECRETS[@]}"; do
+    secret_env="${entry%%:*}"
+    echo "  - Secrets Manager secret: ${APP_NAME}/${secret_env}"
+  done
   echo ""
   read -rp "Are you sure? (y/N): " CONFIRM
   if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
@@ -98,12 +109,16 @@ if [[ "$MODE" == "teardown" ]]; then
     fi
   done
 
-  # Force-delete Secrets Manager secret
-  echo "Force-deleting Secrets Manager secret..."
-  aws secretsmanager delete-secret \
-    --secret-id "${APP_NAME}/test-secret" \
-    --force-delete-without-recovery 2>/dev/null \
-    || echo "  Secret test-secret not found or already deleted."
+  # Force-delete Secrets Manager secrets
+  echo "Force-deleting Secrets Manager secrets..."
+  for entry in "${SECRETS[@]}"; do
+    secret_env="${entry%%:*}"
+    aws secretsmanager delete-secret \
+      --secret-id "${APP_NAME}/${secret_env}" \
+      --force-delete-without-recovery 2>/dev/null \
+      || echo "  Secret ${secret_env} not found or already deleted."
+    echo "  Deleted: ${APP_NAME}/${secret_env}"
+  done
 
   echo ""
   echo "=== Teardown complete ==="
@@ -147,29 +162,44 @@ if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
   exit 0
 fi
 
-# --- Step 1: Test Secret ---
+# --- Step 1: Application Secrets ---
 echo ""
-echo "--- Step 1: Test Secret ---"
-TEST_SECRET_NAME="${APP_NAME}/test-secret"
-TEST_SECRET_VALUE="hello-from-secrets-manager"
+echo "--- Step 1: Application Secrets ---"
+echo "You will be prompted for each secret value."
+echo ""
 
-if aws secretsmanager describe-secret --secret-id "$TEST_SECRET_NAME" &>/dev/null; then
-  echo "Updating secret: $TEST_SECRET_NAME"
-  aws secretsmanager put-secret-value \
-    --secret-id "$TEST_SECRET_NAME" \
-    --secret-string "$TEST_SECRET_VALUE" \
-    --no-cli-pager > /dev/null
-else
-  echo "Creating secret: $TEST_SECRET_NAME"
-  aws secretsmanager create-secret \
-    --name "$TEST_SECRET_NAME" \
-    --description "Test secret to verify Secrets Manager access" \
-    --secret-string "$TEST_SECRET_VALUE" \
-    --no-cli-pager > /dev/null
-fi
+declare -A SECRET_ARNS
 
-TEST_SECRET_ARN=$(aws secretsmanager describe-secret \
-  --secret-id "$TEST_SECRET_NAME" --query 'ARN' --output text)
+for entry in "${SECRETS[@]}"; do
+  secret_env="${entry%%:*}"
+  secret_desc="${entry#*:}"
+  secret_name="${APP_NAME}/${secret_env}"
+
+  read -rp "${secret_env} (${secret_desc}): " secret_value
+  if [[ -z "$secret_value" ]]; then
+    echo "Error: ${secret_env} is required."
+    exit 1
+  fi
+
+  if aws secretsmanager describe-secret --secret-id "$secret_name" &>/dev/null; then
+    echo "  Updating secret: $secret_name"
+    aws secretsmanager put-secret-value \
+      --secret-id "$secret_name" \
+      --secret-string "$secret_value" \
+      --no-cli-pager > /dev/null
+  else
+    echo "  Creating secret: $secret_name"
+    aws secretsmanager create-secret \
+      --name "$secret_name" \
+      --description "$secret_desc" \
+      --secret-string "$secret_value" \
+      --no-cli-pager > /dev/null
+  fi
+
+  SECRET_ARNS["$secret_env"]=$(aws secretsmanager describe-secret \
+    --secret-id "$secret_name" --query 'ARN' --output text)
+  echo "  ARN: ${SECRET_ARNS[$secret_env]}"
+done
 
 # --- Step 2: IAM Roles ---
 echo ""
@@ -219,8 +249,16 @@ else
     --no-cli-pager > /dev/null
 fi
 
-# Inline policy for Secrets Manager access
+# Inline policy for Secrets Manager access — scoped to all application secrets
 echo "Attaching secrets policy to instance role..."
+RESOURCE_ARNS=""
+for secret_env in "${!SECRET_ARNS[@]}"; do
+  if [[ -n "$RESOURCE_ARNS" ]]; then
+    RESOURCE_ARNS="${RESOURCE_ARNS},"
+  fi
+  RESOURCE_ARNS="${RESOURCE_ARNS}\"${SECRET_ARNS[$secret_env]}\""
+done
+
 aws iam put-role-policy \
   --role-name "$INSTANCE_ROLE_NAME" \
   --policy-name "SecretsManagerAccess" \
@@ -231,7 +269,7 @@ aws iam put-role-policy \
         \"Effect\": \"Allow\",
         \"Action\": \"secretsmanager:GetSecretValue\",
         \"Resource\": [
-          \"${TEST_SECRET_ARN}\"
+          ${RESOURCE_ARNS}
         ]
       }
     ]
@@ -253,6 +291,15 @@ EXISTING_SERVICE_ARN=$(aws apprunner list-services \
   --query "ServiceSummaryList[?ServiceName=='${SERVICE_NAME}'].ServiceArn | [0]" \
   --output text 2>/dev/null) || EXISTING_SERVICE_ARN="None"
 
+# Build RuntimeEnvironmentSecrets JSON map
+RUNTIME_SECRETS=""
+for secret_env in "${!SECRET_ARNS[@]}"; do
+  if [[ -n "$RUNTIME_SECRETS" ]]; then
+    RUNTIME_SECRETS="${RUNTIME_SECRETS},"
+  fi
+  RUNTIME_SECRETS="${RUNTIME_SECRETS}\"${secret_env}\": \"${SECRET_ARNS[$secret_env]}\""
+done
+
 SERVICE_CONFIG='{
   "ImageRepository": {
     "ImageIdentifier": "'"${ECR_IMAGE_URI}"'",
@@ -260,7 +307,7 @@ SERVICE_CONFIG='{
     "ImageConfiguration": {
       "Port": "'"${CONTAINER_PORT}"'",
       "RuntimeEnvironmentSecrets": {
-        "TEST_SECRET": "'"${TEST_SECRET_ARN}"'"
+        '"${RUNTIME_SECRETS}"'
       }
     }
   },
@@ -331,6 +378,10 @@ echo "Service ARN: $SERVICE_ARN"
 echo "Service URL: https://${SERVICE_URL}"
 echo ""
 echo "ECR Image:   $ECR_IMAGE_URI"
-echo "Test Secret: TEST_SECRET env var = '$TEST_SECRET_VALUE'"
+echo ""
+echo "Secrets mapped to environment variables:"
+for secret_env in "${!SECRET_ARNS[@]}"; do
+  echo "  ${secret_env} -> ${SECRET_ARNS[$secret_env]}"
+done
 echo ""
 echo "Push a new image to ECR and App Runner will auto-deploy."

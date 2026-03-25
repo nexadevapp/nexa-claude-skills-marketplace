@@ -15,7 +15,7 @@ description: >
 Create Jest integration tests for NestJS services and controllers based on the use case $ARGUMENTS.
 Unit tests are already created by the `/implement` skill — this skill focuses on integration tests that hit real dependencies via Testcontainers.
 
-Read and follow the dependency strategies in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
 Use the context7 MCP server for NestJS testing documentation when needed.
 

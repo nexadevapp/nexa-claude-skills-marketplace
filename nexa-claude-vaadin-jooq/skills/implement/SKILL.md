@@ -24,18 +24,18 @@ Check the Vaadin and jOOQ MCP servers for guidance.
 
 ## External Dependencies
 
-Read and follow the instructions in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
 ## DoR Check
 
-- For **UC-XXX**: Read and follow `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/readiness/DEFINITION_OF_READY.md`.
-- For **TT-XXX**: Read and follow `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/readiness/DEFINITION_OF_READY_TT.md`.
+- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY.md`.
+- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY_TT.md`.
 
 Do not proceed with implementation until all items pass or the user explicitly waives failures.
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -56,14 +56,14 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/market
 
 ## DoD Check
 
-- For **UC-XXX**: Read and follow `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/readiness/DEFINITION_OF_DONE.md`.
-- For **TT-XXX**: Read and follow `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/readiness/DEFINITION_OF_DONE_TT.md`.
+- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE.md`.
+- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE_TT.md`.
 
 Do not proceed to post-implementation tracking until all items pass or the user explicitly waives failures.
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
 
 ## Resources
 

@@ -100,4 +100,4 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 ## Git
 
-- Before every commit, bump the `version` field (patch increment) in all `**/.claude-plugin/plugin.json` files.
+- Do NOT bump the `version` field in `**/.claude-plugin/plugin.json` files. Always keep the version at `1.0.0` because the path is referenced in the instructions, in the skills.

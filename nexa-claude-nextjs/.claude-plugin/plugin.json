@@ -1,7 +1,7 @@
 {
   "name": "nexa-claude-nextjs",
   "description": "Nexa Agentic Engineering plugin for the Next.js stack",
-  "version": "1.1.1",
+  "version": "1.0.0",
   "author": {
     "name": "Marius Achim",
     "email": "marius@nexadev.app",

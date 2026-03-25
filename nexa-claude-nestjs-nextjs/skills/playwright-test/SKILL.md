@@ -136,7 +136,7 @@ await page.request.delete(`/api/examples/${created.id}`);
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -160,4 +160,4 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/market
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.

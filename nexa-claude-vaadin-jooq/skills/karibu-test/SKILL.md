@@ -16,7 +16,7 @@ description: >
 Create Karibu integration tests for Vaadin views based on the use case $ARGUMENTS. Karibu Testing allows server-side testing of Vaadin components without a browser.
 Unit tests are already created by the `/implement` skill — this skill focuses on integration tests that hit real dependencies via Testcontainers.
 
-Read and follow the dependency strategies in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
 Use the KaribuTesting MCP server for documentation and code generation.
 

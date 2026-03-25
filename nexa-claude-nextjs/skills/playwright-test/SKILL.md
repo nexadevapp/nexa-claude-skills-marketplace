@@ -32,7 +32,7 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 
 ## External Dependencies
 
-Read and follow the dependency strategies in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
 Before running Playwright tests, ensure all required dependencies are running:
 
@@ -159,7 +159,7 @@ await page.request.delete(`/api/examples/${created.id}`);
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -185,4 +185,4 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/market
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.

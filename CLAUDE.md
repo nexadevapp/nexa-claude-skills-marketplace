@@ -23,7 +23,8 @@ nexa-claude-marketplace/
 │       ├── entity-model/
 │       ├── use-case-diagram/
 │       ├── use-case-spec/
-│       └── technical-task/
+│       ├── technical-task/
+│       └── prioritize/
 ├── nexa-claude-vaadin-jooq/             # Vaadin + jOOQ technology stack plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -78,7 +79,8 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |
 | Elaboration  | `/use-case-diagram`   | Generate PlantUML use case diagrams    |
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
-| Construction | `/technical-task`     | Create technical task specifications    |
+| Construction | `/technical-task`     | Create technical task specifications   |
+| Construction | `/prioritize`         | Recommend implementation order         |
 
 ### Vaadin/jOOQ (stack-specific)
 

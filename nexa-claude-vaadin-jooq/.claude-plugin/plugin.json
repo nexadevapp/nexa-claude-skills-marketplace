@@ -1,7 +1,7 @@
 {
   "name": "nexa-claude-vaadin-jooq",
   "description": "Nexa Agentic Engineering plugin for the Vaadin/jOOQ stack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "Marius Achim",
     "email": "marius@nexadev.app",

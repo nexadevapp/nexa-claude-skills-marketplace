@@ -157,6 +157,10 @@ await page.request.delete(`/api/examples/${created.id}`);
 | Enabled          | `await expect(locator).toBeEnabled()`                     |
 | Contains text    | `await expect(locator).toContainText('partial')`          |
 
+## Tracking
+
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+
 ## Workflow
 
 1. Start external dependencies as described in **External Dependencies** above
@@ -178,3 +182,7 @@ await page.request.delete(`/api/examples/${created.id}`);
     - Verify selectors with `page.pause()` for interactive debugging
     - Use `await page.screenshot()` for debugging visual state
 9. Mark todos complete
+
+## Post-Implementation Tracking
+
+Read and follow the **After Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.

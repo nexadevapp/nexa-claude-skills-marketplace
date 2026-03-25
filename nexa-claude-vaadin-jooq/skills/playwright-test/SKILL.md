@@ -160,6 +160,10 @@ Playwright tests run in a real browser with viewport constraints:
 - Use `isGreaterThan()` instead of exact counts for grids
 - Scroll if needed to access off-screen elements
 
+## Tracking
+
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.
+
 ## Workflow
 
 1. Read the use case specification
@@ -179,3 +183,7 @@ Playwright tests run in a real browser with viewport constraints:
     - Check that test data exists in the Flyway test migrations
     - For grid assertions, use `isGreaterThan()` instead of exact counts
 7. Mark todos complete
+
+## Post-Implementation Tracking
+
+Read and follow the **After Implementation** steps in `~/.claude/plugins/marketplaces/nexa-claude-marketplace/nexa-claude-core/shared/tracking/TRACKING.md`.

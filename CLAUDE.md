@@ -97,3 +97,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/implement`          | Implement use cases or technical tasks using NestJS and Next.js |
 | Construction | `/jest-test`          | Create Jest unit/integration tests           |
 | Construction | `/playwright-test`    | Create Playwright e2e tests                  |
+
+## Git
+
+- Before every commit, bump the `version` field (patch increment) in all `**/.claude-plugin/plugin.json` files.

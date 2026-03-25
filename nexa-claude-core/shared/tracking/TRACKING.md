@@ -5,6 +5,11 @@
 Before and after implementing a use case or technical task, perform the tracking steps below using the `gh` CLI.
 This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked as a GitHub issue and stays in sync with the specification.
 
+## Git Rules
+
+- Always run `git pull` before starting any task to ensure the local branch is up to date.
+- Never create merge commits. Keep a linear Git history.
+
 ## Before Implementation
 
 1. Pull the latest changes: `git pull`

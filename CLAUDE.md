@@ -97,3 +97,8 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/implement`          | Implement use cases or technical tasks using NestJS and Next.js |
 | Construction | `/jest-test`          | Create Jest unit/integration tests           |
 | Construction | `/playwright-test`    | Create Playwright e2e tests                  |
+
+## Git
+
+- Always run `git pull` before starting any task to ensure the local branch is up to date.
+- Never create merge commits. Keep a linear Git history.

@@ -1,14 +1,14 @@
 ---
-name: build
+name: deliver-use-case
 description: >
   Orchestrates the full per-use-case pipeline: specification, design, migration,
   implementation, testing, code review, and evaluation. Iterates automatically
-  until all quality gates pass. Use when the user asks to "build a use case",
-  "run the full pipeline", "implement end-to-end", or wants to automate the
-  complete workflow for a use case.
+  until all quality gates pass. Use when the user asks to "deliver a use case",
+  "build a use case", "run the full pipeline", "implement end-to-end", or wants
+  to automate the complete workflow for a use case.
 ---
 
-# Build Use Case Pipeline
+# Deliver Use Case Pipeline
 
 ## Instructions
 
@@ -34,7 +34,7 @@ If any prerequisite is missing, stop and tell the user which `/command` to run f
 - Run more than 3 iteration cycles
 - Modify the specification or design documents during fix iterations (only modify implementation code and tests)
 - Ask the user for input between steps — run autonomously until the pipeline completes or exhausts retries
-- Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/build` is invoked
+- Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/deliver-use-case` is invoked
 
 ## Entity Gate
 
@@ -60,7 +60,7 @@ Missing from prisma/schema.prisma:
 - [entity name]
 
 Run /entity-model to update the entity model, then /prisma-migration to create
-the database migration before re-running /build $ARGUMENTS.
+the database migration before re-running /deliver-use-case $ARGUMENTS.
 ```
 
 ## Pipeline

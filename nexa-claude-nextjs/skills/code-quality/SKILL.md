@@ -1,3 +1,12 @@
+---
+name: code-quality
+description: >
+  Runs ESLint and Prettier on TypeScript/JavaScript files to fix lint errors and
+  enforce consistent formatting. Use when the user asks to "lint", "format code",
+  "run code quality checks", "fix ESLint errors", or mentions code quality,
+  prettier, or eslint.
+---
+
 # Code Quality — ESLint & Prettier
 
 ## When to Apply

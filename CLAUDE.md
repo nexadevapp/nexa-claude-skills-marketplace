@@ -42,6 +42,7 @@ nexa-claude-marketplace/
 │   │   └── plugin.json
 │   ├── .mcp.json                 # context7, Playwright
 │   └── skills/                   # All workflow steps as skills (slash commands)
+│       ├── setup-env-profiles/
 │       ├── prisma-migration/
 │       ├── implement/
 │       ├── vitest-test/
@@ -115,6 +116,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 | Phase        | Skill (slash command)   | Description                                                        |
 |--------------|-------------------------|--------------------------------------------------------------------|
+| Setup        | `/setup-env-profiles`   | Set up local/dev/prod environment profiles with database URLs      |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |

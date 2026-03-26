@@ -45,25 +45,27 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - For **UC-XXX**: Read the use case specification from `docs/use_cases/`
     - For **TT-XXX**: Read the technical task specification from `docs/technical_tasks/`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
-3. Check existing code for patterns and conventions
-4. Implement the NestJS backend:
+3. Read the design artifact from `docs/designs/` (if it exists for this UC). When a design artifact exists, the implementation must match the specified screens, layout, components, states, and navigation flow.
+4. Check existing code for patterns and conventions
+5. Implement the NestJS backend:
     - Create or update DTOs for request/response validation
     - Create or update the service with business logic using Prisma Client
     - Create or update the controller with REST endpoints
     - Register the module if new
-5. Verify the backend compiles successfully
-6. Implement the Next.js frontend:
+6. Verify the backend compiles successfully
+7. Implement the Next.js frontend:
     - Create or update page components
     - Create or update reusable UI components
     - Implement API calls to the NestJS backend
     - Handle loading, error, and empty states
-7. Write unit tests for the implemented logic:
+    - When a design artifact exists, match the specified layout, components, states, and navigation
+8. Write unit tests for the implemented logic:
     - Test NestJS services with mocked Prisma Client
     - Test DTO validation
     - Test frontend components with React Testing Library
     - Run tests with `npx jest --runInBand` to verify they pass
-8. Run code quality checks as described in `nexa-claude-nestjs-nextjs/skills/code-quality/CODE_QUALITY.md`
-9. Verify the full implementation compiles successfully
+9. Run code quality checks as described in `nexa-claude-nestjs-nextjs/skills/code-quality/CODE_QUALITY.md`
+10. Verify the full implementation compiles successfully
 
 ## DoD Check
 

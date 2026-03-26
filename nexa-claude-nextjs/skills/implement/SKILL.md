@@ -46,20 +46,21 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - For **UC-XXX**: Read the use case specification from `docs/use_cases/`
     - For **TT-XXX**: Read the technical task specification from `docs/technical_tasks/`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
-3. Check existing code for patterns and conventions
-4. Implement API route handlers (if needed for client-side fetching):
+3. Read the design artifact from `docs/designs/` (if it exists for this UC). When a design artifact exists, the implementation must match the specified screens, layout, components, states, and navigation flow.
+4. Check existing code for patterns and conventions
+5. Implement API route handlers (if needed for client-side fetching):
     - Create route handlers in `app/api/**/route.ts`
     - Export named functions matching HTTP methods (`GET`, `POST`, `PUT`, `DELETE`)
     - Validate request bodies with zod
     - Use Prisma Client for data access
     - Return `NextResponse.json()` with appropriate status codes
-5. Implement server actions (if needed for form mutations):
+6. Implement server actions (if needed for form mutations):
     - Create actions in `app/actions/` or colocate with the page
     - Mark with `"use server"` directive
     - Validate input with zod
     - Use Prisma Client for data access
     - Call `revalidatePath()` or `revalidateTag()` for cache invalidation
-6. Implement the UI:
+7. Implement the UI:
     - Create or update `page.tsx` and `layout.tsx` files
     - Use server components by default for data fetching with Prisma
     - Use client components (`"use client"`) only for interactivity (forms, event handlers, state)
@@ -67,13 +68,14 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Handle loading states with `loading.tsx`
     - Handle errors with `error.tsx`
     - Handle empty states
-7. Write unit tests for the implemented logic:
+    - When a design artifact exists, match the specified layout, components, states, and navigation
+8. Write unit tests for the implemented logic:
     - Test API route handlers with mocked Prisma Client
     - Test server actions with mocked dependencies
     - Test client components with React Testing Library
     - Run tests with `npx vitest run` to verify they pass
-8. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-9. Verify the implementation compiles successfully with `next build`
+9. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+10. Verify the implementation compiles successfully with `next build`
 
 ## DoD Check
 

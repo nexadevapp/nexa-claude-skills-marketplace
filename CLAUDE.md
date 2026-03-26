@@ -24,7 +24,10 @@ nexa-claude-marketplace/
 │       ├── use-case-diagram/
 │       ├── use-case-spec/
 │       ├── technical-task/
-│       └── prioritize/
+│       ├── prioritize/
+│       ├── frontend-design/
+│       ├── code-review/
+│       └── evaluate/
 ├── nexa-claude-vaadin-jooq/             # Vaadin + jOOQ technology stack plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -81,6 +84,9 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
 | Construction | `/technical-task`     | Create technical task specifications   |
 | Construction | `/prioritize`         | Recommend implementation order         |
+| Construction | `/frontend-design`    | Create screen design specifications    |
+| Verification | `/code-review`        | Independent code review (runs in isolation) |
+| Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
 
 ### Vaadin/jOOQ (stack-specific)
 

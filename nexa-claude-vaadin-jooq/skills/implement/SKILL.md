@@ -43,16 +43,18 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - For **UC-XXX**: Read the use case specification from `docs/use_cases/`
     - For **TT-XXX**: Read the technical task specification from `docs/technical_tasks/`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
-3. Check existing code for patterns and conventions
-4. Implement the data access layer using jOOQ
-5. Verify the data access layer compiles and follows existing patterns
-6. Implement the Vaadin view following existing patterns
-7. Wire up the view with the data access layer
-8. Write unit tests for the implemented logic:
+3. Read the design artifact from `docs/designs/` (if it exists for this UC). When a design artifact exists, the implementation must match the specified screens, layout, components, states, and navigation flow.
+4. Check existing code for patterns and conventions
+5. Implement the data access layer using jOOQ
+6. Verify the data access layer compiles and follows existing patterns
+7. Implement the Vaadin view following existing patterns
+    - When a design artifact exists, match the specified layout, components, states, and navigation
+8. Wire up the view with the data access layer
+9. Write unit tests for the implemented logic:
     - Test data access layer with mocked jOOQ DSLContext
     - Test business logic in isolation
     - Run tests to verify they pass
-9. Verify the full implementation compiles successfully
+10. Verify the full implementation compiles successfully
 
 ## DoD Check
 

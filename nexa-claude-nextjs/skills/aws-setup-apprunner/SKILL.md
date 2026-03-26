@@ -27,12 +27,12 @@ $ARGUMENTS may specify the app name, region, or special requirements.
 1. **Read the project context**:
    - Check the existing Dockerfile to determine the exposed port
    - Check for any existing AWS infrastructure files in `infra/`
+   - **Read `.env.local`** to discover application secret names (keys only). Use the values from `.env.local` as defaults — never hard-code them into the generated script. If `.env.local` does not exist, ask the user to provide the secret names manually.
    - Ask the user for: app name, AWS region (default: `eu-central-1`), AWS account ID
-   - **Ask the user what secrets the application needs** (e.g., `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, API keys). For each secret, collect the environment variable name and a description. These will be prompted for during script execution.
 
 2. **Create the deployment script** at `infra/aws.apprunner/deploy-apprunner.sh`:
    - Interactive prompts for app name, region, account ID, ECR repo, port, CPU/memory, image tag
-   - **Step 1 — Application Secrets**: For each secret the user specified, prompt for the value at runtime and create/update it in AWS Secrets Manager under `<app-name>/<SECRET_NAME>`. Build the IAM policy to grant `secretsmanager:GetSecretValue` on all created secret ARNs. Build the `RuntimeEnvironmentSecrets` map for the App Runner service configuration.
+   - **Step 1 — Application Secrets**: For each secret discovered from `.env.local`, generate an interactive prompt (using `read -p`) that shows the key name and its `.env.local` value as the default — following the same pattern as other params like region and port (e.g., `read -p "DATABASE_URL [postgres://...]: " INPUT; DATABASE_URL=${INPUT:-postgres://...}`). Create/update each secret in AWS Secrets Manager under `<app-name>/<SECRET_NAME>`. Build the IAM policy to grant `secretsmanager:GetSecretValue` on all created secret ARNs. Build the `RuntimeEnvironmentSecrets` map for the App Runner service configuration.
    - **Step 2 — IAM Roles**:
      - Access Role: allows App Runner to pull images from ECR (trust `build.apprunner.amazonaws.com`)
      - Instance Role: allows the container to read secrets at runtime (trust `tasks.apprunner.amazonaws.com`)
@@ -82,7 +82,7 @@ The workflow template uses these placeholders that must be filled in:
 
 ## DO NOT
 
-- Hard-code AWS account IDs, ARNs, or region — always parameterize
+- Hard-code AWS account IDs, ARNs, region, or secret values from `.env.local` — always parameterize as interactive prompts with defaults
 - Store AWS credentials in the workflow — use OIDC federation
 - Create overly permissive IAM policies — scope to least privilege
 - Skip the `--teardown` option — always provide a clean way to remove resources

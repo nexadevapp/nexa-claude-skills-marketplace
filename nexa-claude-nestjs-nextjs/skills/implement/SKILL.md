@@ -62,7 +62,8 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Test DTO validation
     - Test frontend components with React Testing Library
     - Run tests with `npx jest --runInBand` to verify they pass
-8. Verify the full implementation compiles successfully
+8. Run code quality checks as described in `nexa-claude-nestjs-nextjs/skills/code-quality/CODE_QUALITY.md`
+9. Verify the full implementation compiles successfully
 
 ## DoD Check
 

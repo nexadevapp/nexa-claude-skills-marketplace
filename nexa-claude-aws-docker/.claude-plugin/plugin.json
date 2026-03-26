@@ -1,0 +1,10 @@
+{
+  "name": "nexa-claude-aws-docker",
+  "description": "Nexa Agentic Engineering plugin for Docker containerization and AWS deployment",
+  "version": "1.0.0",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  }
+}

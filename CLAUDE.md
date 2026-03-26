@@ -93,12 +93,14 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 ### NestJS/Next.js (stack-specific)
 
-| Phase        | Skill (slash command) | Description                                  |
-|--------------|-----------------------|----------------------------------------------|
-| Construction | `/prisma-migration`   | Create Prisma schema and migrations          |
-| Construction | `/implement`          | Implement use cases or technical tasks using NestJS and Next.js |
-| Construction | `/jest-test`          | Create Jest unit/integration tests           |
-| Construction | `/playwright-test`    | Create Playwright e2e tests                  |
+| Phase        | Skill (slash command)  | Description                                  |
+|--------------|------------------------|----------------------------------------------|
+| Construction | `/prisma-migration`    | Create Prisma schema and migrations          |
+| Construction | `/implement`           | Implement use cases or technical tasks using NestJS and Next.js |
+| Construction | `/jest-test`           | Create Jest unit/integration tests           |
+| Construction | `/playwright-test`     | Create Playwright e2e tests                  |
+| Transition   | `/aws-dockerize`       | Create production-ready Dockerfiles          |
+| Transition   | `/aws-setup-apprunner` | Generate AWS App Runner deployment infrastructure |
 
 ## Git
 

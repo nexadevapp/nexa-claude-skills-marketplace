@@ -30,6 +30,30 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 | API calls         | Within test setup            | Test-specific data   |
 | Manual cleanup    | afterEach hooks              | Remove created data  |
 
+## External Dependencies
+
+Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
+
+Before running Playwright tests, ensure all required dependencies are running:
+
+1. **PostgreSQL** — Start a Docker container if one is not already running:
+    - Check with `docker ps` for an existing postgres container
+    - If none exists, start one using the project's `docker-compose.yml` (e.g., `docker compose up -d`)
+    - If no `docker-compose.yml` exists, start postgres directly:
+      ```bash
+      docker run -d --name postgres-dev \
+        -e POSTGRES_USER=postgres \
+        -e POSTGRES_PASSWORD=postgres \
+        -e POSTGRES_DB=app \
+        -p 5432:5432 \
+        postgres:16
+      ```
+    - Verify the container is healthy before proceeding
+2. **Database migrations** — Run `npx prisma migrate deploy` (or `npx prisma db push`) to ensure the schema is up to date
+3. **Seed data** — Run `npx prisma db seed` if the project has a seed script and baseline data is needed
+4. **Backend server** — Start the NestJS backend if not already running
+5. **Frontend dev server** — Start the Next.js dev server (`npm run dev`) if not already running; Playwright's `webServer` config in `playwright.config.ts` may handle this automatically
+
 ## Template
 
 Use [templates/example.spec.ts](templates/example.spec.ts) as the test structure.
@@ -140,23 +164,25 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Workflow
 
-1. Read the use case specification
-2. Use TodoWrite to create a task for each test scenario
-3. Create test file using the template
-4. For each test:
+1. Start external dependencies as described in **External Dependencies** above
+2. Read the use case specification
+3. Use TodoWrite to create a task for each test scenario
+4. Create test file using the template
+5. For each test:
     - Navigate to the page
     - Wait for content to load
     - Locate elements using accessible selectors (role, label, text)
     - Perform interactions
     - Assert expected outcomes
     - Clean up test data if created during test
-5. Run tests with `npx playwright test` to verify they pass
-6. If a test fails:
+6. Run code quality checks as described in `nexa-claude-nestjs-nextjs/skills/code-quality/CODE_QUALITY.md`
+7. Run tests with `npx playwright test` to verify they pass
+8. If a test fails:
     - Use `npx playwright test --ui` for visual debugging
     - Check that the dev server is running
     - Verify selectors with `page.pause()` for interactive debugging
     - Use `await page.screenshot()` for debugging visual state
-7. Mark todos complete
+9. Mark todos complete
 
 ## Post-Implementation Tracking
 

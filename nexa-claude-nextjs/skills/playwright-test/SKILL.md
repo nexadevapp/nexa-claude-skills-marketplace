@@ -61,6 +61,10 @@ screen it validates.
 - Delete all data in cleanup (only remove data created during the test)
 - Hard-code database connection strings — `DATABASE_URL` is injected by global setup
 - Write tests that contradict the frontend design (e.g., asserting a table when the design specifies cards)
+- **Skip, exclude, or filter out tests** — never use `--grep-invert`, `--grep`, `test.skip()`, `test.fixme()`, or any other mechanism to avoid running tests. All tests must run and pass
+- **Claim tests pass without verifying output** — you must check the actual Playwright output for "X passed" and "0 failed" before declaring success
+- **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
+- **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
 
 ## Test Data Strategy
 
@@ -236,13 +240,19 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Assert expected outcomes
     - Clean up test data if created during test
 8. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-9. Run tests with `npx playwright test` to verify they pass
-10. If a test fails:
+9. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
+10. **Verify the test results — this is mandatory before declaring success:**
+    - The Playwright output must show **0 failed** and the exit code must be **0**
+    - If the output shows failures, timeouts, or errors, the tests **did not pass** — do not claim otherwise
+    - Count the number of passed tests and confirm it matches the number of tests you wrote
+    - If any test is skipped, that counts as a failure — investigate and fix it
+11. If a test fails:
     - Check that Docker is running (Testcontainers requires it)
-    - Use `npx playwright test --ui` for visual debugging
-    - Verify selectors with `page.pause()` for interactive debugging
-    - Use `await page.screenshot()` for debugging visual state
-11. Mark todos complete
+    - Read the error message carefully and fix the root cause in the test or implementation
+    - Re-run `npx playwright test` and go back to step 10
+    - Use `await page.screenshot()` for debugging visual state if needed
+    - Do NOT skip, exclude, or filter out failing tests as a "fix"
+12. Mark todos complete
 
 ## Post-Implementation Tracking
 

@@ -45,6 +45,7 @@ nexa-claude-marketplace/
 │   └── skills/                   # All workflow steps as skills (slash commands)
 │       ├── setup-env-profiles/
 │       ├── prisma-migration/
+│       ├── build-web-middleware/
 │       ├── implement/
 │       ├── vitest-test/
 │       ├── playwright-test/
@@ -120,6 +121,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 |--------------|-------------------------|--------------------------------------------------------------------|
 | Setup        | `/setup-env-profiles`   | Set up local/dev/prod environment profiles with database URLs      |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
+| Construction | `/build-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |

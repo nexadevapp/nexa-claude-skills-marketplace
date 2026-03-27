@@ -30,10 +30,16 @@ translates the relevant wireframe section into a viewable, annotated design refe
 
 ## Output
 
-A single self-contained HTML file: `docs/designs/UC-XXX-design.html`
+A single self-contained **HTML** file: `docs/designs/UC-XXX-design.html`
+
+**CRITICAL: The output MUST be an `.html` file written with the Write tool. Do NOT produce Markdown.
+Do NOT create a `.md` file. The file extension MUST be `.html` and the content MUST start with
+`<!DOCTYPE html>`. If you find yourself writing Markdown syntax (headings with `#`, lists with `-`,
+tables with `|`), STOP — you are producing the wrong format.**
 
 ## DO NOT
 
+- **Produce Markdown** — the output is HTML, never `.md`. No Markdown syntax anywhere in the file.
 - Skip reading the use case specification first
 - Use any external dependencies — no CDN links, no external CSS/JS, no images via URL
 - Use any framework-specific code (no React, no Next.js, no component libraries)
@@ -51,22 +57,30 @@ A single self-contained HTML file: `docs/designs/UC-XXX-design.html`
 
 ### Phase 2 — Inspect the wireframe with Playwright
 
+All screenshots taken during this phase MUST be saved to `docs/snapshots/` using the naming
+convention `UC-XXX-<description>.png` (e.g., `UC-001-overview.png`, `UC-001-form-screen.png`).
+Create the `docs/snapshots/` directory if it does not exist.
+
 3. Open the wireframe in Playwright:
    a. Navigate to the `file://` absolute path of `docs/wireframes/index.html`
    b. Take an **accessibility snapshot** to understand the overall structure and navigation
+   c. Take a **screenshot** (full page) and save it as `docs/snapshots/UC-XXX-wireframe-overview.png`
 4. Navigate to the screen(s) relevant to the use case:
    a. Using the use case specification, identify which screen(s) in the wireframe correspond
       to the use case
    b. Click links, tabs, or navigation elements to reach the relevant screen
-   c. Take a **screenshot** (full page) to capture the visual layout
+   c. Take a **screenshot** (full page) and save it as
+      `docs/snapshots/UC-XXX-<screen-name>.png` to capture the visual layout
    d. Take an **accessibility snapshot** to capture the semantic structure, components,
       and hierarchy
-   e. If the use case spans multiple screens, repeat for each screen
+   e. If the use case spans multiple screens, repeat for each screen with a distinct
+      `<screen-name>` suffix
 5. Close the Playwright browser
 
 ### Phase 3 — Produce the HTML design artifact
 
-6. Create `docs/designs/UC-XXX-design.html` following the HTML structure below
+6. Using the **Write** tool, create `docs/designs/UC-XXX-design.html` following the HTML structure
+   below. The file content MUST be valid HTML starting with `<!DOCTYPE html>` — never Markdown.
 7. For each screen identified in the wireframe:
    - Reproduce the **layout and visual structure** from the wireframe
    - Map **components** to use case steps using `data-uc-step` attributes

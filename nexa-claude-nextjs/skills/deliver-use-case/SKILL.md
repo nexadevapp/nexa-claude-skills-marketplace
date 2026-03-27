@@ -90,6 +90,9 @@ Alternative Flows, Postconditions, and Business Rules sections.
 Read and follow:
 `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/frontend-design/SKILL.md`
 
+Inputs for this step: the use case specification from Step 1, plus any wireframe in `docs/wireframes/`
+matching the use case ID. See the skill's Inputs section for details.
+
 **Verify:** The file `docs/designs/$ARGUMENTS-design.md` exists and contains at least one screen definition.
 
 ---
@@ -118,14 +121,29 @@ If tests fail, fix them and re-run. Do not proceed until all tests pass.
 
 ---
 
-### Step 5: E2E Tests
+### Step 5: E2E Tests (Isolated)
 
-Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`
+Launch an **isolated agent** (using the Agent tool) to write E2E tests from a clean context.
+The agent must NOT have access to implementation reasoning from earlier steps — it works only
+from the specification and design artifacts, so tests validate what was *designed*, not what
+was *built*.
+
+Agent prompt:
+> You are an independent E2E test author. Read and follow the complete instructions in
+> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
+> Write Playwright end-to-end tests for $ARGUMENTS.
+> Your inputs are the use case specification in `docs/use_cases/$ARGUMENTS.md` and the
+> frontend design in `docs/designs/$ARGUMENTS-design.md`. Test scenarios derive from the
+> use case flows; page structure, selectors, and assertions derive from the frontend design's
+> screens, components, and states.
 
 **Verify:** `npx playwright test` passes.
 
-If tests fail, fix them and re-run. Do not proceed until all tests pass.
+**If tests fail:**
+1. Fix the issues in the main context (do not modify the spec or design)
+2. Re-run `npx playwright test` to verify fixes
+3. If tests still fail, re-launch the E2E test agent
+4. Repeat up to 3 times
 
 ---
 

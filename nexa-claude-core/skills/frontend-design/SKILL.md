@@ -18,6 +18,21 @@ The design artifact bridges the gap between the use case specification (what the
 the implementation (how it looks and behaves). It defines screens, layout, components, states,
 and interactions without prescribing implementation technology.
 
+## Inputs
+
+| Input | Location | Required |
+|-------|----------|----------|
+| Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
+| Entity model | `docs/entity_model.md` | If applicable |
+| Wireframe | `docs/wireframes/UC-XXX.*` (image, markdown, PDF, or any format) | No |
+
+When a wireframe exists, it is the **primary visual reference** for screen layout, component
+placement, and navigation structure. The design specification should faithfully translate the
+wireframe's intent into the structured format below, while filling in states, data mappings,
+and interaction details from the use case specification.
+
+When no wireframe is provided, derive the design entirely from the use case specification.
+
 ## DO NOT
 
 - Skip reading the use case specification first
@@ -26,12 +41,15 @@ and interactions without prescribing implementation technology.
 - Omit error states or empty states
 - Create pixel-perfect mockups — focus on structure, content hierarchy, and interaction flow
 - Add screens or interactions not covered by the Main Success Scenario or Alternative Flows
+- Ignore the wireframe layout when one is provided — the wireframe takes precedence over assumptions about layout
 
 ## Workflow
 
 1. Read the use case specification from `docs/use_cases/`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
-3. Identify all screens needed from the Main Success Scenario steps
+3. Check for wireframes in `docs/wireframes/` matching the use case ID (any format)
+4. If a wireframe exists, use it as the visual reference for layout and component decisions
+5. Identify all screens needed from the Main Success Scenario steps
 4. For each screen, define:
    - **Purpose** — what the user accomplishes on this screen
    - **Layout** — content zones and their arrangement (header, main, sidebar, footer)

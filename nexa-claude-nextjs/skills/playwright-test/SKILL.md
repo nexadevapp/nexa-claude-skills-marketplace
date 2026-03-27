@@ -14,6 +14,44 @@ description: >
 
 Create Playwright end-to-end tests for Next.js pages based on the use case $ARGUMENTS. Playwright tests run in a real browser against the running application with a real database via Testcontainers.
 
+## Inputs
+
+| Input | Location | Required |
+|-------|----------|----------|
+| Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
+| Frontend design | `docs/designs/UC-XXX-design.md` | Yes |
+
+The **use case specification** defines *what* the system does (scenarios, alternative flows, business
+rules). The **frontend design** defines *how* it looks and behaves (screens, components, states,
+user actions, navigation flow). Together they determine the test scenarios and assertions:
+
+- **Test scenarios** derive from the use case Main Success Scenario and Alternative Flows
+- **Page structure and selectors** derive from the frontend design's Components and Layout sections
+- **Assertions** derive from the frontend design's States (default, loading, empty, error, success) and Data Displayed sections
+- **User interactions** derive from the frontend design's User Actions (triggers, results)
+- **Navigation expectations** derive from the frontend design's Navigation Flow and Screen Map
+
+If `docs/designs/$ARGUMENTS-design.md` does not exist, stop and tell the user to run `/frontend-design $ARGUMENTS` first.
+
+## Traceability Convention
+
+Every test must be traceable to the use case scenario and frontend design screen it validates.
+
+**`test.describe`** — maps to a screen from the frontend design. Use the format:
+```
+test.describe('Screen: [Screen Name]', () => { ... })
+```
+
+**`test`** — references the use case flow being tested. Use the format:
+```
+test('UC-XXX MSS Steps N-M: [what is verified]', ...)     // Main Success Scenario
+test('UC-XXX AF[n]: [what is verified]', ...)              // Alternative Flow
+test('UC-XXX BR[n]: [what is verified]', ...)              // Business Rule
+```
+
+This convention allows any test failure to be traced back to the exact use case flow and design
+screen it validates.
+
 ## DO NOT
 
 - Access the database or backend services directly in tests
@@ -22,6 +60,7 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 - Assume all list/table items are visible (scroll if needed)
 - Delete all data in cleanup (only remove data created during the test)
 - Hard-code database connection strings — `DATABASE_URL` is injected by global setup
+- Write tests that contradict the frontend design (e.g., asserting a table when the design specifies cards)
 
 ## Test Data Strategy
 
@@ -182,8 +221,9 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Workflow
 
-1. Read the use case specification
-2. Use TodoWrite to create a task for each test scenario
+1. Read the use case specification from `docs/use_cases/`
+2. Read the frontend design from `docs/designs/` — extract screens, components, states, and navigation flow
+3. Use TodoWrite to create a task for each test scenario
 3. Ensure Testcontainers global setup exists (`e2e/global-setup.ts`); create from template if missing
 4. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
 5. Ensure `playwright.config.ts` references the global setup/teardown

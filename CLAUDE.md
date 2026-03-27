@@ -27,7 +27,8 @@ nexa-claude-marketplace/
 │       ├── prioritize/
 │       ├── frontend-design/
 │       ├── code-review/
-│       └── evaluate/
+│       ├── evaluate/
+│       └── report-bug/
 ├── nexa-claude-vaadin-jooq/             # Vaadin + jOOQ technology stack plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -102,6 +103,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/frontend-design`    | Create screen design specifications    |
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
+| Verification | `/report-bug`         | Create structured bug report documents                             |
 
 ### Vaadin/jOOQ (stack-specific)
 

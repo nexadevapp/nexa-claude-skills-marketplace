@@ -2,8 +2,8 @@
 
 ## Instructions
 
-Before and after implementing a use case or technical task, perform the tracking steps below using the `gh` CLI.
-This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked as a GitHub issue and stays in sync with the specification.
+Before and after implementing a use case, technical task, or bug fix, perform the tracking steps below using the `gh` CLI.
+This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), and bug (`BUG-XXX`) is tracked as a GitHub issue and stays in sync with the specification.
 
 ## Git Rules
 
@@ -16,6 +16,7 @@ This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked 
 2. Read the specification:
    - For **UC-XXX**: Read from `docs/use_cases/`
    - For **TT-XXX**: Read from `docs/technical_tasks/`
+   - For **BUG-XXX**: Read from `docs/bugs/`
 3. Compute a hash of the spec file content: `md5 -q <spec-file>` (macOS) or `md5sum <spec-file>` (Linux)
 4. Build the absolute spec URL for the issue body:
    ```
@@ -24,7 +25,7 @@ This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked 
    SPEC_URL="${REPO_URL}/blob/${DEFAULT_BRANCH}/<relative-path-to-spec>"
    ```
 5. Search for an existing GitHub issue:
-   - `gh issue list --search "in:title <id>" --state all` (where `<id>` is `UC-XXX` or `TT-XXX`)
+   - `gh issue list --search "in:title <id>" --state all` (where `<id>` is `UC-XXX`, `TT-XXX`, or `BUG-XXX`)
 6. If no issue exists, create one:
    - Title: `<id>: <name>` (e.g., `UC-003: Place Order` or `TT-001: Set Up Dev Profile`)
    - Body format for **UC-XXX**:
@@ -57,6 +58,24 @@ This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked 
 
      <!-- spec-hash: <computed-hash> -->
      ```
+   - Body format for **BUG-XXX**:
+     ```
+     ## <bug-id>: <title>
+
+     <description from the bug report>
+
+     **Severity:** <severity from the bug report>
+     **Discovered In:** <discovered in from the bug report>
+
+     **Acceptance criteria:**
+     - [ ] Actual behavior resolved
+     - [ ] Expected behavior achieved
+     - [ ] Regression test added
+
+     **Spec:** [`<relative-path-to-spec>`](<SPEC_URL>)
+
+     <!-- spec-hash: <computed-hash> -->
+     ```
    - `gh issue create --title "<id>: <name>" --body "<body>"`
 7. If a **closed** issue already exists, ask the user:
    - **Reopen** the existing issue (for rework or bug fix)
@@ -77,6 +96,6 @@ This ensures every use case (`UC-XXX`) and technical task (`TT-XXX`) is tracked 
    - `gh issue close <issue-number>`
 5. If not all items are checked, leave the issue open and inform the user what remains
 6. Commit the implementation with a message prefixed by the ID:
-   - Format: `UC-XXX: <description>` or `TT-XXX: <description>` (XXX is always 3 digits, zero-padded)
-   - Examples: `UC-003: Implement place order page and API`, `TT-001: Set up dev profile with seed data`
-   - Always use the ID from the specification (e.g., `UC-001`, `TT-012`)
+   - Format: `UC-XXX: <description>`, `TT-XXX: <description>`, or `BUG-XXX: <description>` (XXX is always 3 digits, zero-padded)
+   - Examples: `UC-003: Implement place order page and API`, `TT-001: Set up dev profile with seed data`, `BUG-003: Fix discount code not applied to order total`
+   - Always use the ID from the specification (e.g., `UC-001`, `TT-012`, `BUG-003`)

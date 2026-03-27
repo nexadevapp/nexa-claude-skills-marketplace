@@ -12,7 +12,7 @@ description: >
 
 ## Instructions
 
-Create Playwright end-to-end tests for Next.js pages based on the use case $ARGUMENTS. Playwright tests run in a real browser against the running application.
+Create Playwright end-to-end tests for Next.js pages based on the use case $ARGUMENTS. Playwright tests run in a real browser against the running application with a real database via Testcontainers.
 
 ## DO NOT
 
@@ -21,6 +21,7 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 - Use hard-coded delays (`page.waitForTimeout`) instead of proper waits
 - Assume all list/table items are visible (scroll if needed)
 - Delete all data in cleanup (only remove data created during the test)
+- Hard-code database connection strings — `DATABASE_URL` is injected by global setup
 
 ## Test Data Strategy
 
@@ -34,28 +35,46 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 
 Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
-Before running Playwright tests, ensure all required dependencies are running:
+## Testcontainers Global Setup
 
-1. **PostgreSQL** — Start a Docker container if one is not already running:
-    - Check with `docker ps` for an existing postgres container
-    - If none exists, start one using the project's `docker-compose.yml` (e.g., `docker compose up -d`)
-    - If no `docker-compose.yml` exists, start postgres directly:
-      ```bash
-      docker run -d --name postgres-dev \
-        -e POSTGRES_USER=postgres \
-        -e POSTGRES_PASSWORD=postgres \
-        -e POSTGRES_DB=app \
-        -p 5432:5432 \
-        postgres:16
-      ```
-    - Verify the container is healthy before proceeding
-2. **Database migrations** — Run `npx prisma migrate deploy` (or `npx prisma db push`) to ensure the schema is up to date
-3. **Seed data** — Run `npx prisma db seed` if the project has a seed script and baseline data is needed
-4. **Dev server** — Start the Next.js dev server (`npm run dev`) if not already running; Playwright's `webServer` config in `playwright.config.ts` may handle this automatically
+Before writing tests, ensure the project has a global setup file that starts a PostgreSQL
+Testcontainer, runs Prisma migrations, seeds the database, and starts the Next.js dev server.
 
-## Template
+If `e2e/global-setup.ts` does not exist, create it using [templates/global-setup.ts](templates/global-setup.ts).
 
-Use [templates/example.spec.ts](templates/example.spec.ts) as the test structure.
+Ensure `playwright.config.ts` references the global setup and does **not** use `webServer`
+(the global setup handles both the database and the dev server):
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  globalSetup: './e2e/global-setup.ts',
+  globalTeardown: './e2e/global-teardown.ts',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
+```
+
+## Templates
+
+- Global setup: [templates/global-setup.ts](templates/global-setup.ts)
+- Global teardown: [templates/global-teardown.ts](templates/global-teardown.ts)
+- Test example: [templates/example.spec.ts](templates/example.spec.ts)
 
 ## Common Patterns
 
@@ -163,25 +182,27 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Workflow
 
-1. Start external dependencies as described in **External Dependencies** above
-2. Read the use case specification
-3. Use TodoWrite to create a task for each test scenario
-4. Create test file using the template
-5. For each test:
+1. Read the use case specification
+2. Use TodoWrite to create a task for each test scenario
+3. Ensure Testcontainers global setup exists (`e2e/global-setup.ts`); create from template if missing
+4. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
+5. Ensure `playwright.config.ts` references the global setup/teardown
+6. Create test file using the template
+7. For each test:
     - Navigate to the page
     - Wait for content to load
     - Locate elements using accessible selectors (role, label, text)
     - Perform interactions
     - Assert expected outcomes
     - Clean up test data if created during test
-6. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-7. Run tests with `npx playwright test` to verify they pass
-8. If a test fails:
+8. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+9. Run tests with `npx playwright test` to verify they pass
+10. If a test fails:
+    - Check that Docker is running (Testcontainers requires it)
     - Use `npx playwright test --ui` for visual debugging
-    - Check that the dev server is running
     - Verify selectors with `page.pause()` for interactive debugging
     - Use `await page.screenshot()` for debugging visual state
-9. Mark todos complete
+11. Mark todos complete
 
 ## Post-Implementation Tracking
 

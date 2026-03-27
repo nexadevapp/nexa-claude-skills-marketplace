@@ -1,7 +1,7 @@
 ---
 name: setup-env-profiles
 description: >
-  Sets up environment profiles (local, dev, prod) with database connection strings
+  Sets up environment profiles (local, dev, prod, test) with database connection strings
   and environment-specific configuration. Interactive — prompts the user for each
   profile's database URL. Use when the user asks to "set up environments", "configure
   profiles", "create .env files", "set up local/dev/prod", or mentions environment
@@ -12,7 +12,7 @@ description: >
 
 ## Instructions
 
-Set up three environment profiles — **local**, **dev**, and **prod** — each with its own
+Set up four environment profiles — **local**, **dev**, **prod**, and **test** — each with its own
 `.env` file and database connection string.
 
 This skill is **interactive**. Prompt the user for input at each step using the
@@ -37,15 +37,17 @@ Check that `.gitignore` includes `.env*` entries. If not, add them before creati
 .env.local
 .env.development
 .env.production
+.env.test
 ```
 
 ## Profiles and File Mapping
 
-| Profile | File                 | Purpose                        |
-|---------|----------------------|--------------------------------|
-| local   | `.env.local`         | Local machine development      |
-| dev     | `.env.development`   | Shared development / staging   |
-| prod    | `.env.production`    | Production                     |
+| Profile | File                 | Purpose                                      |
+|---------|----------------------|----------------------------------------------|
+| local   | `.env.local`         | Local machine development                    |
+| dev     | `.env.development`   | Shared development / staging                 |
+| prod    | `.env.production`    | Production                                   |
+| test    | `.env.test`          | Integration and e2e tests (Testcontainers)   |
 
 ## Workflow
 
@@ -108,7 +110,39 @@ Ask the user:
 
 Wait for the user to provide the connection string.
 
-### Step 5: Additional Environment Variables
+### Step 5: Test Profile (`.env.test`)
+
+This profile is **not interactive** — it is auto-generated for Testcontainers-driven
+integration and e2e tests.
+
+Generate `.env.test` with the following content:
+
+```env
+# =============================================================================
+# Test Environment Profile (Testcontainers)
+# =============================================================================
+# DATABASE_URL is set dynamically by Testcontainers global setup at test runtime.
+# Do not set DATABASE_URL here — it will be overridden by the test harness.
+
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Auth (test-only values — never use in production)
+AUTH_SECRET="test-secret-do-not-use-in-production"
+AUTH_URL="http://localhost:3000"
+```
+
+Only include `AUTH_SECRET` and `AUTH_URL` if the project uses next-auth / Auth.js.
+Add any other environment variables the project needs with safe test-only defaults.
+
+Inform the user:
+
+> The **test** profile does not include a `DATABASE_URL` because Testcontainers
+> provides it dynamically at test runtime. Vitest and Playwright global setup files
+> start a PostgreSQL container, run migrations, and inject `DATABASE_URL` into
+> `process.env` before tests execute.
+
+### Step 6: Additional Environment Variables
 
 After all three database URLs are collected, check if the project uses any of
 the following and ask the user to provide values per profile if applicable:
@@ -120,7 +154,7 @@ the following and ask the user to provide values per profile if applicable:
 For any variables already present in existing `.env*` files, show current values
 and ask whether to keep or update them.
 
-### Step 6: Write Files
+### Step 7: Write Files
 
 For each profile, generate the `.env` file with this structure:
 
@@ -148,7 +182,7 @@ Only include variables that are relevant to the project. Comment out optional
 variables that were not provided rather than omitting them, so the user knows
 they are available.
 
-### Step 7: Update Prisma Schema (if needed)
+### Step 8: Update Prisma Schema (if needed)
 
 If `prisma/schema.prisma` exists and does not already reference the `DIRECT_URL`
 environment variable in the datasource block, update it:
@@ -161,18 +195,19 @@ datasource db {
 }
 ```
 
-### Step 8: Summary
+### Step 9: Summary
 
 Present a summary of what was created:
 
 ```
 ## Environment Profiles Created
 
-| Profile | File               | Database                          |
-|---------|--------------------|-----------------------------------|
-| local   | .env.local         | <short description, e.g. Docker>  |
-| dev     | .env.development   | <short description, e.g. Supabase>|
-| prod    | .env.production    | <short description, e.g. RDS>     |
+| Profile | File               | Database                                |
+|---------|--------------------|-----------------------------------------|
+| local   | .env.local         | <short description, e.g. Docker>        |
+| dev     | .env.development   | <short description, e.g. Supabase>      |
+| prod    | .env.production    | <short description, e.g. RDS>           |
+| test    | .env.test          | Testcontainers (dynamic at runtime)     |
 
 ### Next Steps
 - Run `npx prisma migrate dev` to apply migrations against your local database

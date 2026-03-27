@@ -2,10 +2,10 @@
 name: playwright-test
 description: >
   Creates Playwright browser-based end-to-end tests for Next.js pages covering
-  navigation, form interactions, data display, and user workflows. Use when the
-  user asks to "write Playwright tests", "create e2e tests", "write integration
-  tests", "test in the browser", or mentions end-to-end testing, browser tests,
-  UI integration tests, or Playwright for Next.js.
+  complete user journeys from start to finish. Use when the user asks to "write
+  Playwright tests", "create e2e tests", "write integration tests", "test in
+  the browser", or mentions end-to-end testing, browser tests, UI integration
+  tests, or Playwright for Next.js.
 ---
 
 # Playwright Test
@@ -13,6 +13,11 @@ description: >
 ## Instructions
 
 Create Playwright end-to-end tests for Next.js pages based on the use case $ARGUMENTS. Playwright tests run in a real browser against the running application with a real database via Testcontainers.
+
+**End-to-end means end-to-end.** Each test walks the complete user journey from entry point to
+final outcome — exactly as a real user would. Tests navigate by clicking links and buttons, not
+by jumping to internal URLs. If a real user must click three screens to reach a form, the test
+clicks through those same three screens.
 
 ## Inputs
 
@@ -33,31 +38,53 @@ user actions, navigation flow). Together they determine the test scenarios and a
 
 If `docs/designs/$ARGUMENTS-design.md` does not exist, stop and tell the user to run `/frontend-design $ARGUMENTS` first.
 
+## Test Philosophy: Journeys, Not Fragments
+
+The purpose of E2E tests is to verify that the **complete user journey works end-to-end**. Each
+test represents one path through the use case — either the Main Success Scenario or an
+Alternative Flow.
+
+**How many tests per use case:**
+- **1 test** for the Main Success Scenario (the happy path, all steps start to finish)
+- **1 test per Alternative Flow** that diverges meaningfully from the MSS
+- Business rules are verified **inline** within the journey they belong to, not as separate tests
+
+A typical use case produces **3–8 tests total**, not dozens.
+
+**What makes it E2E:**
+- The test starts at the application's entry point (e.g., landing page, login screen)
+- Every navigation happens through UI interactions (clicks, form submissions) — never `page.goto()` to internal pages
+- The test verifies intermediate states along the way, not just the final outcome
+- The test ends with a verifiable outcome (data visible, confirmation shown, redirect happened)
+
+**`page.goto()` is only used ONCE per test** — to open the application entry point (e.g., `page.goto('/')` or `page.goto('/login')`). All subsequent navigation must happen through the UI.
+
 ## Traceability Convention
 
-Every test must be traceable to the use case scenario and frontend design screen it validates.
-
-**`test.describe`** — maps to a screen from the frontend design. Use the format:
+**`test.describe`** — one describe block per use case:
 ```
-test.describe('Screen: [Screen Name]', () => { ... })
+test.describe('UC-XXX: [Use Case Name]', () => { ... })
 ```
 
-**`test`** — references the use case flow being tested. Use the format:
+**`test`** — one test per complete journey:
 ```
-test('UC-XXX MSS Steps N-M: [what is verified]', ...)     // Main Success Scenario
-test('UC-XXX AF[n]: [what is verified]', ...)              // Alternative Flow
-test('UC-XXX BR[n]: [what is verified]', ...)              // Business Rule
+test('MSS: [end-to-end journey description]', ...)          // Main Success Scenario
+test('AF[n]: [end-to-end journey description]', ...)         // Alternative Flow
 ```
 
-This convention allows any test failure to be traced back to the exact use case flow and design
-screen it validates.
+Each test name describes the complete journey, not an individual step. For example:
+- Good: `'MSS: user registers, verifies email, and lands on dashboard'`
+- Bad: `'MSS Steps 1-2: displays registration form'`
 
 ## DO NOT
 
+- **Navigate with `page.goto()` to internal pages** — only use `page.goto()` once per test to open the entry point. All other navigation must happen through clicking links, buttons, and submitting forms. This is the most important rule: if you bypass navigation, you are not testing E2E
+- **Write one test per step or per screen** — each test must cover the full journey. A test that only checks "form displays correctly" is not an E2E test
+- **Create separate tests for business rules** — verify business rules inline within the journey where they apply
+- **Run tests on multiple browsers** — use Chromium only. The `playwright.config.ts` must have exactly one project
 - Access the database or backend services directly in tests
 - Skip waiting for page loads or network requests to complete
 - Use hard-coded delays (`page.waitForTimeout`) instead of proper waits
-- Assume all list/table items are visible (scroll if needed)
 - Delete all data in cleanup (only remove data created during the test)
 - Hard-code database connection strings — `DATABASE_URL` is injected by global setup
 - Write tests that contradict the frontend design (e.g., asserting a table when the design specifies cards)
@@ -86,7 +113,10 @@ Testcontainer, runs Prisma migrations, seeds the database, and starts the Next.j
 If `e2e/global-setup.ts` does not exist, create it using [templates/global-setup.ts](templates/global-setup.ts).
 
 Ensure `playwright.config.ts` references the global setup and does **not** use `webServer`
-(the global setup handles both the database and the dev server):
+(the global setup handles both the database and the dev server).
+
+**Single browser only** — use Chromium. Do NOT add Firefox or WebKit projects. Cross-browser
+testing is not the purpose of E2E tests; verifying user journeys is.
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
@@ -95,10 +125,10 @@ export default defineConfig({
   testDir: './e2e',
   globalSetup: './e2e/global-setup.ts',
   globalTeardown: './e2e/global-teardown.ts',
-  fullyParallel: true,
+  fullyParallel: false, // E2E journeys may share state; run sequentially
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1, // one worker — journeys are sequential
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3000',
@@ -109,6 +139,7 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    // Do NOT add firefox or webkit — single browser only for E2E
   ],
 });
 ```
@@ -121,90 +152,74 @@ export default defineConfig({
 
 ## Common Patterns
 
-### Navigate to Page
+### Entry Point — the only `page.goto()` in the test
 
 ```typescript
-await page.goto('/examples');
+// Start at the application entry point — the ONLY page.goto() allowed
+await page.goto('/');
+await page.waitForLoadState('networkidle');
 ```
 
-### Wait for Content
+### Navigate Through the UI (never via URL)
 
 ```typescript
-// Wait for specific element
-await page.waitForSelector('table tbody tr');
-
-// Wait for network idle
+// Click a navigation link to reach the next screen
+await page.getByRole('link', { name: 'Items' }).click();
 await page.waitForLoadState('networkidle');
 
-// Wait for API response
-await page.waitForResponse('**/api/examples');
+// Click a button to open a form/modal
+await page.getByRole('button', { name: 'Add New' }).click();
+
+// Click a table row to navigate to detail
+await page.locator('table tbody tr').first().click();
+await page.waitForLoadState('networkidle');
+
+// Verify you arrived at the expected screen
+await expect(page.getByRole('heading')).toContainText('Item Details');
 ```
 
-### Table/List Operations
+### Verify Intermediate State Along the Journey
 
 ```typescript
-// Count rows
+// After navigating to the list screen, verify it loaded correctly
 const rows = page.locator('table tbody tr');
+await expect(rows.first()).toBeVisible();
 await expect(rows).toHaveCount(10);
 
-// Get cell text
-const firstCell = rows.first().locator('td').first();
-await expect(firstCell).toHaveText('Expected Value');
-
-// Click a row
-await rows.first().click();
+// Then continue the journey...
+await page.getByRole('button', { name: 'Create' }).click();
 ```
 
 ### Form Interactions
 
 ```typescript
-// Fill text field
 await page.getByLabel('Name').fill('Test Value');
-
-// Select from dropdown
 await page.getByLabel('Category').selectOption('option-1');
-
-// Check checkbox
 await page.getByLabel('Active').check();
-
-// Click submit button
 await page.getByRole('button', { name: 'Save' }).click();
+await page.waitForLoadState('networkidle');
 ```
 
-### Navigation and Routing
+### Verify Final Outcome
 
 ```typescript
-// Click a link
-await page.getByRole('link', { name: 'Details' }).click();
+// After form submission, verify the result is visible
+await expect(page.getByText('Item created successfully')).toBeVisible();
+await expect(page.locator('table tbody tr')).toContainText(['Test Value']);
+```
 
-// Verify URL changed
-await expect(page).toHaveURL('/examples/123');
+### Cleanup After Test
 
-// Go back
-await page.goBack();
+```typescript
+// Clean up test data via API in afterEach or at end of test
+await page.request.delete(`/api/examples/${createdId}`);
 ```
 
 ### Dialog Interactions
 
 ```typescript
-// Handle confirm dialog
 page.on('dialog', dialog => dialog.accept());
-
-// Modal dialog
 await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
-```
-
-### API Interaction in Tests
-
-```typescript
-// Create test data via API
-const response = await page.request.post('/api/examples', {
-  data: { name: 'Test Item', description: 'Created by test' },
-});
-const created = await response.json();
-
-// Clean up after test
-await page.request.delete(`/api/examples/${created.id}`);
 ```
 
 ## Assertions Reference
@@ -227,32 +242,38 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 1. Read the use case specification from `docs/use_cases/`
 2. Read the frontend design from `docs/designs/` — extract screens, components, states, and navigation flow
-3. Use TodoWrite to create a task for each test scenario
-3. Ensure Testcontainers global setup exists (`e2e/global-setup.ts`); create from template if missing
-4. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
-5. Ensure `playwright.config.ts` references the global setup/teardown
-6. Create test file using the template
-7. For each test:
-    - Navigate to the page
-    - Wait for content to load
-    - Locate elements using accessible selectors (role, label, text)
-    - Perform interactions
-    - Assert expected outcomes
+3. **Plan the journeys** — map each test to a complete path through the application:
+    - One test for the MSS: entry point → each screen in sequence → final outcome
+    - One test per AF that diverges from the MSS
+    - Note the entry point URL (the only `page.goto()` allowed) and every UI interaction needed to complete each journey
+    - Identify which business rules are verified inline within each journey
+4. Use TodoWrite to create a task for each journey test (expect 3–8 tests total, not dozens)
+5. Ensure Testcontainers global setup exists (`e2e/global-setup.ts`); create from template if missing
+6. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
+7. Ensure `playwright.config.ts` references the global setup/teardown and has **only Chromium** (one project)
+8. Create test file using the template
+9. For each journey test:
+    - `page.goto()` to the entry point (the **only** goto in the test)
+    - Navigate through each screen by clicking links, buttons, and submitting forms
+    - Verify intermediate states along the way (page loaded, data displayed, form visible)
+    - Perform the key interactions (fill forms, click actions, confirm dialogs)
+    - Assert the final outcome (success message, data in list, redirect to expected page)
     - Clean up test data if created during test
-8. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-9. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
-10. **Verify the test results — this is mandatory before declaring success:**
+10. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+11. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
+12. **Verify the test results — this is mandatory before declaring success:**
     - The Playwright output must show **0 failed** and the exit code must be **0**
     - If the output shows failures, timeouts, or errors, the tests **did not pass** — do not claim otherwise
     - Count the number of passed tests and confirm it matches the number of tests you wrote
     - If any test is skipped, that counts as a failure — investigate and fix it
-11. If a test fails:
+    - **If a test failure reveals a route mismatch** (e.g., test expects `/register` but app uses `/sign-up`), this means the test is not navigating through the UI — fix the test to click through the real navigation instead of hardcoding URLs
+13. If a test fails:
     - Check that Docker is running (Testcontainers requires it)
     - Read the error message carefully and fix the root cause in the test or implementation
-    - Re-run `npx playwright test` and go back to step 10
+    - Re-run `npx playwright test` and go back to step 12
     - Use `await page.screenshot()` for debugging visual state if needed
     - Do NOT skip, exclude, or filter out failing tests as a "fix"
-12. Mark todos complete
+14. Mark todos complete
 
 ## Post-Implementation Tracking
 

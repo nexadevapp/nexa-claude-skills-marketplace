@@ -34,24 +34,145 @@ Create Playwright end-to-end tests for Next.js pages based on the use case $ARGU
 
 Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
-Before running Playwright tests, ensure all required dependencies are running:
+### Automated Preflight (Recommended)
 
-1. **PostgreSQL** — Start a Docker container if one is not already running:
-    - Check with `docker ps` for an existing postgres container
-    - If none exists, start one using the project's `docker-compose.yml` (e.g., `docker compose up -d`)
-    - If no `docker-compose.yml` exists, start postgres directly:
-      ```bash
-      docker run -d --name postgres-dev \
-        -e POSTGRES_USER=postgres \
-        -e POSTGRES_PASSWORD=postgres \
-        -e POSTGRES_DB=app \
-        -p 5432:5432 \
-        postgres:16
-      ```
-    - Verify the container is healthy before proceeding
-2. **Database migrations** — Run `npx prisma migrate deploy` (or `npx prisma db push`) to ensure the schema is up to date
-3. **Seed data** — Run `npx prisma db seed` if the project has a seed script and baseline data is needed
-4. **Dev server** — Start the Next.js dev server (`npm run dev`) if not already running; Playwright's `webServer` config in `playwright.config.ts` may handle this automatically
+Run the preflight skill before e2e tests:
+
+```
+/preflight
+```
+
+This automatically handles all dependency setup. See `nexa-claude-nextjs/skills/preflight/SKILL.md`.
+
+### Manual Dependency Setup
+
+If running tests manually without preflight:
+
+#### 1. PostgreSQL — Start Test Database
+
+```bash
+# Check for existing container
+docker ps --filter "name=postgres" --format "{{.Names}}"
+
+# If no container, use docker-compose.test.yml (recommended)
+docker compose -f docker-compose.test.yml up -d
+
+# Or start directly
+docker run -d --name postgres-test \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=test \
+  -p 5432:5432 \
+  --health-cmd="pg_isready -U postgres" \
+  --health-interval=5s \
+  --health-timeout=5s \
+  --health-retries=5 \
+  postgres:16
+
+# Wait for healthy status
+docker inspect --format='{{.State.Health.Status}}' postgres-test
+```
+
+#### 2. Database Migrations
+
+```bash
+npx prisma migrate deploy
+```
+
+#### 3. Seed Data
+
+```bash
+# Only if seed script exists in package.json
+npx prisma db seed
+```
+
+#### 4. Dev Server
+
+Start manually or let Playwright's webServer config handle it:
+
+```bash
+npm run dev
+```
+
+### webServer Configuration
+
+Ensure `playwright.config.ts` has proper webServer configuration. Use the template at
+[templates/playwright.config.partial.ts](../preflight/templates/playwright.config.partial.ts):
+
+```typescript
+webServer: {
+  command: 'npm run dev',
+  url: 'http://localhost:3000',
+  timeout: 120 * 1000,
+  reuseExistingServer: !process.env.CI,
+  stdout: 'pipe',
+  stderr: 'pipe',
+}
+```
+
+Key settings:
+- `timeout: 120000` — 2 minutes for slow cold starts
+- `reuseExistingServer: !process.env.CI` — Reuse in dev, fresh in CI
+- `stdout/stderr: 'pipe'` — Capture output for debugging
+
+### Docker Compose Template
+
+Copy [templates/docker-compose.test.yml](templates/docker-compose.test.yml) to your project root for
+consistent test database configuration.
+
+## Test Cleanup Strategy
+
+**Reset database to seed state BEFORE running tests**, not just after. This ensures consistent
+starting conditions regardless of previous test failures.
+
+### Pre-Test Cleanup
+
+Add to your test setup or run manually before `npx playwright test`:
+
+```bash
+# Reset database to migration baseline
+npx prisma migrate reset --force --skip-seed
+
+# Re-apply seed data for consistent baseline
+npx prisma db seed
+```
+
+Or in a global setup file (`playwright/global-setup.ts`):
+
+```typescript
+import { execSync } from 'child_process';
+
+async function globalSetup() {
+  console.log('🧹 Resetting database to seed state...');
+  execSync('npx prisma migrate reset --force --skip-seed', { stdio: 'inherit' });
+  execSync('npx prisma db seed', { stdio: 'inherit' });
+  console.log('✅ Database ready');
+}
+
+export default globalSetup;
+```
+
+Register in `playwright.config.ts`:
+
+```typescript
+export default defineConfig({
+  globalSetup: './playwright/global-setup.ts',
+  // ...
+});
+```
+
+### Per-Test Cleanup
+
+For data created during individual tests, clean up in `afterEach`:
+
+```typescript
+test.afterEach(async ({ page }) => {
+  // Delete only data created by this test
+  // Use API calls or direct cleanup
+});
+```
+
+**DO NOT** delete all data in cleanup — only remove test-specific data.
 
 ## Template
 

@@ -1,0 +1,32 @@
+version: '3.8'
+
+# Test database configuration for Playwright e2e tests
+# Usage: docker compose -f docker-compose.test.yml up -d
+
+services:
+  postgres-test:
+    image: postgres:16
+    container_name: postgres-test
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    volumes:
+      # Persist data between test runs (optional - remove for ephemeral)
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d test']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres-test-data:
+    driver: local
+
+# Connection string for .env.test:
+# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test?schema=public"

@@ -118,6 +118,23 @@ If tests fail, fix them and re-run. Do not proceed until all tests pass.
 
 ---
 
+### Step 4.5: Environment Preflight
+
+**Before running e2e tests, verify the test environment is ready.**
+
+Read and follow:
+`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/preflight/SKILL.md`
+
+**Verify:**
+1. Docker daemon is running
+2. PostgreSQL container is healthy
+3. Migrations have been applied
+4. Dev server responds at `http://localhost:3000`
+
+If preflight fails, fix the reported issue before proceeding. Do not skip this step.
+
+---
+
 ### Step 5: E2E Tests
 
 Read and follow:

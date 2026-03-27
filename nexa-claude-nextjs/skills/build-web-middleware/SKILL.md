@@ -359,18 +359,89 @@ Comment out variables that need user-provided values with a `# TODO:` prefix.
 If `.env.example` exists, add the new variables there as well (without values) so other
 developers know which variables are required.
 
-### Step 7: Verify
+### Step 7: Write Unit Tests
+
+Create unit tests for the middleware modules. Focus on pure functions with clear
+inputs/outputs — these give real regression value without maintenance burden.
+
+Place test files colocated with the source:
+
+| Source File              | Test File                                |
+|--------------------------|------------------------------------------|
+| `lib/auth/headers.ts`    | `lib/auth/__tests__/headers.test.ts`    |
+| `lib/auth/logger.ts`     | `lib/auth/__tests__/logger.test.ts`     |
+| `lib/auth/middleware.ts`  | `lib/auth/__tests__/middleware.test.ts` |
+
+**Do not** create a test file for `constants.ts` — it contains static data, not logic.
+Testing that an array contains specific values just creates a test that breaks on every
+intentional change without catching actual bugs.
+
+**Do not** create a unit test for the root `middleware.ts` function — it relies heavily on
+`NextRequest`/`NextResponse` objects that are complex to mock correctly, making these tests
+brittle. The middleware routing logic is more reliably validated by Playwright e2e tests.
+
+#### 7a. `headers.test.ts` — Security Headers
+
+Test the `securityHeaders()` function:
+
+- Returns all required security headers (`Content-Security-Policy`, `X-Frame-Options`,
+  `X-Content-Type-Options`, `Referrer-Policy`, `X-DNS-Prefetch-Control`, `Permissions-Policy`)
+- `Strict-Transport-Security` is present only when `NODE_ENV=production`
+- `Strict-Transport-Security` is absent when `NODE_ENV=development`
+- Header values match the expected defaults
+
+#### 7b. `logger.test.ts` — Structured Logger
+
+Test the `middlewareLogger` object:
+
+- `debug` emits a JSON string to `console.debug` with correct fields (`timestamp`, `level`,
+  `source`, `path`, `method`, `message`)
+- `warn` and `error` emit to `console.warn` and `console.error` respectively
+- `debug` is suppressed when `NODE_ENV=production`
+- `debug` is emitted when `NODE_ENV` is not `production`
+- Additional context fields (e.g. `userId`, `redirectTo`) are included in the output
+- Mock `console` methods with `vi.spyOn` and parse the logged JSON to assert field values
+
+#### 7c. `middleware.test.ts` (lib/auth) — Session Helpers
+
+Test the auth helper functions. The test setup depends on the auth strategy chosen in Step 3:
+
+- **Custom JWT (`jose`)** — use `jose` to create real test tokens (valid, expired, wrong-signature) signed with a test secret. Set `AUTH_SECRET` via `vi.stubEnv`
+- **NextAuth.js** — mock `getToken()` from `next-auth/jwt` to return valid/null/expired payloads
+- **Lucia** — mock the session cookie decoder to return valid/null sessions
+- **External provider** — mock the provider SDK's token verification function
+
+Regardless of strategy, test these behaviors:
+
+- `getSessionFromRequest` returns a valid session when a valid token/cookie is present
+- `getSessionFromRequest` returns `null` when no token is present
+- `getSessionFromRequest` returns `null` when the token is expired
+- `getSessionFromRequest` returns `null` when the token signature is invalid
+- `getSessionFromRequest` never throws (returns `null` on any error)
+- `isAuthenticated` returns `true` for a valid, non-expired session
+- `isAuthenticated` returns `false` for `null` or expired sessions
+- `hasRole` returns `true` when the session contains the required role
+- `hasRole` returns `false` when the session lacks the required role
+
+### Step 8: Verify
 
 1. Run `npx next build` to verify the middleware compiles and is Edge-compatible
 2. Verify the `matcher` config excludes `_next/static`, `_next/image`, and static file extensions
 3. Verify that `middleware.ts` exports are correct (named export `middleware` + `config`)
 4. Verify that no Prisma Client imports exist in `middleware.ts` or any file it imports
-5. Create a minimal smoke test: describe to the user how to manually verify:
+5. Run all existing tests to ensure the middleware does not break anything:
+   - **Unit tests** — run `npx vitest run` (includes the new middleware unit tests from Step 7)
+   - **Integration tests** — if integration test files exist (e.g. `**/*.integration.test.ts`), run them
+   - **End-to-end tests** — if Playwright is configured (`playwright.config.ts` exists), run `npx playwright test`
+   - If any test fails, fix the issue before proceeding. In retrofit mode, test failures likely
+     indicate routes that need the auth setup from the migration checklist — note these in the
+     summary but do not suppress or skip the tests
+6. Create a minimal smoke test: describe to the user how to manually verify:
    - Visit a protected route (e.g. `/dashboard`) without being logged in → should redirect to login
    - Visit a public route (e.g. `/`) → should load normally
    - Check response headers in browser DevTools → security headers should be present
 
-### Step 8: Summary
+### Step 9: Summary
 
 Present a summary of what was created:
 
@@ -381,13 +452,16 @@ Present a summary of what was created:
 <chosen strategy>
 
 ### Files Created/Updated
-| File                     | Purpose                                |
-|--------------------------|----------------------------------------|
-| middleware.ts            | Main middleware entry point (Edge)     |
-| lib/auth/middleware.ts   | Stateless session validation helpers   |
-| lib/auth/constants.ts   | Route rules and auth constants         |
-| lib/auth/headers.ts     | Security headers (including CSP)       |
-| lib/auth/logger.ts      | Structured middleware logger (Edge)    |
+| File                                     | Purpose                                |
+|------------------------------------------|----------------------------------------|
+| middleware.ts                            | Main middleware entry point (Edge)     |
+| lib/auth/middleware.ts                   | Stateless session validation helpers   |
+| lib/auth/constants.ts                    | Route rules and auth constants         |
+| lib/auth/headers.ts                      | Security headers (including CSP)       |
+| lib/auth/logger.ts                       | Structured middleware logger (Edge)    |
+| lib/auth/__tests__/headers.test.ts       | Unit tests for security headers        |
+| lib/auth/__tests__/logger.test.ts        | Unit tests for structured logger       |
+| lib/auth/__tests__/middleware.test.ts    | Unit tests for session helpers         |
 
 ### Route Protection
 | Pattern       | Rule                              |
@@ -403,6 +477,12 @@ Present a summary of what was created:
 - Middleware fails closed — unexpected errors redirect to login, never allow through
 - All auth failures produce structured JSON logs with path, method, and error context
 - Debug-level logs (public route allowed, authenticated allowed) are suppressed in production
+
+### Test Results
+- Unit tests: X passed, Y failed
+- Integration tests: X passed, Y failed (or N/A if none exist)
+- End-to-end tests: X passed, Y failed (or N/A if Playwright not configured)
+- [If any failures, list them and explain whether they are pre-existing or caused by the middleware]
 
 ### What This Enables for Feature Implementation
 - `getSessionFromRequest(request)` is available in API routes and server actions

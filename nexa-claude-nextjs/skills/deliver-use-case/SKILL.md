@@ -135,14 +135,28 @@ If preflight fails, fix the reported issue before proceeding. Do not skip this s
 
 ---
 
-### Step 5: E2E Tests
+### Step 5: E2E Tests (Isolated)
 
-Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`
+Launch an **isolated agent** (using the Agent tool) to write Playwright e2e tests.
+The agent must NOT have access to implementation reasoning from earlier steps.
+
+Agent prompt:
+> You are an independent test author. Read and follow the complete instructions in
+> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
+> Write e2e tests for $ARGUMENTS based on the use case specification and design artifact.
+> Do not reference implementation details — test against the spec.
+> Run the tests and return a structured PASS/FAIL result.
+
+**If PASS:** Proceed to Step 6.
+
+**If FAIL:**
+1. Review the failure report in the main context
+2. Determine if it's an implementation bug or a test assumption error
+3. If implementation bug: fix the code in main context, re-run `npx playwright test`
+4. If test assumption error: re-launch the isolated tester with a correction note explaining the spec clarification
+5. Repeat up to 3 cycles
 
 **Verify:** `npx playwright test` passes.
-
-If tests fail, fix them and re-run. Do not proceed until all tests pass.
 
 ---
 

@@ -6,6 +6,7 @@ description: >
   user asks to "write Playwright tests", "create e2e tests", "write integration
   tests", "test in the browser", or mentions end-to-end testing, browser tests,
   UI integration tests, or Playwright for Next.js.
+context: fork
 ---
 
 # Playwright Test
@@ -303,6 +304,26 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Verify selectors with `page.pause()` for interactive debugging
     - Use `await page.screenshot()` for debugging visual state
 9. Mark todos complete
+
+## Output Format
+
+Always conclude with a structured result:
+
+### PASS
+```
+All N tests passed.
+```
+
+### FAIL
+```
+| Test | Expected | Actual | Screenshot |
+|------|----------|--------|------------|
+| [test name] | [expected behavior] | [actual behavior] | `screenshots/test-name.png` |
+
+**Suspected cause:** [Your analysis based on spec vs observed behavior]
+```
+
+Do NOT attempt to fix implementation code. Report findings only. The main context implementer will review failures and determine if it's an implementation bug or a test assumption error.
 
 ## Post-Implementation Tracking
 

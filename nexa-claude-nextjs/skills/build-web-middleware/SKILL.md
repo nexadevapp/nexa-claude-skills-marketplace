@@ -163,21 +163,28 @@ distinction clearly in the consolidation plan.
 
 #### 2e. Generate Migration Checklist
 
-If in retrofit mode, create `docs/technical_tasks/TT-middleware-retrofit.md` with:
+If in retrofit mode, create a technical task following the standard `TT-XXX` naming convention:
 
-- A checklist of every file that needs updating after the middleware is applied
-- For each file, the specific change needed (remove ad-hoc auth, add session context usage, add to public routes, update tests)
-- Files grouped by change type:
-  - **Remove redundant auth** — files where middleware now handles what the code did manually
-  - **Keep explicit auth** — server actions that need their own auth check
-  - **Update tests** — test files that need auth tokens/sessions added to their setup
-  - **Review conflicts** — files with auth logic that may conflict with middleware behavior
+1. Read existing files in `docs/technical_tasks/` to determine the next available `TT-XXX` ID (zero-padded, 3 digits — e.g. if `TT-003.md` is the highest, the next is `TT-004`)
+2. Create `docs/technical_tasks/TT-XXX-middleware-retrofit.md` using the template from `nexa-claude-core/skills/technical-task/templates/technical-task.md` with:
+   - **Task ID:** `TT-XXX` (the assigned numeric ID)
+   - **Task Name:** Middleware Retrofit — Consolidate Ad-hoc Auth
+   - **Category:** Cleanup
+   - **Goal:** Adapt existing routes and server actions to use the new middleware auth layer, removing redundant ad-hoc auth checks and updating tests
+   - **Status:** Approved
+   - **Acceptance Criteria:** one checklist item per file that needs updating, grouped by change type:
+     - **Remove redundant auth** — files where middleware now handles what the code did manually
+     - **Keep explicit auth** — server actions that need their own auth check
+     - **Update tests** — test files that need auth tokens/sessions added to their setup
+     - **Review conflicts** — files with auth logic that may conflict with middleware behavior
+   - **Affected Areas:** every file identified in the retrofit analysis
+   - **Dependencies:** None
 
 This checklist becomes the work plan for adapting existing code after the middleware is in place.
 
 **Do not apply the migration changes in this skill.** The checklist is implemented via
-`/implement TT-middleware-retrofit` as a follow-up step, so each change can be reviewed
-individually.
+`/implement TT-XXX-middleware-retrofit` (using the assigned ID) as a follow-up step, so each
+change can be reviewed individually.
 
 ### Step 3: Confirm Auth Strategy with User
 
@@ -410,12 +417,12 @@ Present a summary of what was created:
 - Existing routes affected: N
 - Breaking changes: N files
 - Ad-hoc auth to consolidate: N files
-- Migration checklist: docs/technical_tasks/TT-middleware-retrofit.md
+- Migration checklist: docs/technical_tasks/TT-XXX-middleware-retrofit.md
 
 ### Next Steps
 - Implement the auth API routes (login, signup, session endpoints) — e.g. `/api/auth/[...nextauth]/route.ts` for NextAuth or custom routes for JWT/Lucia
 - Implement the login/signup pages as a use case with `/implement`
-- If in retrofit mode: run `/implement TT-middleware-retrofit` to adapt existing code
+- If in retrofit mode: run `/implement TT-XXX-middleware-retrofit` to adapt existing code
 - Configure OAuth providers and fill in `# TODO:` env vars (if applicable)
 - Tune the Content-Security-Policy header for your project's specific needs
 - Run `/implement` for your next use case

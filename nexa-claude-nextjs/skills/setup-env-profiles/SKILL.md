@@ -182,7 +182,55 @@ Only include variables that are relevant to the project. Comment out optional
 variables that were not provided rather than omitting them, so the user knows
 they are available.
 
-### Step 8: Update Prisma Schema (if needed)
+### Step 8: Create Local Dev Script (Docker only)
+
+If the user chose **Docker** for the local profile, create a `scripts/dev.sh` script
+that orchestrates the full local development startup.
+
+1. **Create `scripts/dev.sh`** with the following behavior:
+
+   - **Ensure Docker is running** — if not, open Docker Desktop and wait up to 60 s
+   - **Ensure PostgreSQL container** — create if missing, start if stopped, wait for readiness
+   - **Run Prisma migrations** — `npx prisma migrate deploy`
+   - **Start Next.js dev server** — `exec npm run dev`
+
+   Use these conventions:
+   - Container name: `<project_name>-postgres` (derived from `package.json` `name`)
+   - Database name: same as the `<project_name>` used in `DATABASE_URL` (underscored)
+   - DB user/password: `postgres` / `postgres`
+   - Port: the port from the `DATABASE_URL` (default `5432`)
+   - PostgreSQL image: `postgres:17-alpine`
+   - If the project has a `prisma/prisma.config.ts`, append `--config prisma/prisma.config.ts`
+     to the migrate command
+
+   The script must:
+   - Start with `#!/usr/bin/env bash` and `set -euo pipefail`
+   - Include a descriptive header comment explaining what the script does
+   - Use helper functions (`ensure_docker`, `ensure_postgres`, `run_migrations`, `start_dev`)
+   - Print clear status messages with `✓` for success and `→` for in-progress
+
+2. **Make the script executable**: `chmod +x scripts/dev.sh`
+
+3. **Add `dev:local` npm script** to `package.json`:
+
+   ```json
+   "dev:local": "bash scripts/dev.sh"
+   ```
+
+   Insert it right after the existing `dev` script entry. If `dev:local` already exists,
+   show the user the current value and ask whether to overwrite.
+
+4. **Create a `.env` symlink** pointing to `.env.local` if one does not already exist:
+
+   ```bash
+   ln -sf .env.local .env
+   ```
+
+   This ensures tools that read `.env` by default (like Prisma) pick up the local profile.
+
+If the user chose **Other** (not Docker) for the local profile, skip this step entirely.
+
+### Step 9: Update Prisma Schema (if needed)
 
 If `prisma/schema.prisma` exists and does not already reference the `DIRECT_URL`
 environment variable in the datasource block, update it:
@@ -195,7 +243,7 @@ datasource db {
 }
 ```
 
-### Step 9: Summary
+### Step 10: Summary
 
 Present a summary of what was created:
 
@@ -210,6 +258,7 @@ Present a summary of what was created:
 | test    | .env.test          | Testcontainers (dynamic at runtime)     |
 
 ### Next Steps
-- Run `npx prisma migrate dev` to apply migrations against your local database
+- Run `npm run dev:local` to start the full local development environment (Docker + migrations + dev server)
+- Or run `npx prisma migrate dev` to apply migrations manually against your local database
 - Verify each profile by running: `dotenv -e .env.<profile> -- npx prisma db pull`
 ```

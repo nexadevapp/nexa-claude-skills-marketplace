@@ -1,0 +1,7 @@
+Deliver use case UC-003 Browse Volunteering Listings. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-004 Filter Volunteerings by Category. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-005 Browse Organization Listings. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-006 View Pricing Page. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-007 View About Page. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-008 View Blog Posts. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.
+Deliver use case UC-009 View Testimonials. Run the full per-use-case pipeline: specification, design, migration, implementation, testing, code review, and evaluation. Iterate automatically until all quality gates pass.

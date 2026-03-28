@@ -206,8 +206,106 @@ Agent prompt:
 > Let me know if there are gaps. Are the E2E tests actually validating the user journeys
 > defined in the specification (main success scenario and alternative flows)?
 >
-> List each gap explicitly: which journey or flow is missing or insufficiently tested.
+> Your report MUST include:
+>
+> 1. **Coverage Matrix** — a table mapping every spec flow (MSS steps, each alternative flow)
+>    to the test that covers it, with a verdict: Covered, Partial, or Missing.
+> 2. **Gap Analysis** — for each Partial or Missing item, explain what is not tested and why
+>    it matters. Be specific: name the spec step, the expected behavior, and what the test
+>    should assert.
+> 3. **What's Done Well** — acknowledge tests that go beyond the spec or cover smart edge cases.
+> 4. **Recommendations** — prioritized list of gaps to fix, with concrete guidance on how to
+>    test each one.
+>
 > Return the full gap analysis report.
+>
+> **Example output format** (for UC-001 Register):
+>
+> ```
+> QA Review: UC-001_register.spec.ts vs UC-001_register.md
+>
+> Coverage Matrix
+>
+> ┌───────────────────────────────────────────────────────────┬─────────────────┬─────────┐
+> │                         Spec Flow                         │  Test Coverage  │ Verdict │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ MSS (steps 1-10) — Register → check-your-email            │ MSS test        │ Covered │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ MSS (steps 11-14) — Email verification + redirect by type │ MSS-verify test │ Partial │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ A1 — Duplicate email                                      │ AF1 test        │ Covered │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ A2 — Weak password → correct → resubmit                   │ AF2 test        │ Covered │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ A3 — Verification link expired                            │ —               │ Missing │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ A4 — Unconfirmed email on next login                      │ —               │ Missing │
+> ├───────────────────────────────────────────────────────────┼─────────────────┼─────────┤
+> │ A5 — Consent not given                                    │ AF5 test        │ Covered │
+> └───────────────────────────────────────────────────────────┴─────────────────┴─────────┘
+>
+> Gap Analysis
+>
+> GAP 1: Verification link expired (A3) — Not tested at all
+> The spec defines a flow where an expired token shows "This verification link has expired"
+> with a "Resend verification email" option. No test navigates to /verify-email with an
+> expired/invalid token. This is a real user journey (24-hour expiry per BR-004).
+>
+> GAP 2: Unconfirmed email on next login (A4) — Not tested at all
+> The spec says a user who never verified should see a "resend verification" prompt on their
+> next login attempt. This crosses into login territory but is explicitly part of UC-001's scope.
+>
+> GAP 3: Account-type-specific redirect after verification (MSS step 14) — Not validated
+> The spec says:
+> - Volunteer → Onboarding Wizard (UC-003)
+> - ONG → ONG data form (UC-002)
+> - Company → Company data form (UC-002)
+> The MSS-verify test only checks Volunteer and only asserts a link to /onboarding. It doesn't
+> test ONG or Company redirects, and it doesn't actually click the CTA to confirm the redirect works.
+>
+> GAP 4: Verification test is synthetic, not a real journey
+> MSS-verify navigates directly to /verify-email?success=true — it never hits the actual token
+> validation API route (/api/auth/verify-email?token=...). The comment says "covered by unit
+> tests," but from an E2E perspective, the real verification flow (token → API → redirect) is
+> untested. At minimum, the test should hit the API route with a known token to validate the
+> full chain.
+>
+> GAP 5: ONG and Company account types only partially exercised
+> - MSS test: Volunteer only
+> - AF1 test: uses ONG for the duplicate attempt (but doesn't complete registration as ONG)
+> - AF2 test: uses Company (completes registration)
+> - No test registers as ONG through to the check-your-email screen and verifies ONG-specific behavior
+>
+> GAP 6: Email format validation not tested
+> The spec says step 7 validates email format. No test submits an invalid email and checks for
+> an inline error.
+>
+> GAP 7: No assertion on backend state
+> The spec's postconditions state: Account created with status "PENDING", email_confirmed = false,
+> auth_provider = "EMAIL", consent flags set to true, onboarding_completed = false. No test
+> queries the database or API to verify these postconditions. E2E tests can validate backend state
+> via API calls — without it, you're only testing the UI facade.
+>
+> What's Done Well
+>
+> - The consent test (AF5) is thorough — it tests partial consent and verifies it still blocks.
+> - The AF-no-account-type test covers a scenario the spec doesn't explicitly call out — good
+>   defensive testing.
+> - Password strength indicator assertions go beyond the spec to validate UX quality.
+> - Navigation is tested from the landing page (not just /register), validating the real entry point.
+>
+> Recommendations (Priority Order)
+>
+> 1. Add A3 test — navigate to /verify-email?token=expired-token and assert the expired message
+>    + resend option
+> 2. Add email format validation test — submit with invalid email, assert inline error
+> 3. Add ONG/Company verification redirect tests — register as each type, verify type-appropriate
+>    redirect destination
+> 4. Add backend state assertions — after registration, call an API or query DB to confirm account
+>    status, consent flags, auth_provider
+> 5. Consider A4 test — register without verifying, attempt login, assert resend prompt (may depend
+>    on UC-004 login being implemented)
+> ```
 
 #### Phase 2: Fix E2E Tests (Isolated Agent)
 

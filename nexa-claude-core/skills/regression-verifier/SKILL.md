@@ -32,7 +32,7 @@ or equivalent).
 |--------------------|---------------------------------|------------------------|
 | Use case spec      | `docs/use_cases/$ARGUMENTS.md`  | Yes (for UC-XXX)       |
 | Bug report         | `docs/bugs/$ARGUMENTS.md`       | Yes (for BUG-XXX)      |
-| Frontend design    | `docs/designs/$ARGUMENTS-design.md` | If exists (for UC-XXX) |
+| Frontend design    | `docs/designs/$ARGUMENTS-design.html` | If exists (for UC-XXX) |
 
 ## DO NOT
 
@@ -53,7 +53,7 @@ or equivalent).
    multiple variants (e.g., separate MSS per actor type). Collect all of them as separate
    flows to walk through sequentially
 3. Extract **Preconditions** — these define the required initial state
-4. Read `docs/designs/$ARGUMENTS-design.md` if it exists — use it to identify selectors,
+4. Read `docs/designs/$ARGUMENTS-design.html` if it exists — use it to identify selectors,
    page structure, and expected UI states for each step
 
 **For BUG-XXX:**

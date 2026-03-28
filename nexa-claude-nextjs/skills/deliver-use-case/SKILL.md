@@ -95,7 +95,7 @@ Alternative Flows, Postconditions, and Business Rules sections.
 
 ### Step 2: Frontend Design
 
-**Skip if** `docs/designs/$ARGUMENTS-design.md` already exists **or** $ARGUMENTS matches `BUG-XXX`.
+**Skip if** `docs/designs/$ARGUMENTS-design.html` already exists **or** $ARGUMENTS matches `BUG-XXX`.
 
 Read and follow:
 `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/frontend-design/SKILL.md`
@@ -103,7 +103,7 @@ Read and follow:
 Inputs for this step: the use case specification from Step 1, plus any wireframe in `docs/wireframes/`
 matching the use case ID. See the skill's Inputs section for details.
 
-**Verify:** The file `docs/designs/$ARGUMENTS-design.md` exists and contains at least one screen definition.
+**Verify:** The file `docs/designs/$ARGUMENTS-design.html` exists and contains at least one screen definition.
 
 ---
 
@@ -141,7 +141,7 @@ Agent prompt:
 > `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
 > Write Playwright end-to-end tests for $ARGUMENTS.
 > Your inputs are the use case specification in `docs/use_cases/$ARGUMENTS.md` and the
-> frontend design in `docs/designs/$ARGUMENTS-design.md`. Test scenarios derive from the
+> frontend design in `docs/designs/$ARGUMENTS-design.html`. Test scenarios derive from the
 > use case flows; page structure, selectors, and assertions derive from the frontend design's
 > screens, components, and states.
 >
@@ -375,7 +375,7 @@ If the QA evaluation identifies gaps, launch the **E2E agent** with the gap anal
 >
 > The following QA gap analysis was produced by reviewing the current tests against the
 > use case specification in `docs/use_cases/$ARGUMENTS.md` and the frontend design in
-> `docs/designs/$ARGUMENTS-design.md`:
+> `docs/designs/$ARGUMENTS-design.html`:
 >
 > [paste the full QA evaluation / gap analysis report here]
 >
@@ -437,7 +437,7 @@ Agent prompt:
 >
 > Your inputs:
 > - For UC-XXX: use case specification in `docs/use_cases/$ARGUMENTS.md` and frontend
->   design in `docs/designs/$ARGUMENTS-design.md`
+>   design in `docs/designs/$ARGUMENTS-design.html`
 > - For BUG-XXX: bug report in `docs/bugs/$ARGUMENTS.md`
 >
 > Walk through every step, take a browser_snapshot after each action, and classify any

@@ -12,10 +12,11 @@ description: >
 
 ## Instructions
 
-Run the complete pipeline for $ARGUMENTS (a use case ID like `UC-XXX`).
+Run the complete pipeline for $ARGUMENTS (a use case ID like `UC-XXX` or a bug ID like `BUG-XXX`).
 
 This skill orchestrates multiple sub-skills sequentially, verifying each step before
-proceeding. If the QA evaluation finds gaps in E2E test coverage, it loops back to fix
+proceeding. For bug fixes (`BUG-XXX`), it includes interactive browser verification after
+implementation. If the QA evaluation finds gaps in E2E test coverage, it loops back to fix
 them automatically.
 
 ## Prerequisites
@@ -27,6 +28,13 @@ The following must exist before running this pipeline:
 
 If any prerequisite is missing, stop and tell the user which `/command` to run first.
 
+For **BUG-XXX** arguments, the following must also exist:
+
+- `docs/bugs/$ARGUMENTS.md` (from `/report-bug`)
+
+When $ARGUMENTS is a `BUG-XXX`, Steps 1 (Use Case Specification) and 2 (Frontend Design)
+are skipped — the bug report serves as the specification. The Entity Gate is also skipped.
+
 ## DO NOT
 
 - Skip any step without checking its skip condition
@@ -37,6 +45,8 @@ If any prerequisite is missing, stop and tell the user which `/command` to run f
 - Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/deliver-use-case` is invoked
 
 ## Entity Gate
+
+**Skip if** $ARGUMENTS matches `BUG-XXX` (bug fixes do not require entity gate validation).
 
 **This check runs before any pipeline step and is a hard stop.**
 
@@ -73,7 +83,7 @@ before moving to the next step. Treat $ARGUMENTS as the argument for every sub-s
 
 ### Step 1: Use Case Specification
 
-**Skip if** `docs/use_cases/$ARGUMENTS.md` already exists.
+**Skip if** `docs/use_cases/$ARGUMENTS.md` already exists **or** $ARGUMENTS matches `BUG-XXX`.
 
 Read and follow:
 `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
@@ -85,7 +95,7 @@ Alternative Flows, Postconditions, and Business Rules sections.
 
 ### Step 2: Frontend Design
 
-**Skip if** `docs/designs/$ARGUMENTS-design.md` already exists.
+**Skip if** `docs/designs/$ARGUMENTS-design.md` already exists **or** $ARGUMENTS matches `BUG-XXX`.
 
 Read and follow:
 `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/frontend-design/SKILL.md`
@@ -107,6 +117,9 @@ Read and follow:
 2. Unit tests pass: `npx vitest run`
 
 If verification fails, fix the issues and re-verify. Do not proceed until both checks pass.
+
+For **BUG-XXX**: The implement skill reads the bug report from `docs/bugs/$ARGUMENTS.md`
+and applies the fix.
 
 ---
 
@@ -401,10 +414,94 @@ Remaining gaps:
 - [gap description from latest QA evaluation]
 ```
 
+---
+
+### Step 6: Regression Verification (Isolated Agent)
+
+This is the final quality gate. After all E2E tests pass and the QA evaluation reports no
+gaps, verify the implementation by interactively walking through the real user journey in a
+browser. For use cases, this replays the Main Success Scenario. For bugs, this replays the
+Steps to Reproduce. This catches integration issues (e.g., missing auth sessions,
+cross-feature dependencies) that scripted E2E tests abstract away.
+
+Launch an **isolated agent** (using the Agent tool) to perform the verification from a clean
+context. The agent must NOT have access to implementation reasoning from earlier steps — it
+works only from the specification/bug report and design artifacts, so it verifies the real
+user experience without bias from how the code was built.
+
+Agent prompt:
+> You are an independent regression verifier. Read and follow the complete instructions in
+> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/regression-verifier/SKILL.md`.
+> Verify that $ARGUMENTS works end-to-end by walking through the user journey in a real
+> browser using the Playwright MCP tools.
+>
+> Your inputs:
+> - For UC-XXX: use case specification in `docs/use_cases/$ARGUMENTS.md` and frontend
+>   design in `docs/designs/$ARGUMENTS-design.md`
+> - For BUG-XXX: bug report in `docs/bugs/$ARGUMENTS.md`
+>
+> Walk through every step, take a browser_snapshot after each action, and classify any
+> failures. If you discover an unrelated issue, invoke `/report-bug` to create a new bug
+> report before returning.
+>
+> Return the full verification report including: verdict, step-by-step results table,
+> postcondition/expected behavior check, classification details, and any new bugs created.
+
+**Verify:** The agent's verification report verdict is **VERIFIED**.
+
+**If verdict is VERIFIED:** Proceed to Completion.
+
+**If verdict is IMPLEMENTATION GAP (UC-XXX) or REGRESSION (BUG-XXX):**
+
+The implementation does not satisfy the specification. Discard all implementation changes
+made during this pipeline run using `git stash` (to preserve them for reference if needed),
+then stop:
+
+```
+PIPELINE FAILED: $ARGUMENTS — [implementation gap | regression] detected
+
+The implementation does not pass the interactive browser walkthrough.
+
+Failing step: [step N from verification report]
+Observed behavior: [what happened]
+Expected behavior: [what should happen]
+
+Implementation changes have been stashed (git stash).
+```
+
+**If verdict is NEW BUG FOUND:**
+
+An unrelated issue blocks the full user journey. The regression-verifier skill has already
+created a new bug report (e.g., `BUG-YYY`) via `/report-bug`. Discard all implementation
+changes made during this pipeline run using `git stash`, then stop:
+
+```
+PIPELINE FAILED: $ARGUMENTS — blocked by new bug
+
+Regression verification discovered an unrelated issue that blocks the user journey.
+A new bug has been created: BUG-YYY
+
+Failing step: [step N from verification report]
+Observed behavior: [what happened]
+Expected behavior: [what should happen]
+
+Implementation changes have been stashed (git stash).
+
+To resolve:
+1. Run /deliver-use-case BUG-YYY to fix the blocking bug
+2. Re-run /deliver-use-case $ARGUMENTS
+```
+
+**If verdict is ENVIRONMENT ISSUE:**
+
+Stop the pipeline. Report the environment issue to the user with remediation steps.
+Do not discard implementation changes — the failure is not due to code.
+
 ## Completion
 
-When the pipeline finishes successfully (E2E tests pass and the QA evaluation reports no
-gaps), present a summary to the user and post it to the GitHub issue.
+When the pipeline finishes successfully (E2E tests pass, QA evaluation reports no gaps,
+and regression verification is VERIFIED), present a summary to the user and post it to
+the GitHub issue.
 
 ### Terminal Summary
 
@@ -421,6 +518,7 @@ Display the pipeline report to the user:
 | Implementation              | ...    |
 | E2E Tests                   | ...    |
 | E2E Evaluation Iterations   | N / 3  |
+| Regression Verification     | ...    |
 ```
 
 Include a **What was built** section listing the key artifacts: pages, API routes, services,

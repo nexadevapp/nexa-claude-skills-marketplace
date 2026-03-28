@@ -28,7 +28,8 @@ nexa-claude-marketplace/
 │       ├── frontend-design/
 │       ├── code-review/
 │       ├── evaluate/
-│       └── report-bug/
+│       ├── report-bug/
+│       └── regression-verifier/
 ├── nexa-claude-nextjs/                  # Next.js technology stack plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -85,6 +86,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
 | Verification | `/report-bug`         | Create structured bug report documents                             |
+| Verification | `/regression-verifier`| Interactive browser walkthrough of MSS (UC) or reproduction steps (BUG) |
 
 ### Next.js (stack-specific)
 

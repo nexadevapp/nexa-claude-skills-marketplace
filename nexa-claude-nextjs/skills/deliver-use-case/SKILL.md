@@ -2,7 +2,7 @@
 name: deliver-use-case
 description: >
   Orchestrates the full per-use-case pipeline: specification, design, migration,
-  implementation, testing, code review, and evaluation. Iterates automatically
+  implementation, testing, and E2E evaluation. Iterates automatically
   until all quality gates pass. Use when the user asks to "deliver a use case",
   "build a use case", "run the full pipeline", "implement end-to-end", or wants
   to automate the complete workflow for a use case.
@@ -15,7 +15,7 @@ description: >
 Run the complete pipeline for $ARGUMENTS (a use case ID like `UC-XXX`).
 
 This skill orchestrates multiple sub-skills sequentially, verifying each step before
-proceeding. If code review or evaluation finds critical issues, it loops back to fix
+proceeding. If the QA evaluation finds gaps in E2E test coverage, it loops back to fix
 them automatically.
 
 ## Prerequisites
@@ -190,70 +190,84 @@ Playwright output (last run):
 
 ---
 
-### Step 5: Code Review (Isolated)
+### Step 5: E2E Test Evaluation Loop (up to 3 iterations)
 
-Launch an **isolated agent** (using the Agent tool) to perform an independent code review.
-The agent must NOT have access to the implementation reasoning from earlier steps.
+After E2E tests pass in Step 4, run an evaluation–fix loop to ensure the tests actually
+cover the use case journeys. This loop iterates up to **3 times**.
 
-Agent prompt:
-> You are an independent code reviewer. Read and follow the complete instructions in
-> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/code-review/SKILL.md`.
-> Review the implementation for $ARGUMENTS. Return the full review report.
+#### Phase 1: QA Evaluation (Isolated Agent)
 
-**If Critical findings exist:**
-1. Fix the issues in the main context (do not modify the spec or design)
-2. Re-run `npx next build` and `npx playwright test` — verify both pass (0 failed, exit code 0)
-3. Re-launch the code review agent
-4. Repeat up to 3 times
-
----
-
-### Step 6: Evaluation (Isolated)
-
-Launch an **isolated agent** (using the Agent tool) to evaluate the implementation against
-the specification and design.
+Launch an **isolated agent** (using the Agent tool) to evaluate the E2E tests against the
+use case specification.
 
 Agent prompt:
-> You are an independent evaluator. Read and follow the complete instructions in
-> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/evaluate/SKILL.md`.
-> Evaluate the implementation for $ARGUMENTS. Return the full evaluation report.
+> You are a QA specialist. Review the Playwright end-to-end tests introduced for $ARGUMENTS
+> and compare them against the use case specification in `docs/use_cases/$ARGUMENTS.md`.
+> Let me know if there are gaps. Are the E2E tests actually validating the user journeys
+> defined in the specification (main success scenario and alternative flows)?
+>
+> List each gap explicitly: which journey or flow is missing or insufficiently tested.
+> Return the full gap analysis report.
 
-**If verdict is FAIL:**
-1. Fix the issues in the main context (do not modify the spec or design)
-2. Re-run `npx next build` and `npx playwright test` — verify both pass (0 failed, exit code 0)
-3. Re-launch the evaluation agent
-4. Repeat up to 3 times
+#### Phase 2: Fix E2E Tests (Isolated Agent)
 
----
+If the QA evaluation identifies gaps, launch the **E2E agent** with the gap analysis as input:
 
-## Iteration Protocol
+> You are an independent E2E test author. Read and follow the complete instructions in
+> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
+> Fix and extend the Playwright end-to-end tests for $ARGUMENTS.
+>
+> The following QA gap analysis was produced by reviewing the current tests against the
+> use case specification in `docs/use_cases/$ARGUMENTS.md` and the frontend design in
+> `docs/designs/$ARGUMENTS-design.md`:
+>
+> [paste the full QA evaluation / gap analysis report here]
+>
+> Address every identified gap. Ensure all user journeys from the specification are covered.
+>
+> **CRITICAL RULES:**
+> - Run ALL tests with `npx playwright test` — no filters, no `--grep`, no `--grep-invert`, no project subsets
+> - Testcontainers provides the database — never skip DB-dependent tests; if Docker is not running, STOP and report it
+> - After running tests, check the output: it must show 0 failed and exit code 0. If it shows failures or timeouts, the tests DID NOT PASS — fix them
+> - Never use `test.skip()`, `test.fixme()`, or any mechanism to avoid running tests
+> - Every test must have meaningful assertions that would fail if the feature were broken
+>
+> When you are done, return a summary listing: each test file created/modified, the number
+> of tests, and whether your own run showed them passing or failing (with error output if failing).
 
-After completing Steps 5-6, if any fixes were made:
+After the E2E agent returns, **independently verify** the tests pass (same as Step 4 Phase 2):
+run `npx playwright test`, confirm 0 failed, 0 skipped, exit code 0.
 
-1. Re-run `npx next build`
-2. Re-run `npx playwright test` and verify 0 failed
-3. If code review had critical findings: re-run Step 5
-4. If evaluation verdict was FAIL: re-run Step 6
+If tests fail, apply the same fix loop from Step 4 to get them passing before the next
+evaluation iteration.
 
-Maximum **3 full iteration cycles**. If issues remain after 3 cycles, present the
-outstanding findings to the user for manual resolution.
+#### Iteration
+
+Go back to Phase 1 (QA Evaluation) with the updated tests. Repeat until the QA specialist
+reports no gaps or **3 iterations** are exhausted.
+
+After 3 iterations, if the QA specialist still reports gaps, present a report to the user:
+```
+E2E EVALUATION FAILED: $ARGUMENTS (3 iterations exhausted)
+
+Remaining gaps:
+- [gap description from latest QA evaluation]
+```
 
 ## Completion
 
-When the pipeline finishes successfully (code review has no critical findings and
-evaluation verdict is PASS or PASS WITH OBSERVATIONS), present a summary:
+When the pipeline finishes successfully (E2E tests pass and the QA evaluation reports no
+gaps), present a summary:
 
 ```
 ## Pipeline Complete: $ARGUMENTS
 
-| Step                  | Status |
-|-----------------------|--------|
-| Use Case Spec         | ...    |
-| Frontend Design       | ...    |
-| Entity Gate           | ...    |
-| Implementation        | ...    |
-| E2E Tests             | ...    |
-| Code Review           | ...    |
-| Evaluation            | ...    |
-| Iteration Cycles Used | N / 3  |
+| Step                        | Status |
+|-----------------------------|--------|
+| Use Case Spec               | ...    |
+| Frontend Design             | ...    |
+| Entity Gate                 | ...    |
+| Implementation              | ...    |
+| E2E Tests                   | ...    |
+| E2E Evaluation Iterations   | N / 3  |
 ```

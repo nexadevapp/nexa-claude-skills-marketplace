@@ -82,7 +82,7 @@ Each test name describes the complete journey, not an individual step. For examp
 - **Write one test per step or per screen** — each test must cover the full journey. A test that only checks "form displays correctly" is not an E2E test
 - **Create separate tests for business rules** — verify business rules inline within the journey where they apply
 - **Run tests on multiple browsers** — use Chromium only. The `playwright.config.ts` must have exactly one project
-- Access the database or backend services directly in tests
+- Access the database directly in tests — use the test API endpoints (`/api/e2e/users`) instead
 - Skip waiting for page loads or network requests to complete
 - Use hard-coded delays (`page.waitForTimeout`) instead of proper waits
 - Delete all data in cleanup (only remove data created during the test)
@@ -93,13 +93,73 @@ Each test name describes the complete journey, not an individual step. For examp
 - **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
 - **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
 
-## Test Data Strategy
+## Test User Provisioning
 
-| Approach          | Location                     | Purpose              |
-|-------------------|------------------------------|----------------------|
-| Prisma seed       | prisma/seed.ts               | Baseline test data   |
-| API calls         | Within test setup            | Test-specific data   |
-| Manual cleanup    | afterEach hooks              | Remove created data  |
+Every E2E test requires an authenticated user. User provisioning operates at two levels:
+
+### Suite-Level User (default)
+
+Each test file provisions **one shared user** for all tests in the file. This user is a standard,
+fully-valid user suitable for happy-path scenarios.
+
+**Lifecycle (managed via `test.beforeAll` / `test.afterAll`):**
+
+1. **Before all tests:** Create a user directly in the database via the test API endpoint:
+   - Email: `e2e-{random8chars}@example.com`
+   - Password: bcrypt-hashed (plaintext stored in a variable for login)
+   - `account_type`: as needed by the use case (default to the most common type)
+   - `status`: `"ACTIVE"`
+   - `email_confirmed`: `true`
+   - All consent flags: `true`
+   - `auth_provider`: `"EMAIL"`
+   - `created_at` / `updated_at`: current timestamp
+2. **Before all tests (after user creation):** Log in via the login page UI and save the authenticated state.
+3. **After all tests:** Log out via the UI (click "Sign out").
+4. **After all tests (after logout):** Delete the user and all related records via the test API endpoint.
+
+### Per-Test User Override
+
+Individual tests that need a user with **different characteristics** (e.g., inactive status,
+unconfirmed email, a different account type) provision their own user, overriding the suite-level user.
+
+**Lifecycle (managed via `test.beforeEach` / `test.afterEach` or inline):**
+
+1. **Before the test:** Create a custom user directly in the database via the test API endpoint:
+   - Email: `e2e-{random8chars}@example.com`
+   - Password: bcrypt-hashed (plaintext stored in a variable for login)
+   - `account_type`: as needed by the specific test scenario
+   - `status`: as needed by the test scenario (e.g., `"SUSPENDED"`, `"PENDING"`)
+   - `email_confirmed`: as needed (e.g., `false` for unconfirmed-email flows)
+   - All consent flags: `true`
+   - `auth_provider`: `"EMAIL"`
+   - `created_at` / `updated_at`: current timestamp
+2. **Start of test:** Log in as this custom user via the login page UI.
+3. **End of test:** Log out via the UI (click "Sign out").
+4. **After the test:** Delete this custom user and all related records via the test API endpoint.
+
+### Test API Endpoint
+
+The application must expose a test-only API endpoint for user provisioning and cleanup. This endpoint
+is **only available when `NODE_ENV=test`**:
+
+- `POST /api/e2e/users` — Creates a user in the database. Accepts the user fields above. Returns the created user with `id`.
+- `DELETE /api/e2e/users/:id` — Deletes the user and all related records (cascade).
+
+If this endpoint does not exist in the project, create it before writing tests. Use the template at
+[templates/e2e-users-api.ts](templates/e2e-users-api.ts).
+
+### Test User Helper
+
+Use the helper at [templates/test-user.ts](templates/test-user.ts) to provision and clean up users.
+If `e2e/helpers/test-user.ts` does not exist, create it from the template.
+
+### Other Test Data
+
+| Approach          | Location                     | Purpose                          |
+|-------------------|------------------------------|----------------------------------|
+| Prisma seed       | prisma/seed.ts               | Baseline reference data (non-user)|
+| API calls         | Within test setup            | Test-specific entity data        |
+| Manual cleanup    | afterEach hooks              | Remove data created during test  |
 
 ## External Dependencies
 
@@ -148,9 +208,81 @@ export default defineConfig({
 
 - Global setup: [templates/global-setup.ts](templates/global-setup.ts)
 - Global teardown: [templates/global-teardown.ts](templates/global-teardown.ts)
+- Test user helper: [templates/test-user.ts](templates/test-user.ts)
+- E2E users API endpoint: [templates/e2e-users-api.ts](templates/e2e-users-api.ts)
 - Test example: [templates/example.spec.ts](templates/example.spec.ts)
 
 ## Common Patterns
+
+### Suite-Level User Provisioning
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { createTestUser, deleteTestUser, type TestUser } from './helpers/test-user';
+
+let suiteUser: TestUser;
+
+test.beforeAll(async ({ request }) => {
+  // Create the suite-level user via test API
+  suiteUser = await createTestUser(request, { accountType: 'BUYER' });
+});
+
+test.afterAll(async ({ request, browser }) => {
+  // Log out via UI, then delete the user
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Sign out' }).click();
+  await context.close();
+
+  await deleteTestUser(request, suiteUser.id);
+});
+```
+
+### Login via UI (start of each test)
+
+```typescript
+test('MSS: ...', async ({ page }) => {
+  // Start at login — the ONLY page.goto() allowed
+  await page.goto('/login');
+  await page.waitForLoadState('networkidle');
+
+  // Log in as the suite user
+  await page.getByLabel('Email').fill(suiteUser.email);
+  await page.getByLabel('Password').fill(suiteUser.plainPassword);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForLoadState('networkidle');
+
+  // ... continue the journey
+});
+```
+
+### Per-Test User Override
+
+```typescript
+test('AF2: suspended user sees account-locked screen', async ({ page, request }) => {
+  // Create a custom user for this test
+  const suspendedUser = await createTestUser(request, {
+    accountType: 'BUYER',
+    status: 'SUSPENDED',
+  });
+
+  try {
+    await page.goto('/login');
+    await page.waitForLoadState('networkidle');
+    await page.getByLabel('Email').fill(suspendedUser.email);
+    await page.getByLabel('Password').fill(suspendedUser.plainPassword);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await page.waitForLoadState('networkidle');
+
+    // Verify suspended user sees the locked screen
+    await expect(page.getByText('Account suspended')).toBeVisible();
+  } finally {
+    // Always clean up the per-test user
+    await deleteTestUser(request, suspendedUser.id);
+  }
+});
+```
 
 ### Entry Point — the only `page.goto()` in the test
 
@@ -208,10 +340,10 @@ await expect(page.getByText('Item created successfully')).toBeVisible();
 await expect(page.locator('table tbody tr')).toContainText(['Test Value']);
 ```
 
-### Cleanup After Test
+### Cleanup Entity Data Created During Test
 
 ```typescript
-// Clean up test data via API in afterEach or at end of test
+// Clean up non-user test data via API at end of test
 await page.request.delete(`/api/examples/${createdId}`);
 ```
 
@@ -251,29 +383,36 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 5. Ensure Testcontainers global setup exists (`e2e/global-setup.ts`); create from template if missing
 6. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
 7. Ensure `playwright.config.ts` references the global setup/teardown and has **only Chromium** (one project)
-8. Create test file using the template
-9. For each journey test:
-    - `page.goto()` to the entry point (the **only** goto in the test)
+8. Ensure the test user helper exists (`e2e/helpers/test-user.ts`); create from template if missing
+9. Ensure the E2E users API endpoint exists (`app/api/e2e/users/route.ts` and `app/api/e2e/users/[id]/route.ts`); create from template if missing
+10. Create test file using the template
+11. For each journey test:
+    - Set up suite-level user in `test.beforeAll` (create via test API, log in via UI)
+    - For tests needing a custom user, create a per-test user override (see Common Patterns)
+    - `page.goto()` to the login page (the **only** goto in the test), log in via UI
     - Navigate through each screen by clicking links, buttons, and submitting forms
     - Verify intermediate states along the way (page loaded, data displayed, form visible)
     - Perform the key interactions (fill forms, click actions, confirm dialogs)
     - Assert the final outcome (success message, data in list, redirect to expected page)
-    - Clean up test data if created during test
-10. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-11. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
-12. **Verify the test results — this is mandatory before declaring success:**
+    - Log out via UI at end of test (or in `test.afterAll` for suite user)
+    - Clean up test-specific entity data if created during test
+    - Clean up per-test override users in `finally` blocks or `test.afterEach`
+    - Delete suite user in `test.afterAll`
+12. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+13. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
+14. **Verify the test results — this is mandatory before declaring success:**
     - The Playwright output must show **0 failed** and the exit code must be **0**
     - If the output shows failures, timeouts, or errors, the tests **did not pass** — do not claim otherwise
     - Count the number of passed tests and confirm it matches the number of tests you wrote
     - If any test is skipped, that counts as a failure — investigate and fix it
     - **If a test failure reveals a route mismatch** (e.g., test expects `/register` but app uses `/sign-up`), this means the test is not navigating through the UI — fix the test to click through the real navigation instead of hardcoding URLs
-13. If a test fails:
+15. If a test fails:
     - Check that Docker is running (Testcontainers requires it)
     - Read the error message carefully and fix the root cause in the test or implementation
-    - Re-run `npx playwright test` and go back to step 12
+    - Re-run `npx playwright test` and go back to step 14
     - Use `await page.screenshot()` for debugging visual state if needed
     - Do NOT skip, exclude, or filter out failing tests as a "fix"
-14. Mark todos complete
+16. Mark todos complete
 
 ## Post-Implementation Tracking
 

@@ -71,7 +71,10 @@ before moving to the next step. Treat $ARGUMENTS as the argument for every sub-s
 
 ---
 
-### Step 1: Use Case Specification
+### Step 1: Use Case Specification (Optional)
+
+This step is optional — the use case specification should typically be created beforehand
+using `/use-case-spec`. The pipeline includes it as a convenience fallback.
 
 **Skip if** `docs/use_cases/$ARGUMENTS.md` already exists.
 
@@ -83,7 +86,12 @@ Alternative Flows, Postconditions, and Business Rules sections.
 
 ---
 
-### Step 2: Frontend Design
+### Step 2: Frontend Design (Optional)
+
+This step is optional — the frontend design should typically be created beforehand
+using `/frontend-design`. Running spec and design across all use cases upfront allows
+cross-referencing to identify gaps (missing entities, shared screens, conflicting flows)
+before implementation begins. The pipeline includes it as a convenience fallback.
 
 **Skip if** `docs/designs/$ARGUMENTS-design.md` already exists.
 

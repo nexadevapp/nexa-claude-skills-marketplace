@@ -9,6 +9,27 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  --bg: #f7f8fa;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f1f5;
+  --border: #dce0e8;
+  --text: #4a5568;
+  --text-dim: #8694a7;
+  --text-bright: #2d3748;
+  --accent: #818cf8;
+  --inception: #818cf8;
+  --elaboration: #a78bfa;
+  --construction: #60a5fa;
+  --verification: #34d399;
+  --transition: #fbbf24;
+  --core: #a78bfa;
+  --nextjs: #38bdf8;
+  --edge-color: #cbd5e1;
+  --node-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  --glow: 0 0 20px rgba(129,140,248,0.15);
+}
+
+:root.dark {
   --bg: #0f1117;
   --bg-card: #1a1d27;
   --bg-hover: #242836;
@@ -830,6 +851,7 @@ body {
     <span class="zoom-label" id="zoom-label">100%</span>
     <button class="zoom-btn" id="zoom-in">+</button>
     <button class="reset-btn" id="zoom-reset">Reset</button>
+    <button class="reset-btn" id="theme-toggle" title="Toggle light/dark theme">&#9790; Dark</button>
   </div>
 </div>
 
@@ -1280,7 +1302,7 @@ function renderTree() {
     if (!matchesFilter(node, activeFilter)) return '';
 
     const hasChildren = node.children && node.children.length > 0;
-    const isOpen = depth < 3; // Default open for first 3 levels
+    const isOpen = depth < 1; // Collapsed at plugin level — user expands to explore
 
     let phaseTag = '';
     if (node.phase) {
@@ -1337,6 +1359,22 @@ function renderTree() {
   }
 
   render();
+}
+
+// ─── Theme Toggle ───
+const themeBtn = document.getElementById('theme-toggle');
+themeBtn.addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+  const isDark = document.documentElement.classList.contains('dark');
+  themeBtn.innerHTML = isDark ? '&#9788; Light' : '&#9790; Dark';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+// Restore saved theme (light is default)
+if (localStorage.getItem('theme') === 'dark') {
+  document.documentElement.classList.add('dark');
+  themeBtn.innerHTML = '&#9788; Light';
+} else {
+  themeBtn.innerHTML = '&#9790; Dark';
 }
 
 // ─── Init ───

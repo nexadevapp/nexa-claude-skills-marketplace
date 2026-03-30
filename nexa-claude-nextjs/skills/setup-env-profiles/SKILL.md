@@ -1,29 +1,29 @@
 ---
 name: setup-env-profiles
 description: >
-  Sets up environment profiles (local, dev, prod, test) with database connection strings
-  and environment-specific configuration. Interactive — prompts the user for each
-  profile's database URL. Use when the user asks to "set up environments", "configure
-  profiles", "create .env files", "set up local/dev/prod", or mentions environment
-  profiles, environment configuration, or database connection setup.
+  Sets up environment profiles (local, dev, test) with database connection strings
+  and environment-specific configuration. Local uses Testcontainers, dev uses Supabase.
+  Only prompts the user for the Supabase connection string. Use when the user asks to
+  "set up environments", "configure profiles", "create .env files", "set up local/dev",
+  or mentions environment profiles, environment configuration, or database connection setup.
 ---
 
 # Setup Environment Profiles
 
 ## Instructions
 
-Set up four environment profiles — **local**, **dev**, **prod**, and **test** — each with its own
-`.env` file and database connection string.
+Set up three environment profiles — **local**, **dev**, and **test** — each with its own
+`.env` file and database connection string. Local and test both use Testcontainers;
+dev uses Supabase.
 
-This skill is **interactive**. Prompt the user for input at each step using the
-questions described below.
+This skill is **minimally interactive**. The only user input required is the Supabase
+connection string for the dev profile.
 
 ## DO NOT
 
 - Generate `docker-compose.yml` or any Docker infrastructure files
 - Overwrite an existing `.env` file without showing the user what will change and asking for confirmation
 - Store real credentials in committed files (all `.env*` files must be in `.gitignore`)
-- Proceed to the next profile before the current one is confirmed
 - Invent or guess database credentials — always ask the user
 
 ## Prerequisites
@@ -36,81 +36,91 @@ Check that `.gitignore` includes `.env*` entries. If not, add them before creati
 .env.*
 .env.local
 .env.development
-.env.production
 .env.test
 ```
 
 ## Profiles and File Mapping
 
-| Profile | File                 | Purpose                                      |
-|---------|----------------------|----------------------------------------------|
-| local   | `.env.local`         | Local machine development                    |
-| dev     | `.env.development`   | Shared development / staging                 |
-| prod    | `.env.production`    | Production                                   |
-| test    | `.env.test`          | Integration and e2e tests (Testcontainers)   |
+| Profile | File                 | Database                              | Purpose                                    |
+|---------|----------------------|---------------------------------------|--------------------------------------------|
+| local   | `.env.local`         | Testcontainers (dynamic at runtime)   | Local machine development                  |
+| dev     | `.env.development`   | Supabase                              | Shared development / staging               |
+| test    | `.env.test`          | Testcontainers (dynamic at runtime)   | Integration and e2e tests                  |
 
 ## Workflow
 
+### Step 0: Consult Prisma Documentation
+
+Before starting, use the **Context7 MCP tool** to fetch the latest Prisma documentation
+on environment configuration and `prisma.config.ts`. This ensures the setup follows
+the current Prisma conventions (e.g. config file format, env loading, `--config` flag usage).
+
+Query Context7 for:
+- `prisma.config.ts` configuration file setup and usage
+- Prisma environment variables and `.env` file loading behavior
+
+Use the documentation to inform decisions in subsequent steps — especially around
+whether the project should use `prisma.config.ts` for env file resolution and how
+Prisma CLI commands should reference the config.
+
 ### Step 1: Detect Existing Configuration
 
-1. Check if `prisma/schema.prisma` exists to confirm Prisma is in use
-2. Check if any `.env*` files already exist
-3. If existing files are found, show the user which ones exist and ask whether to
+1. Check if Prisma is in use by looking for **any** of:
+   - `prisma/schema.prisma`
+   - `prisma.config.ts` (project root)
+   - `prisma/prisma.config.ts`
+2. If `prisma.config.ts` exists (at either location), note it as the **Prisma config path** —
+   it will be used in later steps for CLI commands and env file resolution
+3. Check if any `.env*` files already exist
+4. If existing files are found, show the user which ones exist and ask whether to
    update them or skip
 
-### Step 2: Local Profile (`.env.local`)
+### Step 2: Local Profile (`.env.local`) — Auto-generated
 
-Ask the user:
+This profile is **not interactive**. It uses Testcontainers, same as the test profile.
 
-> **Local database setup — choose one:**
->
-> 1. **Docker** (PostgreSQL container on localhost)
-> 2. **Other** (provide your own connection string)
+Generate `.env.local` with the following content:
 
-**If the user chooses Docker (option 1):**
+```env
+# =============================================================================
+# Local Environment Profile (Testcontainers)
+# =============================================================================
+# DATABASE_URL is set dynamically by the dev script at startup.
+# Testcontainers spins up a PostgreSQL container, runs migrations, and provides
+# the connection string automatically.
 
-Pre-fill the `DATABASE_URL` with:
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 
+# Auth (local-only values — never use in production)
+AUTH_SECRET="local-secret-do-not-use-in-production"
+AUTH_URL="http://localhost:3000"
 ```
-postgresql://postgres:postgres@localhost:5432/<project_name>?schema=public
-```
 
-where `<project_name>` is derived from the project's `package.json` `name` field
-(lowercase, hyphens replaced with underscores).
+Only include `AUTH_SECRET` and `AUTH_URL` if the project uses next-auth / Auth.js.
+Add any other environment variables the project needs with safe local-only defaults.
 
-Show the pre-filled value and ask the user to confirm or adjust it.
+### Step 3: Dev Profile (`.env.development`) — Supabase
 
-**If the user chooses Other (option 2):**
+Ask the user for both URLs:
 
-Ask the user to provide their full `DATABASE_URL` connection string.
-
-### Step 3: Dev Profile (`.env.development`)
-
-Ask the user:
-
-> **Dev database connection string:**
+> **Supabase connection strings for the dev environment:**
 >
-> Please provide a Supabase, AWS RDS, or other managed database connection string
-> for your development/staging environment.
+> Prisma requires two connection URLs. Please provide both:
 >
-> Docker is not available for dev — use a managed database service.
-
-Wait for the user to provide the connection string.
-
-### Step 4: Prod Profile (`.env.production`)
-
-Ask the user:
-
-> **Production database connection string:**
+> 1. **Pooled URL** (`DATABASE_URL`) — used by your application at runtime.
+>    Typically looks like:
+>    `postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres`
 >
-> Please provide a Supabase, AWS RDS, or other managed database connection string
-> for your production environment.
+> 2. **Direct URL** (`DIRECT_URL`) — used by Prisma for migrations and introspection.
+>    Typically looks like:
+>    `postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres`
 >
-> Docker is not available for prod — use a managed database service.
+> You can find both in your Supabase dashboard under **Settings → Database → Connection string**.
 
-Wait for the user to provide the connection string.
+Wait for the user to provide both connection strings.
 
-### Step 5: Test Profile (`.env.test`)
+### Step 4: Test Profile (`.env.test`) — Auto-generated
 
 This profile is **not interactive** — it is auto-generated for Testcontainers-driven
 integration and e2e tests.
@@ -137,38 +147,38 @@ Add any other environment variables the project needs with safe test-only defaul
 
 Inform the user:
 
-> The **test** profile does not include a `DATABASE_URL` because Testcontainers
-> provides it dynamically at test runtime. Vitest and Playwright global setup files
-> start a PostgreSQL container, run migrations, and inject `DATABASE_URL` into
-> `process.env` before tests execute.
+> Both **local** and **test** profiles use Testcontainers. `DATABASE_URL` is provided
+> dynamically at runtime — by the dev script for local, and by Vitest/Playwright
+> global setup for tests. PostgreSQL containers are started automatically, migrations
+> are applied, and the connection string is injected into `process.env`.
 
-### Step 6: Additional Environment Variables
+### Step 5: Additional Environment Variables
 
-After all three database URLs are collected, check if the project uses any of
-the following and ask the user to provide values per profile if applicable:
+Check if the project uses any of the following and, for the **dev profile only**,
+ask the user to provide values if applicable:
 
 - `NEXTAUTH_SECRET` / `AUTH_SECRET` (if next-auth is a dependency)
 - `NEXTAUTH_URL` / `AUTH_URL` (if next-auth is a dependency)
 - `NEXT_PUBLIC_APP_URL` (if referenced in the codebase)
 
+For local and test profiles, use safe defaults automatically (as shown in Steps 2 and 4).
 For any variables already present in existing `.env*` files, show current values
 and ask whether to keep or update them.
 
-### Step 7: Write Files
+### Step 6: Write Files
 
-For each profile, generate the `.env` file with this structure:
+For the **dev** profile, generate the `.env` file with this structure:
 
 ```env
 # =============================================================================
-# <PROFILE_NAME> Environment Profile
+# Development Environment Profile (Supabase)
 # =============================================================================
 
 # Database
-DATABASE_URL="<user_provided_url>"
+DATABASE_URL="<user_provided_pooled_url>"
 
-# Direct connection URL (for Prisma migrations — same as DATABASE_URL unless
-# the provider requires a different connection mode, e.g. Supabase pooling)
-DIRECT_URL="<user_provided_url>"
+# Direct connection URL (for Prisma migrations — bypasses connection pooling)
+DIRECT_URL="<user_provided_direct_url>"
 
 # App
 # NEXT_PUBLIC_APP_URL="<if applicable>"
@@ -182,58 +192,26 @@ Only include variables that are relevant to the project. Comment out optional
 variables that were not provided rather than omitting them, so the user knows
 they are available.
 
-### Step 8: Create Local Dev Script (Docker only)
+For the **local** and **test** profiles, write the files as defined in Steps 2 and 4.
 
-If the user chose **Docker** for the local profile, create a `scripts/dev.sh` script
-that orchestrates the full local development startup.
+### Step 7: Create `.env` Symlink
 
-1. **Create `scripts/dev.sh`** with the following behavior:
+Create a `.env` symlink pointing to `.env.local` if one does not already exist:
 
-   - **Ensure Docker is running** — if not, open Docker Desktop and wait up to 60 s
-   - **Ensure PostgreSQL container** — create if missing, start if stopped, wait for readiness
-   - **Run Prisma migrations** — `npx prisma migrate deploy`
-   - **Start Next.js dev server** — `exec npm run dev`
+```bash
+ln -sf .env.local .env
+```
 
-   Use these conventions:
-   - Container name: `<project_name>-postgres` (derived from `package.json` `name`)
-   - Database name: same as the `<project_name>` used in `DATABASE_URL` (underscored)
-   - DB user/password: `postgres` / `postgres`
-   - Port: the port from the `DATABASE_URL` (default `5432`)
-   - PostgreSQL image: `postgres:17-alpine`
-   - If the project has a `prisma/prisma.config.ts`, append `--config prisma/prisma.config.ts`
-     to the migrate command
+This ensures tools that read `.env` by default (like Prisma) pick up the local profile.
 
-   The script must:
-   - Start with `#!/usr/bin/env bash` and `set -euo pipefail`
-   - Include a descriptive header comment explaining what the script does
-   - Use helper functions (`ensure_docker`, `ensure_postgres`, `run_migrations`, `start_dev`)
-   - Print clear status messages with `✓` for success and `→` for in-progress
+### Step 8: Update Prisma Datasource (if needed)
 
-2. **Make the script executable**: `chmod +x scripts/dev.sh`
+Ensure the Prisma datasource includes `directUrl`. The location depends on the project setup:
 
-3. **Add `dev:local` npm script** to `package.json`:
-
-   ```json
-   "dev:local": "bash scripts/dev.sh"
-   ```
-
-   Insert it right after the existing `dev` script entry. If `dev:local` already exists,
-   show the user the current value and ask whether to overwrite.
-
-4. **Create a `.env` symlink** pointing to `.env.local` if one does not already exist:
-
-   ```bash
-   ln -sf .env.local .env
-   ```
-
-   This ensures tools that read `.env` by default (like Prisma) pick up the local profile.
-
-If the user chose **Other** (not Docker) for the local profile, skip this step entirely.
-
-### Step 9: Update Prisma Schema (if needed)
-
-If `prisma/schema.prisma` exists and does not already reference the `DIRECT_URL`
-environment variable in the datasource block, update it:
+- If `prisma.config.ts` exists: check whether the datasource `directUrl` is configured there
+  (per the Context7 documentation fetched in Step 0). Update the config file accordingly.
+- If `prisma/schema.prisma` is used (no `prisma.config.ts`): ensure the datasource block
+  references `DIRECT_URL`:
 
 ```prisma
 datasource db {
@@ -243,7 +221,12 @@ datasource db {
 }
 ```
 
-### Step 10: Summary
+If the project does **not** yet have a `prisma.config.ts` but the Context7 documentation
+indicates it is the recommended approach for the project's Prisma version, suggest creating
+one to the user and explain the benefits (centralized config, TypeScript support, env file
+resolution). Do not create it without user confirmation.
+
+### Step 9: Summary
 
 Present a summary of what was created:
 
@@ -252,13 +235,11 @@ Present a summary of what was created:
 
 | Profile | File               | Database                                |
 |---------|--------------------|-----------------------------------------|
-| local   | .env.local         | <short description, e.g. Docker>        |
-| dev     | .env.development   | <short description, e.g. Supabase>      |
-| prod    | .env.production    | <short description, e.g. RDS>           |
+| local   | .env.local         | Testcontainers (dynamic at runtime)     |
+| dev     | .env.development   | Supabase                                |
 | test    | .env.test          | Testcontainers (dynamic at runtime)     |
 
 ### Next Steps
-- Run `npm run dev:local` to start the full local development environment (Docker + migrations + dev server)
-- Or run `npx prisma migrate dev` to apply migrations manually against your local database
-- Verify each profile by running: `dotenv -e .env.<profile> -- npx prisma db pull`
+- Run `npx prisma migrate dev` to apply migrations (add `--config <path>` if using `prisma.config.ts`)
+- Verify the dev profile by running: `dotenv -e .env.development -- npx prisma db pull`
 ```

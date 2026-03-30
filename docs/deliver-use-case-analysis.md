@@ -221,7 +221,7 @@ On re-delivery after a spec change:
 
 | # | Recommendation | Impact | Effort | Priority |
 |---|----------------|--------|--------|----------|
-| 1 | Iteration artifacts | High | Low | **P1** |
+| 1 | Iteration artifacts | High | Low | **P1 ✅** |
 | 2 | Entity Gate in use-case-spec | High | Low | **P1** |
 | 4 | Automate DoD checks | Medium | Low | **P2** |
 | 3 | Test failures in QA prompt | Medium | Medium | **P2** |

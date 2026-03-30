@@ -36,6 +36,47 @@ If any prerequisite is missing, stop and tell the user which `/command` to run f
 - Ask the user for input between steps — run autonomously until the pipeline completes or exhausts retries
 - Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/deliver-use-case` is invoked
 
+## Iteration Artifacts
+
+Maintain a delivery log at `docs/delivery/$ARGUMENTS-iterations.md` that records every
+iteration attempt. This file gives agents in subsequent iterations full context of what
+was already tried and what failed, preventing repeated mistakes.
+
+**Create the file** at the start of Step 4 (before launching the first E2E agent). Use
+this format:
+
+```markdown
+# $ARGUMENTS Delivery Log
+
+## E2E Test Iterations
+
+### Iteration 1 — [timestamp]
+
+#### Test Run Result
+- **Result:** PASSED | FAILED (N/M passed)
+- **Failures:**
+  - `[test name]` — [classification: test bug / implementation bug] — [error summary]
+
+#### Fixes Applied
+- [description of each fix made]
+
+---
+```
+
+**Update the file** after every Phase 2 verification in Step 4 and after every QA evaluation
+and test run in Step 5. Append a new iteration section each time. For Step 5, add an
+`## E2E Evaluation Iterations` heading and include both the QA gap analysis summary and
+the subsequent test run result.
+
+**Pass the file to agents** on every re-launch. When re-launching the E2E agent for fix
+iterations (Step 4) or gap fixes (Step 5), include this in the agent prompt:
+
+> **Previous iteration history** (read `docs/delivery/$ARGUMENTS-iterations.md` for full
+> context of what was already attempted and what failed — do NOT repeat fixes that did not
+> work):
+
+This ensures agents never retry a fix that already failed.
+
 ## Entity Gate
 
 **This check runs before any pipeline step and is a hard stop.**
@@ -195,11 +236,18 @@ syntax error). Indicators: `locator.click: Target closed`, `expect(locator).toHa
 Indicators: wrong HTTP status, missing API route, incorrect data returned, UI renders
 wrong content, server error in console output.
 
+**Log the iteration** — append the test run result, failure classifications, and fixes
+applied to `docs/delivery/$ARGUMENTS-iterations.md` (see Iteration Artifacts).
+
 Then act based on the classification:
 
-1. **Test bugs:** Re-launch the E2E agent with the error context:
+1. **Test bugs:** Re-launch the E2E agent with the error context and iteration history:
    > The following tests failed due to test issues. Fix them.
    > [paste the exact Playwright error output for each failing test]
+   >
+   > **Previous iteration history** (read `docs/delivery/$ARGUMENTS-iterations.md` for full
+   > context of what was already attempted and what failed — do NOT repeat fixes that did not
+   > work):
    After the agent returns, go back to Phase 2.
 
 2. **Implementation bugs:** Fix the implementation in the main context (do not modify spec
@@ -218,6 +266,8 @@ Failing tests:
 
 Playwright output (last run):
 [paste full output]
+
+Delivery log: docs/delivery/$ARGUMENTS-iterations.md
 ```
 
 ---
@@ -362,7 +412,11 @@ GitHub issue for `$ARGUMENTS`:
 
 #### Phase 2: Fix E2E Tests (Isolated Agent)
 
-If the QA evaluation identifies gaps, launch the **E2E agent** with the gap analysis as input:
+**Log the QA evaluation** — append the gap analysis summary (gaps found, coverage verdict)
+to `docs/delivery/$ARGUMENTS-iterations.md` under the `## E2E Evaluation Iterations` heading.
+
+If the QA evaluation identifies gaps, launch the **E2E agent** with the gap analysis and
+iteration history as input:
 
 > You are an independent E2E test author. Read and follow the complete instructions in
 > `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
@@ -373,6 +427,10 @@ If the QA evaluation identifies gaps, launch the **E2E agent** with the gap anal
 > `docs/designs/$ARGUMENTS-design.html`:
 >
 > [paste the full QA evaluation / gap analysis report here]
+>
+> **Previous iteration history** (read `docs/delivery/$ARGUMENTS-iterations.md` for full
+> context of what was already attempted and what failed — do NOT repeat fixes that did not
+> work):
 >
 > Address every identified gap. Ensure all user journeys from the specification are covered.
 >
@@ -388,6 +446,9 @@ If the QA evaluation identifies gaps, launch the **E2E agent** with the gap anal
 
 After the E2E agent returns, **independently verify** the tests pass (same as Step 4 Phase 2):
 run `npx playwright test`, confirm 0 failed, 0 skipped, exit code 0.
+
+**Log the test run result** — append the verification outcome (pass/fail, test counts,
+errors) to `docs/delivery/$ARGUMENTS-iterations.md`.
 
 **Post the test run outcome to the GitHub issue** (same as Step 4 — heading, iteration number,
 pass/fail result, test counts, failure details if any, Playwright summary output, and the
@@ -407,6 +468,8 @@ E2E EVALUATION FAILED: $ARGUMENTS (3 iterations exhausted)
 
 Remaining gaps:
 - [gap description from latest QA evaluation]
+
+Delivery log: docs/delivery/$ARGUMENTS-iterations.md
 ```
 
 ## Completion
@@ -433,6 +496,8 @@ Display the pipeline report to the user:
 
 Include a **What was built** section listing the key artifacts: pages, API routes, services,
 tests, and any notable implementation details.
+
+Include a **Delivery log** line pointing to `docs/delivery/$ARGUMENTS-iterations.md`.
 
 ### GitHub Issue Report
 

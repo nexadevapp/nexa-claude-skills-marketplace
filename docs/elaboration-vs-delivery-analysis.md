@@ -94,7 +94,7 @@ The following must exist before running this pipeline:
 - `docs/requirements.md` (from `/requirements`)
 - `docs/entity_model.md` (from `/entity-model`)
 - `docs/use_cases/$ARGUMENTS.md` (from `/refine-use-cases` or `/use-case-spec`)
-- `docs/designs/$ARGUMENTS-design.md` (from `/refine-use-cases` or `/frontend-design`)
+- `docs/designs/$ARGUMENTS-design.html` (from `/refine-use-cases` or `/frontend-design`)
 - Prisma migration for all entities referenced in the use case
 
 If any prerequisite is missing, stop and tell the user to run `/refine-use-cases` first.

@@ -24,7 +24,7 @@ clicks through those same three screens.
 | Input | Location | Required |
 |-------|----------|----------|
 | Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
-| Frontend design | `docs/designs/UC-XXX-design.md` | Yes |
+| Frontend design | `docs/designs/UC-XXX-design.html` | Yes |
 
 The **use case specification** defines *what* the system does (scenarios, alternative flows, business
 rules). The **frontend design** defines *how* it looks and behaves (screens, components, states,
@@ -36,7 +36,7 @@ user actions, navigation flow). Together they determine the test scenarios and a
 - **User interactions** derive from the frontend design's User Actions (triggers, results)
 - **Navigation expectations** derive from the frontend design's Navigation Flow and Screen Map
 
-If `docs/designs/$ARGUMENTS-design.md` does not exist, stop and tell the user to run `/frontend-design $ARGUMENTS` first.
+If `docs/designs/$ARGUMENTS-design.html` does not exist, stop and tell the user to run `/frontend-design $ARGUMENTS` first.
 
 ## Test Philosophy: Journeys, Not Fragments
 

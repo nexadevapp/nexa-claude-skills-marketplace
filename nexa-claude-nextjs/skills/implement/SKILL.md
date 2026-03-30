@@ -29,6 +29,16 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 
 Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
 
+## Project Readiness Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/shared/readiness/PROJECT_READINESS.md`.
+
+This gate checks that cross-cutting infrastructure (middleware, error logging, security headers,
+environment configuration) exists before use case implementation begins. It applies to `UC-XXX`
+items only — `TT-XXX` and `BUG-XXX` items skip this gate.
+
+Do not proceed with implementation until all items pass or the user explicitly waives failures.
+
 ## DoR Check
 
 - For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY.md`.

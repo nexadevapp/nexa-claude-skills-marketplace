@@ -1,9 +1,9 @@
 ---
 name: build-web-middleware
 description: >
-  Builds the Next.js middleware layer with authentication, authorization, security
-  headers, and request context enrichment. Run before implementing use cases so that
-  feature code can rely on cross-cutting infrastructure. Use when the user asks to
+  Builds the Next.js request interception layer with authentication, authorization, security
+  headers, error tracking, and request context enrichment. Run before implementing use cases
+  so that feature code can rely on cross-cutting infrastructure. Use when the user asks to
   "set up middleware", "add auth middleware", "build the middleware layer",
   "add security headers", "protect my routes", "add login redirect", "secure my
   API routes", "set up route guards", or mentions middleware, authentication guard,
@@ -14,42 +14,47 @@ description: >
 
 ## Instructions
 
-Build the Next.js middleware layer for the project. This skill produces the cross-cutting
-infrastructure that use case implementations depend on: authentication, authorization,
-security headers, and request context enrichment.
+Build the Next.js request interception and cross-cutting infrastructure for the project.
+This skill produces the infrastructure that use case implementations depend on:
+authentication, authorization, security headers, structured error logging, and server
+error tracking.
 
 Run this skill **after** the entity model and Prisma migration exist (so user/role entities
 are available) and **before** implementing use cases.
 
-If a documentation MCP server (e.g. context7) is available, use it to look up Next.js
-middleware docs. Otherwise, rely on training knowledge and the project's installed
-Next.js version.
+## Step 0: Consult Next.js Documentation
 
-## Edge Runtime Constraints
+**Before writing any code**, use the context7 MCP server to look up the current Next.js
+documentation for the project's installed version (read `package.json` to determine the
+version). Query for:
 
-Next.js middleware runs in the **Edge Runtime**. This imposes hard constraints:
+1. **Request interception file convention** — the correct file name, export name, runtime,
+   and configuration format for the request interception entry point (historically
+   `middleware.ts`, but this may change across versions)
+2. **Runtime constraints** — which runtime the request interception layer runs in and what
+   APIs are available or restricted (e.g. Edge Runtime vs Node.js, Prisma availability,
+   native module support)
+3. **Instrumentation and error tracking** — the correct file convention and exports for
+   global server error tracking (e.g. `instrumentation.ts` with `onRequestError`)
+4. **Matcher/config format** — how to configure which routes the interception layer applies to
 
-- **No Node.js APIs** — `fs`, `crypto` (full), native modules, and `node:*` imports are unavailable
-- **No Prisma Client** — you cannot import or call Prisma from `middleware.ts`. Session validation must be **stateless** (e.g. verify a JWT signature) or delegated to an API route
-- **Edge-compatible libraries only** — use `jose` for JWT (not `jsonwebtoken`), use Web Crypto API for hashing
-- **No heavy dependencies** — middleware must stay lightweight; large libraries will slow every request
-
-If the chosen auth strategy requires a database lookup to validate sessions (e.g. Lucia with
-DB sessions), the middleware must verify a signed cookie/token statelessly and defer full
-session hydration to server components or API routes.
+Store these findings and use them throughout the remaining steps. Every file name, export
+name, runtime constraint, and API choice in the steps below must align with what the
+documentation says for the installed version — not with hardcoded assumptions.
 
 ## DO NOT
 
-- Overwrite an existing `middleware.ts` without showing the user what will change and asking for confirmation
+- Overwrite an existing request interception file without showing the user what will change and asking for confirmation
 - Hard-code secrets, tokens, or credentials (use environment variables)
 - Install authentication libraries without user confirmation (e.g. next-auth, lucia, clerk) — ask the user which auth approach to use
-- Use Edge-incompatible libraries in middleware (`jsonwebtoken`, `bcrypt`, Prisma Client, `node:*` imports)
-- Import Prisma Client from `middleware.ts` — it will compile but fail at runtime in Edge
+- Use libraries incompatible with the runtime determined in Step 0
+- Import Prisma Client from the request interception entry point if the runtime does not support it
 - Add i18n routing unless the requirements explicitly mention internationalization
-- Add rate limiting logic inside the middleware itself (use a dedicated service or external provider)
-- Create feature-specific logic in middleware — keep it generic and cross-cutting
-- Skip reading the entity model — the middleware must align with the project's user/role structure
-- Set security headers in both `middleware.ts` and `next.config.js` — pick one location to avoid duplication and conflicts
+- Add rate limiting logic inside the request interception layer (use a dedicated service or external provider)
+- Create feature-specific logic in the interception layer — keep it generic and cross-cutting
+- Skip reading the entity model — the layer must align with the project's user/role structure
+- Set security headers in both the interception entry point and `next.config.js` — pick one location to avoid duplication and conflicts
+- Hardcode file names or runtime constraints without checking the documentation first
 
 ## Prerequisites
 
@@ -90,18 +95,18 @@ Search the codebase for:
 - **Pages** — `app/**/page.tsx` files (excluding `app/page.tsx` if it's just a landing page)
 - **API routes** — `app/api/**/route.ts` files
 - **Server actions** — files containing `"use server"` in `app/actions/` or colocated with pages
-- **Existing middleware** — check if `middleware.ts` or `middleware.js` already exists at the project root
+- **Existing request interception** — check if a request interception file already exists at the project root (use the file name determined in Step 0)
 - **Ad-hoc auth checks** — grep for patterns like `getServerSession`, `getSession`, `auth()`, `cookies().get`, `headers().get('authorization')`, or manual token validation in existing code
 
-#### 2b. If Existing Middleware Found
+#### 2b. If Existing Request Interception Found
 
-If `middleware.ts` already exists, show the user its current content and ask:
+If a request interception file already exists, show the user its current content and ask:
 
-> **An existing `middleware.ts` was found. Choose how to proceed:**
+> **An existing request interception file was found. Choose how to proceed:**
 >
 > 1. **Extend** — keep existing logic and add auth/security layers around it
-> 2. **Replace** — discard the current middleware and build from scratch
-> 3. **Abort** — stop and let me review the existing middleware first
+> 2. **Replace** — discard the current file and build from scratch
+> 3. **Abort** — stop and let me review the existing file first
 
 Wait for the user to choose before proceeding.
 
@@ -123,15 +128,15 @@ Present this table to the user and ask:
 
 > **Retrofit impact analysis:**
 >
-> The following existing routes will be affected by the middleware:
+> The following existing routes will be affected:
 >
 > [impact table]
 >
 > **Breaking changes** require updates — these routes currently work without auth
-> and will start redirecting or returning 403 after middleware is applied.
+> and will start redirecting or returning 403 after the interception layer is applied.
 >
 > **Review items** have existing ad-hoc auth that may conflict or duplicate the
-> middleware logic.
+> new logic.
 >
 > Options:
 > 1. **Proceed** — I'll adjust the route protection rules to minimize breakage and
@@ -150,16 +155,16 @@ auth pattern:
 >
 > | File                       | Current Pattern                          | Recommendation          |
 > |----------------------------|------------------------------------------|-------------------------|
-> | `app/api/users/route.ts`   | `getServerSession()` + manual role check | Remove — middleware handles it |
-> | `app/actions/create-post.ts` | `auth()` guard at top of action        | Keep — server actions need explicit auth since middleware only covers the request |
-> | `app/dashboard/page.tsx`   | `redirect()` if no session               | Remove — middleware redirects |
+> | `app/api/users/route.ts`   | `getServerSession()` + manual role check | Remove — interception layer handles it |
+> | `app/actions/create-post.ts` | `auth()` guard at top of action        | Keep — server actions need explicit auth since the interception layer only covers the request |
+> | `app/dashboard/page.tsx`   | `redirect()` if no session               | Remove — interception layer redirects |
 >
-> After the middleware is built, I will update these files as part of the migration checklist.
+> After the interception layer is built, I will update these files as part of the migration checklist.
 
-**Important:** Server actions called via `fetch` or form submission go through middleware,
-but server actions called directly from server components do not hit middleware. For these,
-the explicit auth check in the action itself must be **kept**, not removed. Flag this
-distinction clearly in the consolidation plan.
+**Important:** Server actions called via `fetch` or form submission go through the
+interception layer, but server actions called directly from server components do not.
+For these, the explicit auth check in the action itself must be **kept**, not removed.
+Flag this distinction clearly in the consolidation plan.
 
 #### 2e. Generate Migration Checklist
 
@@ -170,17 +175,17 @@ If in retrofit mode, create a technical task following the standard `TT-XXX` nam
    - **Task ID:** `TT-XXX` (the assigned numeric ID)
    - **Task Name:** Middleware Retrofit — Consolidate Ad-hoc Auth
    - **Category:** Cleanup
-   - **Goal:** Adapt existing routes and server actions to use the new middleware auth layer, removing redundant ad-hoc auth checks and updating tests
+   - **Goal:** Adapt existing routes and server actions to use the new auth layer, removing redundant ad-hoc auth checks and updating tests
    - **Status:** Approved
    - **Acceptance Criteria:** one checklist item per file that needs updating, grouped by change type:
-     - **Remove redundant auth** — files where middleware now handles what the code did manually
+     - **Remove redundant auth** — files where the interception layer now handles what the code did manually
      - **Keep explicit auth** — server actions that need their own auth check
      - **Update tests** — test files that need auth tokens/sessions added to their setup
-     - **Review conflicts** — files with auth logic that may conflict with middleware behavior
+     - **Review conflicts** — files with auth logic that may conflict with the new behavior
    - **Affected Areas:** every file identified in the retrofit analysis
    - **Dependencies:** None
 
-This checklist becomes the work plan for adapting existing code after the middleware is in place.
+This checklist becomes the work plan for adapting existing code after the interception layer is in place.
 
 **Do not apply the migration changes in this skill.** The checklist is implemented via
 `/implement TT-XXX-middleware-retrofit` (using the assigned ID) as a follow-up step, so each
@@ -190,23 +195,20 @@ change can be reviewed individually.
 
 If an auth library is already installed in `package.json`, lead with it:
 
-> **I found `<library>` in your dependencies. Should I build the middleware around it?**
+> **I found `<library>` in your dependencies. Should I build the interception layer around it?**
 >
 > If not, choose an alternative:
 
-If no auth library is installed, present all options:
+If no auth library is installed, present options. Use the context7 MCP server to check
+which auth libraries are compatible with the runtime determined in Step 0, then present:
 
 > **Authentication strategy — choose one:**
 >
-> 1. **NextAuth.js (Auth.js)** — session-based, supports OAuth providers and credentials
-> 2. **Lucia** — lightweight, session-based, full control over the auth flow
-> 3. **Custom JWT** — stateless token-based auth with `jose` (Edge-compatible)
-> 4. **External provider** — Clerk, Supabase Auth, AWS Cognito (middleware validates tokens)
-> 5. **Other** — describe your preferred approach
+> [list options compatible with the runtime, e.g. session-based, JWT, external provider]
 
 Wait for the user to choose before proceeding.
 
-### Step 3: Define Route Protection Rules
+### Step 4: Define Route Protection Rules
 
 Ask the user to confirm or adjust the default route protection rules:
 
@@ -225,71 +227,53 @@ Ask the user to confirm or adjust the default route protection rules:
 
 Incorporate the user's adjustments.
 
-### Step 4: Build the Middleware
+### Step 5: Build the Infrastructure
 
-Create or update the following files:
+Create the files below. For every file, use the conventions determined in Step 0 (file
+names, export names, runtime APIs, matcher format). Consult the context7 MCP server again
+if you need to clarify any API or convention.
 
-#### 4a. `middleware.ts` (project root)
+#### 5a. Request Interception Entry Point (project root)
 
-The middleware entry point. It must:
+Create the entry point file using the correct file name and export name from Step 0. It must:
 
-- Export a `middleware` function and a `config` with a `matcher` array
-- Use the `matcher` to exclude static assets and internal Next.js routes:
-  ```ts
-  export const config = {
-    matcher: [
-      /*
-       * Match all request paths except:
-       * - _next/static (static files)
-       * - _next/image (image optimization)
-       * - favicon.ico, sitemap.xml, robots.txt
-       * - Static file extensions (.svg, .png, .jpg, .jpeg, .gif, .webp, .ico)
-       */
-      '/((?!_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
-    ],
-  };
-  ```
-- Wrap the entire `middleware` function body in a try/catch. On unexpected errors, log the error with full context and **fail closed** (redirect to login rather than letting the request through)
-- Follow this composition pattern in the `middleware` function:
+- Export the entry function and configuration using the convention from the docs
+- Use the matcher/config to exclude static assets and internal Next.js routes
+- Wrap the entire function body in a try/catch. On unexpected errors, log the error with full context and **fail closed** (redirect to login rather than letting the request through)
+- Follow this composition pattern:
   1. Check if the route is public — if so, log at debug level, apply security headers and return
-  2. Validate the session/token statelessly (no DB calls)
+  2. Validate the session/token (respect runtime constraints — if DB calls are not available, validate statelessly)
   3. If unauthenticated on a protected route — log a warning with the path and redirect to login
   4. If authenticated on an auth route (login/signup) — log at debug level and redirect to dashboard
   5. If route requires a specific role and user lacks it — log a warning with the path, user ID, and required vs. actual roles, then return 403 or redirect
   6. Apply security headers to the response
   7. Return the response
 
-#### 4b. `lib/auth/middleware.ts`
+#### 5b. `lib/auth/middleware.ts`
 
-Auth-specific middleware helpers (must be Edge-compatible — no Prisma, no Node.js APIs):
+Auth-specific helpers (must respect the runtime constraints from Step 0):
 
-- `getSessionFromRequest(request)` — extract and validate the session/token from the request cookie or Authorization header. For JWT strategies, verify the signature using `jose`. For session-based strategies, decode and verify the signed session cookie. Must never throw — catch verification errors internally, log them with `middlewareLogger.error()`, and return `null`
+- `getSessionFromRequest(request)` — extract and validate the session/token from the request cookie or Authorization header. Use libraries compatible with the runtime. Must never throw — catch verification errors internally, log them, and return `null`
 - `isAuthenticated(session)` — check if the session is valid and not expired
 - `hasRole(session, role)` — check if the user has the required role
 
-#### 4c. `lib/auth/constants.ts`
+#### 5c. `lib/auth/constants.ts`
 
 Route and auth constants:
 
 - `PUBLIC_ROUTES` — array of public route patterns
 - `AUTH_ROUTES` — array of auth-related routes (login, signup) that redirect when authenticated
-- `ROLE_PROTECTED_ROUTES` — map of route patterns to required roles, supporting multiple roles per route:
-  ```ts
-  export const ROLE_PROTECTED_ROUTES: Record<string, { roles?: string[]; permissions?: string[] }> = {
-    '/admin': { roles: ['ADMIN'] },
-    '/admin/users': { roles: ['ADMIN', 'SUPER_ADMIN'] },
-  };
-  ```
+- `ROLE_PROTECTED_ROUTES` — map of route patterns to required roles, supporting multiple roles per route
 - `DEFAULT_LOGIN_REDIRECT` — where to redirect after login (e.g. `/dashboard`)
 - `LOGIN_PAGE` — the login page path
 
-#### 4d. `lib/auth/headers.ts`
+#### 5d. `lib/auth/headers.ts`
 
-Security headers utility. Set headers **only** in middleware — not in `next.config.js` — to
-avoid duplication and conflicts:
+Security headers utility. Set headers **only** in the interception entry point — not in
+`next.config.js` — to avoid duplication and conflicts:
 
 - `securityHeaders()` — returns a `Headers` object with:
-  - `Content-Security-Policy` — start with a restrictive baseline (`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'`) and add a comment noting it should be tuned per project
+  - `Content-Security-Policy` — start with a restrictive baseline and add a comment noting it should be tuned per project
   - `X-Frame-Options: DENY`
   - `X-Content-Type-Options: nosniff`
   - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -297,22 +281,22 @@ avoid duplication and conflicts:
   - `Permissions-Policy` with sensible defaults (e.g. `camera=(), microphone=(), geolocation=()`)
   - `Strict-Transport-Security: max-age=31536000; includeSubDomains` (production only — check `process.env.NODE_ENV`)
 
-#### 4e. `lib/auth/logger.ts`
+#### 5e. `lib/auth/logger.ts`
 
-Structured middleware logger (Edge-compatible — uses `console` only, no `fs` or external
-logging libraries):
+Structured logger (must respect the runtime constraints from Step 0 — use only APIs
+available in the determined runtime):
 
-- Create a `middlewareLogger` object with `debug`, `warn`, and `error` methods
+- Create a logger object with `debug`, `warn`, and `error` methods
 - Every log message must be a **structured JSON string** with these fields:
   - `timestamp` — ISO 8601
   - `level` — `DEBUG`, `WARN`, or `ERROR`
-  - `source` — always `"middleware"`
+  - `source` — identifies this as the request interception layer
   - `path` — the request path
   - `method` — the HTTP method
   - `message` — human-readable description of what happened
   - Additional context fields depending on the event (see below)
 - `debug` level is only emitted when `process.env.NODE_ENV !== 'production'` to avoid noise
-- Define explicit log messages for each middleware decision point:
+- Define explicit log messages for each decision point:
 
 | Event                     | Level   | Additional Fields                                      |
 |---------------------------|---------|--------------------------------------------------------|
@@ -330,22 +314,23 @@ logging libraries):
 **Security rule:** Never log token values, session cookies, secrets, or full Authorization
 headers. Log user IDs and error messages only.
 
-Example output:
-```json
-{"timestamp":"2026-03-27T14:22:01.123Z","level":"WARN","source":"middleware","method":"GET","path":"/dashboard","message":"Token expired","userId":"usr_abc123","expiredAt":"2026-03-27T13:00:00.000Z"}
-```
+#### 5f. Instrumentation / Server Error Tracking
 
-### Step 5: Install Dependencies
+Use the context7 MCP server to look up the correct file convention and exports for global
+server error tracking in the installed Next.js version. Create the instrumentation file at
+the project root with an error tracking export that:
+
+- Captures all server-side errors (render errors, route handler errors, server action errors)
+- Logs errors as structured JSON with: error message, request path, HTTP method, route type, and error digest
+- Is extensible — includes a comment showing where to send errors to an external observability provider (e.g. Sentry, Datadog)
+
+### Step 6: Install Dependencies
 
 Install any required packages for the chosen auth strategy. Always ask the user for
-confirmation before installing:
+confirmation before installing. Use the context7 MCP server to verify package compatibility
+with the runtime determined in Step 0.
 
-- **NextAuth.js**: `next-auth`
-- **Lucia**: `lucia`, `@lucia-auth/adapter-prisma`
-- **Custom JWT**: `jose` (Edge-compatible — do NOT install `jsonwebtoken`)
-- **External provider**: provider-specific SDK
-
-### Step 6: Update Environment Variables
+### Step 7: Update Environment Variables
 
 Check existing `.env*` files (`.env.local`, `.env.development`, `.env.production`, and
 `.env.example` if present) and add any missing auth-related variables:
@@ -359,9 +344,9 @@ Comment out variables that need user-provided values with a `# TODO:` prefix.
 If `.env.example` exists, add the new variables there as well (without values) so other
 developers know which variables are required.
 
-### Step 7: Write Unit Tests
+### Step 8: Write Unit Tests
 
-Create unit tests for the middleware modules. Focus on pure functions with clear
+Create unit tests for the modules. Focus on pure functions with clear
 inputs/outputs — these give real regression value without maintenance burden.
 
 Place test files colocated with the source:
@@ -376,11 +361,11 @@ Place test files colocated with the source:
 Testing that an array contains specific values just creates a test that breaks on every
 intentional change without catching actual bugs.
 
-**Do not** create a unit test for the root `middleware.ts` function — it relies heavily on
-`NextRequest`/`NextResponse` objects that are complex to mock correctly, making these tests
-brittle. The middleware routing logic is more reliably validated by Playwright e2e tests.
+**Do not** create a unit test for the root request interception entry point — it relies
+heavily on framework request/response objects that are complex to mock correctly, making
+these tests brittle. The routing logic is more reliably validated by Playwright e2e tests.
 
-#### 7a. `headers.test.ts` — Security Headers
+#### 8a. `headers.test.ts` — Security Headers
 
 Test the `securityHeaders()` function:
 
@@ -390,9 +375,9 @@ Test the `securityHeaders()` function:
 - `Strict-Transport-Security` is absent when `NODE_ENV=development`
 - Header values match the expected defaults
 
-#### 7b. `logger.test.ts` — Structured Logger
+#### 8b. `logger.test.ts` — Structured Logger
 
-Test the `middlewareLogger` object:
+Test the logger object:
 
 - `debug` emits a JSON string to `console.debug` with correct fields (`timestamp`, `level`,
   `source`, `path`, `method`, `message`)
@@ -402,14 +387,11 @@ Test the `middlewareLogger` object:
 - Additional context fields (e.g. `userId`, `redirectTo`) are included in the output
 - Mock `console` methods with `vi.spyOn` and parse the logged JSON to assert field values
 
-#### 7c. `middleware.test.ts` (lib/auth) — Session Helpers
+#### 8c. `middleware.test.ts` (lib/auth) — Session Helpers
 
-Test the auth helper functions. The test setup depends on the auth strategy chosen in Step 3:
-
-- **Custom JWT (`jose`)** — use `jose` to create real test tokens (valid, expired, wrong-signature) signed with a test secret. Set `AUTH_SECRET` via `vi.stubEnv`
-- **NextAuth.js** — mock `getToken()` from `next-auth/jwt` to return valid/null/expired payloads
-- **Lucia** — mock the session cookie decoder to return valid/null sessions
-- **External provider** — mock the provider SDK's token verification function
+Test the auth helper functions. The test setup depends on the auth strategy chosen in Step 3.
+Use the context7 MCP server to look up the correct testing approach for the chosen auth
+library and runtime.
 
 Regardless of strategy, test these behaviors:
 
@@ -423,14 +405,14 @@ Regardless of strategy, test these behaviors:
 - `hasRole` returns `true` when the session contains the required role
 - `hasRole` returns `false` when the session lacks the required role
 
-### Step 8: Verify
+### Step 9: Verify
 
-1. Run `npx next build` to verify the middleware compiles and is Edge-compatible
-2. Verify the `matcher` config excludes `_next/static`, `_next/image`, and static file extensions
-3. Verify that `middleware.ts` exports are correct (named export `middleware` + `config`)
-4. Verify that no Prisma Client imports exist in `middleware.ts` or any file it imports
-5. Run all existing tests to ensure the middleware does not break anything:
-   - **Unit tests** — run `npx vitest run` (includes the new middleware unit tests from Step 7)
+1. Run `npx next build` to verify everything compiles and is compatible with the runtime
+2. Verify the matcher/config excludes `_next/static`, `_next/image`, and static file extensions
+3. Verify that the entry point exports are correct (use the convention from Step 0)
+4. Verify that no Prisma Client imports exist in the entry point or any file it imports, if the runtime does not support it
+5. Run all existing tests to ensure nothing is broken:
+   - **Unit tests** — run `npx vitest run` (includes the new unit tests from Step 8)
    - **Integration tests** — if integration test files exist (e.g. `**/*.integration.test.ts`), run them
    - **End-to-end tests** — if Playwright is configured (`playwright.config.ts` exists), run `npx playwright test`
    - If any test fails, fix the issue before proceeding. In retrofit mode, test failures likely
@@ -441,12 +423,17 @@ Regardless of strategy, test these behaviors:
    - Visit a public route (e.g. `/`) → should load normally
    - Check response headers in browser DevTools → security headers should be present
 
-### Step 9: Summary
+### Step 10: Summary
 
 Present a summary of what was created:
 
 ```
 ## Web Middleware Created
+
+### Next.js Version & Conventions
+- Next.js version: <version>
+- Request interception file: <file name> (runtime: <runtime>)
+- Instrumentation file: <file name>
 
 ### Auth Strategy
 <chosen strategy>
@@ -454,11 +441,12 @@ Present a summary of what was created:
 ### Files Created/Updated
 | File                                     | Purpose                                |
 |------------------------------------------|----------------------------------------|
-| middleware.ts                            | Main middleware entry point (Edge)     |
-| lib/auth/middleware.ts                   | Stateless session validation helpers   |
+| <entry point file>                       | Request interception entry point       |
+| <instrumentation file>                   | Global server error tracking           |
+| lib/auth/middleware.ts                   | Session validation helpers             |
 | lib/auth/constants.ts                    | Route rules and auth constants         |
 | lib/auth/headers.ts                      | Security headers (including CSP)       |
-| lib/auth/logger.ts                       | Structured middleware logger (Edge)    |
+| lib/auth/logger.ts                       | Structured logger                      |
 | lib/auth/__tests__/headers.test.ts       | Unit tests for security headers        |
 | lib/auth/__tests__/logger.test.ts        | Unit tests for structured logger       |
 | lib/auth/__tests__/middleware.test.ts    | Unit tests for session helpers         |
@@ -473,23 +461,25 @@ Present a summary of what was created:
 |---------------|-----------------------------------|
 | ...           | Added / Already exists / TODO     |
 
-### Error Handling
-- Middleware fails closed — unexpected errors redirect to login, never allow through
+### Error Handling & Observability
+- Request interception fails closed — unexpected errors redirect to login, never allow through
 - All auth failures produce structured JSON logs with path, method, and error context
-- Debug-level logs (public route allowed, authenticated allowed) are suppressed in production
+- Debug-level logs are suppressed in production
+- Server errors are captured globally via instrumentation and logged with request context
 
 ### Test Results
 - Unit tests: X passed, Y failed
 - Integration tests: X passed, Y failed (or N/A if none exist)
 - End-to-end tests: X passed, Y failed (or N/A if Playwright not configured)
-- [If any failures, list them and explain whether they are pre-existing or caused by the middleware]
+- [If any failures, list them and explain whether they are pre-existing or caused by the changes]
 
 ### What This Enables for Feature Implementation
 - `getSessionFromRequest(request)` is available in API routes and server actions
 - Protected routes automatically redirect to login
 - Role-based routes enforce access checks
 - Security headers (including CSP) are applied to all responses
-- Structured logs make auth issues debuggable via `source:"middleware"` filter
+- Structured logs make auth issues debuggable via `source` filter
+- Server errors are tracked globally with request context
 - The `/implement` skill can assume auth infrastructure exists
 
 ### Retrofit (if applicable)
@@ -500,7 +490,7 @@ Present a summary of what was created:
 - Migration checklist: docs/technical_tasks/TT-XXX-middleware-retrofit.md
 
 ### Next Steps
-- Implement the auth API routes (login, signup, session endpoints) — e.g. `/api/auth/[...nextauth]/route.ts` for NextAuth or custom routes for JWT/Lucia
+- Implement the auth API routes (login, signup, session endpoints)
 - Implement the login/signup pages as a use case with `/implement`
 - If in retrofit mode: run `/implement TT-XXX-middleware-retrofit` to adapt existing code
 - Configure OAuth providers and fill in `# TODO:` env vars (if applicable)

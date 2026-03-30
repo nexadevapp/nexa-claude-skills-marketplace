@@ -27,6 +27,16 @@ The following must exist before running this pipeline:
 
 If any prerequisite is missing, stop and tell the user which `/command` to run first.
 
+## Project Readiness Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/shared/readiness/PROJECT_READINESS.md`.
+
+This gate verifies that cross-cutting infrastructure (middleware, error logging, security headers,
+environment configuration) is in place before the pipeline begins. Without it, implemented use
+cases will lack consistent auth checks, error handling, and security protections.
+
+Do not proceed with the pipeline until all items pass or the user explicitly waives failures.
+
 ## DO NOT
 
 - Skip any step without checking its skip condition

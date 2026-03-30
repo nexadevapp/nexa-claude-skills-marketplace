@@ -27,6 +27,7 @@ translates the relevant wireframe section into a viewable, annotated design refe
 | Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
 | Entity model | `docs/entity_model.md` | If applicable |
 | Wireframe | `docs/wireframes/index.html` | Yes |
+| Design system CSS | `docs/designs/design-system.css` | Optional — created automatically if missing |
 
 ## Output
 
@@ -41,7 +42,8 @@ tables with `|`), STOP — you are producing the wrong format.**
 
 - **Produce Markdown** — the output is HTML, never `.md`. No Markdown syntax anywhere in the file.
 - Skip reading the use case specification first
-- Use any external dependencies — no CDN links, no external CSS/JS, no images via URL
+- Use any external dependencies — no CDN links, no remote CSS/JS, no images via URL. The only
+  external stylesheet allowed is the project's `design-system.css` (a local file in `docs/designs/`)
 - Use any framework-specific code (no React, no Next.js, no component libraries)
 - Use lorem ipsum — use realistic placeholder content that matches entity model attributes
 - Design screens for steps not in the use case specification
@@ -54,6 +56,13 @@ tables with `|`), STOP — you are producing the wrong format.**
 
 1. Read the use case specification from `docs/use_cases/UC-XXX.md`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
+3. Check if `docs/designs/design-system.css` exists:
+   - **If it exists**: Read it — all design tokens and base styles are already defined. Use its
+     CSS custom properties throughout the design artifact.
+   - **If it does NOT exist**: You will create it during Phase 3 before writing the design HTML.
+     Inspect the wireframe's visual language (colors, fonts, spacing, border radii) during Phase 2
+     and use those observations to populate the design system tokens. See the
+     **Design System CSS** section below for the required structure.
 
 ### Phase 2 — Inspect the wireframe with Playwright
 
@@ -79,16 +88,21 @@ Create the `docs/snapshots/` directory if it does not exist.
 
 ### Phase 3 — Produce the HTML design artifact
 
-6. Using the **Write** tool, create `docs/designs/UC-XXX-design.html` following the HTML structure
+6. If `docs/designs/design-system.css` does not exist, create it now using the **Write** tool.
+   Populate the CSS custom properties with values derived from the wireframe inspection in Phase 2.
+   Follow the structure defined in the **Design System CSS** section below.
+7. Using the **Write** tool, create `docs/designs/UC-XXX-design.html` following the HTML structure
    below. The file content MUST be valid HTML starting with `<!DOCTYPE html>` — never Markdown.
-7. For each screen identified in the wireframe:
+8. For each screen identified in the wireframe:
    - Reproduce the **layout and visual structure** from the wireframe
    - Map **components** to use case steps using `data-uc-step` attributes
    - Map **data fields** to entity model attributes using `data-entity` attributes
    - Include all **states**: default, loading, empty, error, success — each rendered as a
      visible section
-8. Include a **navigation flow** section showing how screens connect
-9. Include **responsive behavior** using CSS media queries
+   - Use CSS custom properties from the design system (e.g., `var(--color-primary)`,
+     `var(--font-body)`, `var(--spacing-md)`) — never hardcode color, typography, or spacing values
+9. Include a **navigation flow** section showing how screens connect
+10. Include **responsive behavior** using CSS media queries
 
 ## HTML Structure
 
@@ -101,31 +115,25 @@ The design HTML must follow this structure:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Design: UC-XXX — [Use Case Name]</title>
+
+  <!-- Shared design system — single source of truth for tokens and base styles -->
+  <link rel="stylesheet" href="design-system.css">
+
   <style>
-    /* All styles inline — no external CSS */
+    /* ── Screen-specific overrides only ──
+       Layout rules unique to THIS screen go here.
+       All color, typography, and spacing values MUST use CSS custom properties
+       from the design system (e.g., var(--color-primary), var(--font-body), var(--spacing-md)).
+       Do NOT hardcode hex colors, font stacks, or pixel spacing values. */
 
-    /* ── Design metadata bar ── */
-    .design-meta { /* use case ID, status, last updated */ }
-
-    /* ── Screen sections ── */
-    .screen { /* each screen is a top-level section */ }
-    .screen__title { /* screen name and purpose */ }
-    .screen__layout { /* the actual screen design */ }
-
-    /* ── State variants ── */
-    .state { /* each state rendered as a visible block */ }
-    .state--default { }
-    .state--loading { }
-    .state--empty { }
-    .state--error { }
-    .state--success { }
+    /* ── Screen-specific layout ── */
 
     /* ── Annotations ── */
     [data-uc-step]::after {
       /* Optionally show UC step annotations on hover or always */
     }
 
-    /* ── Responsive ── */
+    /* ── Responsive overrides for this screen ── */
     @media (max-width: 768px) { /* tablet adjustments */ }
     @media (max-width: 480px) { /* mobile adjustments */ }
   </style>
@@ -243,4 +251,94 @@ The design HTML must follow this structure:
   visible section. This makes the design a complete reference — no hidden requirements.
 - **Traceable** — Every interactive element traces back to a use case step via `data-uc-step`.
   Every data field traces to the entity model via `data-entity`.
-- **Self-contained** — The HTML file opens in any browser with no dependencies. Inline CSS only.
+- **Self-contained within `docs/designs/`** — The HTML file and `design-system.css` together open
+  in any browser with no internet dependencies. The design system CSS is a project-local shared
+  resource, not an external dependency.
+
+## Design System CSS
+
+The file `docs/designs/design-system.css` is the single source of truth for visual tokens and base
+component styles. All design artifacts link to it. When a stylistic change arrives (brand colors,
+typography, spacing), update this one file and all designs reflect the change.
+
+**When to create it**: The first time `/frontend-design` runs on a project that has no
+`docs/designs/design-system.css`. Derive token values from the wireframe's visual language.
+
+**When to update it**: If a design needs a new token category or component style not yet in the
+file, add it. Never remove tokens that other designs may use without checking.
+
+### Required structure
+
+```css
+:root {
+  /* ── Colors ── */
+  --color-primary: ...;
+  --color-primary-hover: ...;
+  --color-secondary: ...;
+  --color-bg: ...;
+  --color-surface: ...;
+  --color-border: ...;
+  --color-text: ...;
+  --color-text-muted: ...;
+  --color-error: ...;
+  --color-success: ...;
+  --color-warning: ...;
+
+  /* ── Typography ── */
+  --font-body: ...;
+  --font-heading: ...;
+  --font-mono: ...;
+  --font-size-sm: ...;
+  --font-size-base: ...;
+  --font-size-lg: ...;
+  --font-size-xl: ...;
+
+  /* ── Spacing ── */
+  --spacing-xs: ...;
+  --spacing-sm: ...;
+  --spacing-md: ...;
+  --spacing-lg: ...;
+  --spacing-xl: ...;
+
+  /* ── Borders & Radius ── */
+  --radius-sm: ...;
+  --radius-md: ...;
+  --radius-lg: ...;
+  --border-default: ...;
+
+  /* ── Shadows ── */
+  --shadow-sm: ...;
+  --shadow-md: ...;
+}
+
+/* ── Base reset & typography ── */
+/* ── Component styles: buttons, forms, tables, cards, nav ── */
+/* ── State variants: .state--loading, .state--empty, .state--error, .state--success ── */
+/* ── Design metadata & screen structure: .design-meta, .screen, .screen-map ── */
+/* ── Responsive breakpoints ── */
+```
+
+### Token categories
+
+| Category | Properties | Purpose |
+|----------|-----------|---------|
+| Colors | `--color-*` | Brand palette, semantic colors (error, success, warning), surfaces, borders |
+| Typography | `--font-*`, `--font-size-*` | Font families (body, heading, mono) and size scale |
+| Spacing | `--spacing-*` | Consistent spacing scale from xs to xl |
+| Borders & Radius | `--radius-*`, `--border-*` | Corner radii and default border style |
+| Shadows | `--shadow-*` | Elevation levels |
+
+### Base component styles
+
+Below the `:root` tokens, include base styles for common components so that design artifacts share
+a consistent look without duplicating CSS:
+
+- **Reset & typography**: box-sizing, body font, heading styles, link styles
+- **Buttons**: `.btn`, `.btn--primary`, `.btn--secondary`, `.btn--danger`
+- **Forms**: `input`, `select`, `textarea`, `label`, form layout
+- **Tables**: `table`, `th`, `td`, striped rows, hover states
+- **Cards**: `.card`, `.card__header`, `.card__body`
+- **Navigation**: `.nav`, `.nav__item`, active states
+- **State variants**: `.state--loading`, `.state--empty`, `.state--error`, `.state--success`
+- **Design metadata**: `.design-meta`, `.screen`, `.screen-map`
+- **Responsive breakpoints**: tablet (768px) and mobile (480px) base adjustments

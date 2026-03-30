@@ -26,6 +26,7 @@ nexa-claude-marketplace/
 │       ├── technical-task/
 │       ├── prioritize/
 │       ├── frontend-design/
+│       ├── fix-designs/
 │       ├── refine-use-cases/
 │       ├── code-review/
 │       ├── evaluate/
@@ -83,6 +84,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/technical-task`     | Create technical task specifications   |
 | Construction | `/prioritize`         | Recommend implementation order         |
 | Construction | `/frontend-design`    | Create screen design specifications    |
+| Construction | `/fix-designs`        | Migrate existing designs to shared design system CSS |
 | Elaboration  | `/refine-use-cases`   | Generate all specs & designs, then GAP analysis |
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |

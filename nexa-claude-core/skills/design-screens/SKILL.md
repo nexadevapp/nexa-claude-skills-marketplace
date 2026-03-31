@@ -5,6 +5,8 @@ description: >
   Uses Playwright to open the wireframe, identify the section relevant to the current use case,
   and produces a self-contained HTML design file faithful to the wireframe's layout and enriched
   with states, data mappings, and interactions from the use case specification.
+  Uses a separated CSS theming approach — HTML references a theme switcher CSS file and a Tailwind
+  config, so changing the theme across all designs requires only swapping CSS files.
   Use when the user asks to "design a screen", "create a wireframe", "define the UI",
   "design the frontend", or mentions screen design, wireframes, UI layout, or frontend design.
 ---
@@ -20,6 +22,90 @@ The design artifact bridges the use case specification (what the system does) an
 implementation (how it looks and behaves). It is a **standalone HTML file** that faithfully
 translates the relevant wireframe section into a viewable, annotated design reference.
 
+## Theming Architecture
+
+**CSS is fully separated from HTML.** All visual identity lives in external CSS theme files and
+Tailwind config files. The HTML uses Tailwind utility classes with semantic color names and CSS
+custom properties from the theme — it never contains hardcoded colors, font stacks, or brand values.
+
+Switching the entire visual theme across all design artifacts requires changing only two files:
+- `current-theme.css` — change the `@import` to point to a different theme CSS
+- `current-tailwind-config.js` — replace contents with the matching Tailwind config
+
+### File structure in `docs/designs/`
+
+```
+docs/designs/
+├── current-theme.css              # Theme switcher — @imports the active theme
+├── current-tailwind-config.js     # Active Tailwind config (colors, fonts)
+├── green-theme-001.css            # Green/Forest theme (CSS custom properties + components)
+├── green-tailwind-config.js       # Green/Forest Tailwind color/font config
+├── blue-theme-001.css             # Blue/Indigo theme (CSS custom properties + components)
+├── blue-tailwind-config.js        # Blue/Indigo Tailwind color/font config
+├── UC-000-design.html             # Design artifact (references current-theme.css)
+├── UC-001-design.html
+└── ...
+```
+
+### How the theme switcher works
+
+**`current-theme.css`** contains a single `@import` pointing to the active theme:
+```css
+@import url('green-theme-001.css');
+```
+
+**`current-tailwind-config.js`** contains the active Tailwind configuration that maps semantic
+color names (forest, coral, cream, gold) to the theme's palette:
+```js
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        forest: { 50:'...', 100:'...', /* ... */ 900:'...' },
+        coral:  { 50:'...', 100:'...', /* ... */ 900:'...' },
+        cream:  { 50:'...', 100:'...', /* ... */ },
+        gold:   { 50:'...', 100:'...', /* ... */ 900:'...' },
+      },
+      fontFamily: {
+        display: ['Outfit', 'sans-serif'],
+        body: ['Lora', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+```
+
+To switch from green to blue: change `@import url('green-theme-001.css')` to
+`@import url('blue-theme-001.css')` and replace `current-tailwind-config.js` contents with
+`blue-tailwind-config.js`. All design HTML files instantly reflect the new theme.
+
+## Examples
+
+Reference examples are available in this skill's `examples/` directory:
+
+| File | Purpose |
+|------|---------|
+| `examples/UC-000_landing_page.html` | Complete landing page design — shows section-by-section layout with annotations |
+| `examples/UC-001_register.html` | Registration flow design — shows forms, validation states, multi-step flow |
+| `examples/UC-002_verify_ong_company.html` | Verification flow — shows admin review screens, status states |
+| `examples/current-theme.css` | Theme switcher file — single `@import` line |
+| `examples/current-tailwind-config.js` | Active Tailwind config file |
+| `examples/green-theme-001.css` | Green/Forest theme — full CSS custom properties + component styles |
+| `examples/green-tailwind-config.js` | Green/Forest Tailwind color palette |
+| `examples/blue-theme-001.css` | Blue/Indigo theme — same structure, different palette |
+| `examples/blue-tailwind-config.js` | Blue/Indigo Tailwind color palette |
+
+**Study these examples before producing output.** They demonstrate:
+- How HTML uses Tailwind utility classes with semantic names (`bg-forest-800`, `text-coral-500`)
+- How CSS custom properties (`var(--forest-600)`, `var(--bg-card)`) are used in component styles
+- The section-by-section design layout with `design-section-divider`, `design-annotation`,
+  `design-screen` patterns
+- How `design-header`, `design-meta`, `design-annotation`, `design-data-table` classes annotate
+  the design without embedding styling in HTML
+- How theme CSS files share identical structure (resets, animations, components) but differ only
+  in `:root` token values and rgba references
+
 ## Inputs
 
 | Input | Location | Required |
@@ -27,11 +113,14 @@ translates the relevant wireframe section into a viewable, annotated design refe
 | Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
 | Entity model | `docs/entity_model.md` | If applicable |
 | Wireframe | `docs/wireframes/index.html` | Yes |
-| Design system CSS | `docs/designs/design-system.css` | Optional — created automatically if missing |
+| Theme CSS | `docs/designs/current-theme.css` | Optional — created automatically if missing |
+| Tailwind config | `docs/designs/current-tailwind-config.js` | Optional — created automatically if missing |
 
 ## Output
 
-A single self-contained **HTML** file: `docs/designs/UC-XXX-design.html`
+A single **HTML** file: `docs/designs/UC-XXX-design.html`
+
+If the theme files do not exist yet, also create the theme infrastructure (see Phase 3).
 
 **CRITICAL: The output MUST be an `.html` file written with the Write tool. Do NOT produce Markdown.
 Do NOT create a `.md` file. The file extension MUST be `.html` and the content MUST start with
@@ -42,8 +131,10 @@ tables with `|`), STOP — you are producing the wrong format.**
 
 - **Produce Markdown** — the output is HTML, never `.md`. No Markdown syntax anywhere in the file.
 - Skip reading the use case specification first
-- Use any external dependencies — no CDN links, no remote CSS/JS, no images via URL. The only
-  external stylesheet allowed is the project's `design-system.css` (a local file in `docs/designs/`)
+- **Hardcode colors, fonts, or spacing in HTML** — use Tailwind utility classes with semantic
+  color names (forest, coral, cream, gold) and CSS custom properties from the theme
+- **Embed CSS custom property definitions in the HTML `<style>` block** — token definitions belong
+  in the theme CSS files only. The HTML `<style>` block is for screen-specific layout rules only.
 - Use any framework-specific code (no React, no Next.js, no component libraries)
 - Use lorem ipsum — use realistic placeholder content that matches entity model attributes
 - Design screens for steps not in the use case specification
@@ -56,13 +147,14 @@ tables with `|`), STOP — you are producing the wrong format.**
 
 1. Read the use case specification from `docs/use_cases/UC-XXX.md`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
-3. Check if `docs/designs/design-system.css` exists:
-   - **If it exists**: Read it — all design tokens and base styles are already defined. Use its
-     CSS custom properties throughout the design artifact.
-   - **If it does NOT exist**: You will create it during Phase 3 before writing the design HTML.
-     Inspect the wireframe's visual language (colors, fonts, spacing, border radii) during Phase 2
-     and use those observations to populate the design system tokens. See the
-     **Design System CSS** section below for the required structure.
+3. Read the example files from this skill's `examples/` directory to understand the expected
+   output format, HTML structure, and theming patterns
+4. Check if `docs/designs/current-theme.css` exists:
+   - **If it exists**: Read it and the active theme CSS it imports — all design tokens and base
+     styles are already defined.
+   - **If it does NOT exist**: You will create the theme infrastructure during Phase 3.
+     Inspect the wireframe's visual language (colors, fonts, spacing) during Phase 2
+     and use those observations to populate the theme tokens.
 
 ### Phase 2 — Inspect the wireframe with Playwright
 
@@ -88,21 +180,32 @@ Create the `docs/snapshots/` directory if it does not exist.
 
 ### Phase 3 — Produce the HTML design artifact
 
-6. If `docs/designs/design-system.css` does not exist, create it now using the **Write** tool.
-   Populate the CSS custom properties with values derived from the wireframe inspection in Phase 2.
-   Follow the structure defined in the **Design System CSS** section below.
+6. If the theme infrastructure does not exist, create it now using the **Write** tool:
+   - Create a **theme CSS file** (e.g., `docs/designs/green-theme-001.css`) following the
+     structure from the examples. Populate `:root` custom properties with values derived from
+     the wireframe. Include all base resets, animations, and component styles.
+   - Create the matching **Tailwind config** (e.g., `docs/designs/green-tailwind-config.js`)
+     with color palettes matching the theme CSS tokens.
+   - Create **`current-theme.css`** with a single `@import` pointing to the theme CSS.
+   - Create **`current-tailwind-config.js`** with contents matching the active Tailwind config.
+   - Optionally create a second theme variant (e.g., blue) to demonstrate the theme switching
+     capability.
 7. Using the **Write** tool, create `docs/designs/UC-XXX-design.html` following the HTML structure
    below. The file content MUST be valid HTML starting with `<!DOCTYPE html>` — never Markdown.
 8. For each screen identified in the wireframe:
    - Reproduce the **layout and visual structure** from the wireframe
+   - Use **Tailwind utility classes** with semantic color names (`bg-forest-800`, `text-coral-500`,
+     `border-cream-200`) for layout and styling — never hardcode hex values in class attributes
+   - Use **CSS custom properties** (`var(--forest-600)`, `var(--bg-card)`) in the theme CSS for
+     component styles that can't be expressed as Tailwind utilities
    - Map **components** to use case steps using `data-uc-step` attributes
    - Map **data fields** to entity model attributes using `data-entity` attributes
    - Include all **states**: default, loading, empty, error, success — each rendered as a
      visible section
-   - Use CSS custom properties from the design system (e.g., `var(--color-primary)`,
-     `var(--font-body)`, `var(--spacing-md)`) — never hardcode color, typography, or spacing values
+   - Use `design-section-divider`, `design-section-title`, `design-annotation`, `design-screen`,
+     and `design-data-table` CSS classes from the theme for design artifact structure
 9. Include a **navigation flow** section showing how screens connect
-10. Include **responsive behavior** using CSS media queries
+10. Include **responsive behavior** using Tailwind responsive prefixes and CSS media queries
 
 ## HTML Structure
 
@@ -112,123 +215,92 @@ The design HTML must follow this structure:
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Design: UC-XXX — [Use Case Name]</title>
-
-  <!-- Shared design system — single source of truth for tokens and base styles -->
-  <link rel="stylesheet" href="design-system.css">
-
-  <style>
-    /* ── Screen-specific overrides only ──
-       Layout rules unique to THIS screen go here.
-       All color, typography, and spacing values MUST use CSS custom properties
-       from the design system (e.g., var(--color-primary), var(--font-body), var(--spacing-md)).
-       Do NOT hardcode hex colors, font stacks, or pixel spacing values. */
-
-    /* ── Screen-specific layout ── */
-
-    /* ── Annotations ── */
-    [data-uc-step]::after {
-      /* Optionally show UC step annotations on hover or always */
-    }
-
-    /* ── Responsive overrides for this screen ── */
-    @media (max-width: 768px) { /* tablet adjustments */ }
-    @media (max-width: 480px) { /* mobile adjustments */ }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-XXX — [Use Case Name] — [Project] Design</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="current-tailwind-config.js"></script>
+<link rel="stylesheet" href="current-theme.css">
 </head>
-<body>
+<body class="bg-cream-100 text-forest-800 antialiased">
 
-  <!-- ── Design Metadata ── -->
-  <header class="design-meta">
-    <h1>Screen Design: [Use Case Name]</h1>
-    <dl>
-      <dt>Use Case</dt><dd>UC-XXX</dd>
-      <dt>Status</dt><dd>Draft</dd>
-    </dl>
-  </header>
+<div class="max-w-[1400px] mx-auto px-6 py-8">
 
-  <!-- ── Screen Map ── -->
-  <nav class="screen-map">
-    <h2>Screen Map</h2>
-    <ol>
-      <li><a href="#screen-1">[Screen 1 Name]</a></li>
-      <li><a href="#screen-2">[Screen 2 Name]</a></li>
-    </ol>
-  </nav>
-
-  <!-- ── Screen 1 ── -->
-  <section id="screen-1" class="screen">
-    <h2 class="screen__title">[Screen Name]</h2>
-    <p class="screen__purpose">Purpose: [What the user accomplishes here]</p>
-    <p class="screen__trigger">Triggered by: [UC step or navigation action]</p>
-
-    <!-- Default state -->
-    <div class="state state--default">
-      <h3>Default State</h3>
-      <div class="screen__layout">
-        <!--
-          Reproduce the wireframe layout here using semantic HTML.
-          Annotate interactive elements with data-uc-step and data fields with data-entity.
-
-          Example:
-          <form data-uc-step="3">
-            <label for="email">Email</label>
-            <input id="email" type="email" data-entity="User.email" placeholder="user@example.com">
-
-            <label for="password">Password</label>
-            <input id="password" type="password" data-entity="User.passwordHash" placeholder="••••••••">
-
-            <button type="submit" data-uc-step="4">Sign In</button>
-          </form>
-        -->
-      </div>
+  <!-- Design Header -->
+  <div class="design-header">
+    <h1>UC-XXX — [Use Case Name]</h1>
+    <p>[Brief description of what this screen/flow accomplishes]</p>
+    <div class="design-meta">
+      <span>Actor: <strong>[Primary Actor]</strong></span>
+      <span>Route: <strong>[URL route]</strong></span>
+      <span>Priority: <strong>[Priority]</strong></span>
     </div>
+  </div>
 
-    <!-- Loading state -->
-    <div class="state state--loading">
-      <h3>Loading State</h3>
-      <div class="screen__layout">
-        <!-- Show what the user sees while data loads or action processes -->
-      </div>
-    </div>
+  <!-- ============================================================== -->
+  <!-- SECTION 1: [Section Name] -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">1. [Section Name]</div>
 
-    <!-- Empty state -->
-    <div class="state state--empty">
-      <h3>Empty State</h3>
-      <div class="screen__layout">
-        <!-- Show what the user sees when there is no data -->
-      </div>
-    </div>
+  <div class="design-annotation">
+    <strong>[Annotation type]:</strong> [Description of the section's purpose,
+    layout, behavior, and key interactions]
+  </div>
 
-    <!-- Error state -->
-    <div class="state state--error">
-      <h3>Error State</h3>
-      <div class="screen__layout">
-        <!-- Show what the user sees when something fails.
-             Map to Alternative Flows from the use case spec. -->
-      </div>
-    </div>
+  <div class="design-screen">
+    <!-- Actual screen content using Tailwind utility classes -->
+    <!-- Use semantic color names: bg-forest-800, text-coral-500, border-cream-200 -->
+  </div>
 
-    <!-- Success state -->
-    <div class="state state--success">
-      <h3>Success State</h3>
-      <div class="screen__layout">
-        <!-- Show what the user sees after a successful action -->
-      </div>
-    </div>
-  </section>
+  <div class="design-annotation">
+    <strong>Data mapping:</strong> [Entity-to-field mappings, navigation targets,
+    API endpoints]
+  </div>
 
-  <!-- ── Repeat for each screen ── -->
+  <!-- Repeat sections for each part of the screen -->
 
-  <!-- ── Navigation Flow ── -->
-  <section class="navigation-flow">
-    <h2>Navigation Flow</h2>
-    <!-- Describe or diagram how screens connect:
-         what action on Screen 1 leads to Screen 2, etc. -->
-  </section>
+  <!-- ============================================================== -->
+  <!-- STATES -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">States</div>
 
+  <!-- Loading state -->
+  <div class="design-annotation">
+    <strong>Loading:</strong> [What the user sees while data loads]
+  </div>
+  <div class="design-screen">
+    <!-- Loading skeleton / spinner -->
+  </div>
+
+  <!-- Empty state -->
+  <div class="design-annotation">
+    <strong>Empty:</strong> [What the user sees when there is no data]
+  </div>
+  <div class="design-screen">
+    <!-- Empty state content -->
+  </div>
+
+  <!-- Error state -->
+  <div class="design-annotation">
+    <strong>Error:</strong> [What the user sees on failure — map to Alternative Flows]
+  </div>
+  <div class="design-screen">
+    <!-- Error state content -->
+  </div>
+
+  <!-- Success state -->
+  <div class="design-annotation">
+    <strong>Success:</strong> [What the user sees after successful action]
+  </div>
+  <div class="design-screen">
+    <!-- Success state content -->
+  </div>
+
+</div>
 </body>
 </html>
 ```
@@ -245,100 +317,59 @@ The design HTML must follow this structure:
 
 - **Wireframe-faithful** — The layout, component placement, and navigation structure must match
   the wireframe. Do not invent layouts.
-- **Semantic HTML** — Use appropriate elements (`form`, `table`, `nav`, `button`, `input`) so the
-  design communicates component intent.
+- **CSS-separated theming** — All visual identity (colors, fonts, spacing tokens) lives in
+  external CSS theme files and Tailwind configs. HTML never contains hardcoded brand values.
+  Changing the theme = swapping CSS files. This is the most important architectural principle.
+- **Semantic HTML + Tailwind** — Use appropriate elements (`form`, `table`, `nav`, `button`,
+  `input`) styled with Tailwind utility classes using semantic color names (forest, coral, cream,
+  gold). Custom component styles use CSS custom properties from the theme.
 - **All states visible** — Every state (default, loading, empty, error, success) is rendered as a
   visible section. This makes the design a complete reference — no hidden requirements.
 - **Traceable** — Every interactive element traces back to a use case step via `data-uc-step`.
   Every data field traces to the entity model via `data-entity`.
-- **Self-contained within `docs/designs/`** — The HTML file and `design-system.css` together open
-  in any browser with no internet dependencies. The design system CSS is a project-local shared
-  resource, not an external dependency.
+- **Section-by-section layout** — Each logical section of the screen gets its own
+  `design-section-divider` + `design-section-title` + `design-annotation` + `design-screen`
+  block, making the design easy to review and implement incrementally.
 
-## Design System CSS
+## Theme CSS Structure
 
-The file `docs/designs/design-system.css` is the single source of truth for visual tokens and base
-component styles. All design artifacts link to it. When a stylistic change arrives (brand colors,
-typography, spacing), update this one file and all designs reflect the change.
+Each theme CSS file (e.g., `green-theme-001.css`, `blue-theme-001.css`) contains the **complete**
+visual identity. All theme files share identical structure but differ in `:root` token values.
 
-**When to create it**: The first time `/design-screens` runs on a project that has no
-`docs/designs/design-system.css`. Derive token values from the wireframe's visual language.
-
-**When to update it**: If a design needs a new token category or component style not yet in the
-file, add it. Never remove tokens that other designs may use without checking.
-
-### Required structure
+### Required sections
 
 ```css
+/* ── Reset & Base ── */
+/* box-sizing, body font, heading font families */
+
+/* ── CSS Custom Properties (Theme Tokens) ── */
 :root {
-  /* ── Colors ── */
-  --color-primary: ...;
-  --color-primary-hover: ...;
-  --color-secondary: ...;
-  --color-bg: ...;
-  --color-surface: ...;
-  --color-border: ...;
-  --color-text: ...;
-  --color-text-muted: ...;
-  --color-error: ...;
-  --color-success: ...;
-  --color-warning: ...;
-
-  /* ── Typography ── */
-  --font-body: ...;
-  --font-heading: ...;
-  --font-mono: ...;
-  --font-size-sm: ...;
-  --font-size-base: ...;
-  --font-size-lg: ...;
-  --font-size-xl: ...;
-
-  /* ── Spacing ── */
-  --spacing-xs: ...;
-  --spacing-sm: ...;
-  --spacing-md: ...;
-  --spacing-lg: ...;
-  --spacing-xl: ...;
-
-  /* ── Borders & Radius ── */
-  --radius-sm: ...;
-  --radius-md: ...;
-  --radius-lg: ...;
-  --border-default: ...;
-
-  /* ── Shadows ── */
-  --shadow-sm: ...;
-  --shadow-md: ...;
+  /* Color palettes: --forest-*, --coral-*, --cream-*, --gold-* (50-900 scale) */
+  /* Semantic aliases: --bg-page, --bg-card, --text-primary, --accent, etc. */
+  /* Sizing: --radius-*, --shadow-*, --nav-height */
 }
 
-/* ── Base reset & typography ── */
-/* ── Component styles: buttons, forms, tables, cards, nav ── */
-/* ── State variants: .state--loading, .state--empty, .state--error, .state--success ── */
-/* ── Design metadata & screen structure: .design-meta, .screen, .screen-map ── */
-/* ── Responsive breakpoints ── */
+/* ── Grain Overlay ── */
+/* ── Custom Scrollbar ── */
+/* ── Animations ── (fadeUp, fadeIn, scaleIn, slideRight, float, pulse-ring, shimmer) */
+/* ── Page Transitions ── */
+/* ── Component styles ── (hero-blob, card-hover, tab-link, toggle-switch, etc.) */
+/* ── Status Chips ── */
+/* ── Language Switcher ── */
+/* ── Design Artifact classes ── (design-header, design-section-divider, design-annotation,
+      design-screen, design-data-table, design-state-label) */
 ```
 
-### Token categories
+### Semantic color names
 
-| Category | Properties | Purpose |
-|----------|-----------|---------|
-| Colors | `--color-*` | Brand palette, semantic colors (error, success, warning), surfaces, borders |
-| Typography | `--font-*`, `--font-size-*` | Font families (body, heading, mono) and size scale |
-| Spacing | `--spacing-*` | Consistent spacing scale from xs to xl |
-| Borders & Radius | `--radius-*`, `--border-*` | Corner radii and default border style |
-| Shadows | `--shadow-*` | Elevation levels |
+All themes use the same semantic names so HTML never changes:
 
-### Base component styles
+| Name | Green theme | Blue theme | Purpose |
+|------|-------------|------------|---------|
+| `forest` | Green/emerald scale | Blue/indigo scale | Primary brand color |
+| `coral` | Orange/amber accent | Blue accent variant | Secondary/accent color |
+| `cream` | Green-tinted neutrals | Blue-tinted neutrals | Background/surface neutrals |
+| `gold` | True gold scale | Blue-shifted gold | Premium/highlight color |
 
-Below the `:root` tokens, include base styles for common components so that design artifacts share
-a consistent look without duplicating CSS:
-
-- **Reset & typography**: box-sizing, body font, heading styles, link styles
-- **Buttons**: `.btn`, `.btn--primary`, `.btn--secondary`, `.btn--danger`
-- **Forms**: `input`, `select`, `textarea`, `label`, form layout
-- **Tables**: `table`, `th`, `td`, striped rows, hover states
-- **Cards**: `.card`, `.card__header`, `.card__body`
-- **Navigation**: `.nav`, `.nav__item`, active states
-- **State variants**: `.state--loading`, `.state--empty`, `.state--error`, `.state--success`
-- **Design metadata**: `.design-meta`, `.screen`, `.screen-map`
-- **Responsive breakpoints**: tablet (768px) and mobile (480px) base adjustments
+The HTML always writes `bg-forest-600` or `var(--forest-600)` — the actual rendered color depends
+entirely on which theme CSS is active.

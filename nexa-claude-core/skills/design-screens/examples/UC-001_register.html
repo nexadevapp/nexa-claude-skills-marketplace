@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-001 — Register — VoluntX Design</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="current-tailwind-config.js"></script>
+<link rel="stylesheet" href="current-theme.css">
+</head>
+<body class="bg-cream-100 text-forest-800 antialiased">
+
+<div class="max-w-[1400px] mx-auto px-6 py-8">
+
+  <!-- Design Header -->
+  <div class="design-header">
+    <h1>UC-001 — Register</h1>
+    <p>Account registration flow for new users. Supports email signup and social OAuth (Google, LinkedIn).</p>
+    <div class="design-meta">
+      <span>Actor: <strong>Visitor (Unauthenticated)</strong></span>
+      <span>Route: <strong>/register</strong></span>
+      <span>Priority: <strong>Critical</strong></span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 1: Account Type Selection -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">1. Account Type Selection</div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> User selects one of three account types before proceeding to the registration form. The selected card gets a blue border and checkmark. This determines the <code>role</code> field in the user record.
+  </div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="w-9 h-9 rounded-xl bg-forest-700 flex items-center justify-center mx-auto mb-4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z"/></svg>
+        </div>
+        <h2 class="font-display text-2xl font-bold text-forest-900">Join VoluntX</h2>
+        <p class="font-body text-forest-500 mt-2">Choose your account type to get started</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <!-- Volunteer - Selected -->
+        <div class="relative bg-white rounded-2xl p-6 border-2 border-forest-600 cursor-pointer transition-all shadow-lg shadow-forest-600/10">
+          <div class="absolute top-3 right-3 w-6 h-6 rounded-full bg-forest-600 flex items-center justify-center">
+            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-forest-100 flex items-center justify-center mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1D34FF" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
+          </div>
+          <h3 class="font-display font-semibold text-forest-800 mb-1">Volunteer</h3>
+          <p class="text-xs text-forest-500 font-body">Find opportunities, build your Social Resume</p>
+        </div>
+
+        <!-- NGO/ONG - Default -->
+        <div class="bg-white rounded-2xl p-6 border-2 border-cream-300 cursor-pointer hover:border-forest-300 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-coral-100 flex items-center justify-center mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4a5eff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+          </div>
+          <h3 class="font-display font-semibold text-forest-800 mb-1">NGO / ONG</h3>
+          <p class="text-xs text-forest-500 font-body">Post opportunities, manage volunteers</p>
+        </div>
+
+        <!-- Company - Default -->
+        <div class="bg-white rounded-2xl p-6 border-2 border-cream-300 cursor-pointer hover:border-forest-300 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-gold-100 flex items-center justify-center mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2940e6" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+          </div>
+          <h3 class="font-display font-semibold text-forest-800 mb-1">Company</h3>
+          <p class="text-xs text-forest-500 font-body">Access the Walled Garden, hire verified talent</p>
+        </div>
+      </div>
+
+      <span class="design-state-label design-state-label--default">Default State</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 2: Social Login Buttons -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">2. Social Login Buttons</div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> OAuth buttons redirect to Google/LinkedIn consent screens. On return, the user is auto-registered and redirected to onboarding. If a matching account exists, it merges or shows an error.
+  </div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-md mx-auto space-y-3">
+      <!-- Google -->
+      <button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-cream-50 border-2 border-cream-300 hover:border-forest-200 rounded-xl py-3.5 px-6 font-display font-medium text-forest-700 transition-all">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <!-- LinkedIn -->
+      <button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-cream-50 border-2 border-cream-300 hover:border-forest-200 rounded-xl py-3.5 px-6 font-display font-medium text-forest-700 transition-all">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        Continue with LinkedIn
+      </button>
+
+      <div class="flex items-center gap-4 my-6">
+        <div class="flex-1 h-px bg-cream-300"></div>
+        <span class="font-display text-xs font-medium text-forest-400 uppercase tracking-wider">or register with email</span>
+        <div class="flex-1 h-px bg-cream-300"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 3: Email Registration Form — Default State -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">3. Email Registration Form — Default State</div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-md mx-auto">
+      <form class="space-y-5">
+        <!-- Email -->
+        <div>
+          <label class="font-display text-sm font-medium text-forest-700 mb-1.5 block">Email address</label>
+          <input type="email" placeholder="you@example.com" class="w-full px-4 py-3 rounded-xl border-2 border-cream-300 bg-white font-body text-forest-800 placeholder:text-forest-300 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all">
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="font-display text-sm font-medium text-forest-700 mb-1.5 block">Password</label>
+          <div class="relative">
+            <input type="password" placeholder="Create a strong password" class="w-full px-4 py-3 rounded-xl border-2 border-cream-300 bg-white font-body text-forest-800 placeholder:text-forest-300 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all pr-12">
+            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-forest-400 hover:text-forest-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <!-- Empty strength meter -->
+          <div class="flex gap-1.5 mt-2">
+            <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+            <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+            <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+            <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div>
+          <label class="font-display text-sm font-medium text-forest-700 mb-1.5 block">Confirm password</label>
+          <input type="password" placeholder="Repeat your password" class="w-full px-4 py-3 rounded-xl border-2 border-cream-300 bg-white font-body text-forest-800 placeholder:text-forest-300 focus:border-forest-500 focus:ring-2 focus:ring-forest-100 outline-none transition-all">
+        </div>
+
+        <!-- Terms -->
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" class="mt-1 w-4 h-4 rounded border-forest-300 text-forest-600 focus:ring-forest-500">
+          <span class="font-body text-sm text-forest-600">I agree to the <a class="text-forest-700 underline font-medium">Terms of Service</a> and <a class="text-forest-700 underline font-medium">Privacy Policy</a></span>
+        </label>
+
+        <!-- Submit -->
+        <button type="submit" class="w-full font-display font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-coral-500/20 active:scale-[0.98]">
+          Create Account
+        </button>
+      </form>
+
+      <p class="text-center font-body text-sm text-forest-500 mt-6">Already have an account? <a class="text-forest-700 font-medium underline cursor-pointer">Sign In</a></p>
+
+      <div class="mt-4"><span class="design-state-label design-state-label--default">Default State</span></div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 4: Password Strength Meter States -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">4. Password Strength Meter States</div>
+
+  <div class="design-annotation">
+    <strong>Strength logic:</strong> Weak = &lt;6 chars or common pattern. Medium = 8+ chars, mixed case. Strong = 12+ chars, mixed case + numbers + symbols. The meter fills progressively with color feedback.
+  </div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-md mx-auto space-y-8">
+      <!-- Weak -->
+      <div>
+        <span class="design-state-label design-state-label--error mb-3 inline-flex">Weak Password</span>
+        <div class="relative">
+          <input type="text" value="abc123" class="w-full px-4 py-3 rounded-xl border-2 border-red-300 bg-white font-body text-forest-800 outline-none">
+        </div>
+        <div class="flex gap-1.5 mt-2">
+          <div class="h-1 flex-1 rounded-full bg-red-400"></div>
+          <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+          <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+          <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+        </div>
+        <p class="font-display text-xs text-red-500 mt-1.5">Weak — add uppercase letters and symbols</p>
+      </div>
+
+      <!-- Medium -->
+      <div>
+        <span class="design-state-label design-state-label--hover mb-3 inline-flex">Medium Password</span>
+        <div class="relative">
+          <input type="text" value="MyPassw0rd" class="w-full px-4 py-3 rounded-xl border-2 border-yellow-400 bg-white font-body text-forest-800 outline-none">
+        </div>
+        <div class="flex gap-1.5 mt-2">
+          <div class="h-1 flex-1 rounded-full bg-yellow-400"></div>
+          <div class="h-1 flex-1 rounded-full bg-yellow-400"></div>
+          <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+          <div class="h-1 flex-1 rounded-full bg-cream-300"></div>
+        </div>
+        <p class="font-display text-xs text-yellow-600 mt-1.5">Medium — try adding special characters</p>
+      </div>
+
+      <!-- Strong -->
+      <div>
+        <span class="design-state-label design-state-label--success mb-3 inline-flex">Strong Password</span>
+        <div class="relative">
+          <input type="text" value="Str0ng!P@ss#2026" class="w-full px-4 py-3 rounded-xl border-2 border-green-400 bg-white font-body text-forest-800 outline-none">
+        </div>
+        <div class="flex gap-1.5 mt-2">
+          <div class="h-1 flex-1 rounded-full bg-green-500"></div>
+          <div class="h-1 flex-1 rounded-full bg-green-500"></div>
+          <div class="h-1 flex-1 rounded-full bg-green-500"></div>
+          <div class="h-1 flex-1 rounded-full bg-green-500"></div>
+        </div>
+        <p class="font-display text-xs text-green-600 mt-1.5">Strong password</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 5: Validation Errors -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">5. Validation Error States</div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-md mx-auto space-y-5">
+      <!-- Email error -->
+      <div>
+        <label class="font-display text-sm font-medium text-red-600 mb-1.5 block">Email address</label>
+        <input type="email" value="not-an-email" class="w-full px-4 py-3 rounded-xl border-2 border-red-400 bg-red-50 font-body text-forest-800 outline-none">
+        <p class="font-display text-xs text-red-500 mt-1.5 flex items-center gap-1">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Please enter a valid email address
+        </p>
+      </div>
+
+      <!-- Password mismatch -->
+      <div>
+        <label class="font-display text-sm font-medium text-red-600 mb-1.5 block">Confirm password</label>
+        <input type="password" value="different" class="w-full px-4 py-3 rounded-xl border-2 border-red-400 bg-red-50 font-body text-forest-800 outline-none">
+        <p class="font-display text-xs text-red-500 mt-1.5 flex items-center gap-1">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Passwords do not match
+        </p>
+      </div>
+
+      <!-- Email already exists -->
+      <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+        <svg width="20" height="20" fill="#dc2626" viewBox="0 0 24 24" class="flex-shrink-0 mt-0.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <div>
+          <p class="font-display text-sm font-semibold text-red-700">Account already exists</p>
+          <p class="font-body text-xs text-red-600 mt-0.5">An account with this email already exists. <a class="underline font-medium cursor-pointer">Sign in instead</a></p>
+        </div>
+      </div>
+
+      <div class="mt-4"><span class="design-state-label design-state-label--error">Error State</span></div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 6: Successful Registration -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">6. Successful Registration</div>
+
+  <div class="design-annotation">
+    <strong>After success:</strong> User sees a confirmation screen. For email registration, they must verify their email. For OAuth, they are redirected directly to onboarding.
+  </div>
+
+  <div class="design-screen p-8">
+    <div class="max-w-md mx-auto text-center py-8">
+      <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+        <svg width="32" height="32" fill="#16a34a" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <h2 class="font-display text-2xl font-bold text-forest-900 mb-3">Check Your Email</h2>
+      <p class="font-body text-forest-600 mb-2">We've sent a verification link to</p>
+      <p class="font-mono text-sm text-forest-800 bg-cream-100 inline-block px-4 py-2 rounded-lg mb-6">ana.marinescu@email.com</p>
+      <p class="font-body text-sm text-forest-500 mb-8">Click the link in the email to activate your account and start onboarding.</p>
+
+      <div class="space-y-3">
+        <button class="w-full font-display font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3.5 rounded-xl transition-all">Open Email App</button>
+        <button class="w-full font-display font-medium text-forest-600 hover:text-forest-800 py-3 transition-colors">Resend verification email</button>
+      </div>
+
+      <div class="mt-6"><span class="design-state-label design-state-label--success">Success State</span></div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- DESIGN ANNOTATIONS: Data Mapping -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">Design Annotations &mdash; Data Mapping</div>
+
+  <table class="design-data-table">
+    <thead>
+      <tr><th>UI Field</th><th>DB Column</th><th>Validation</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Account type selector</td><td><code>users.role</code></td><td>Required, enum: VOLUNTEER, ONG, COMPANY</td><td>Determines onboarding flow variant</td></tr>
+      <tr><td>Email address</td><td><code>users.email</code></td><td>Required, valid email, unique</td><td>Used for verification + login</td></tr>
+      <tr><td>Password</td><td><code>users.password_hash</code></td><td>Min 8 chars, strength meter feedback</td><td>Hashed with bcrypt before storage</td></tr>
+      <tr><td>Confirm password</td><td>N/A (client-side)</td><td>Must match password</td><td>Not sent to server</td></tr>
+      <tr><td>Terms checkbox</td><td><code>users.terms_accepted_at</code></td><td>Required (must be checked)</td><td>Stores timestamp of acceptance</td></tr>
+    </tbody>
+  </table>
+
+  <div class="design-annotation">
+    <strong>API:</strong> <code>POST /api/auth/register</code> with body <code>{ email, password, role }</code>. Returns 201 on success. Sends verification email via <code>/api/auth/send-verification</code>. OAuth flows use <code>GET /api/auth/google</code> and <code>GET /api/auth/linkedin</code> redirects.
+  </div>
+
+</div>
+
+</body>
+</html>

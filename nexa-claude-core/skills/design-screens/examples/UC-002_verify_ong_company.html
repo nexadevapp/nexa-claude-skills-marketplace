@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-002 — Verify ONG/Company — VoluntX Design</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="current-tailwind-config.js"></script>
+<link rel="stylesheet" href="current-theme.css">
+</head>
+<body class="min-h-screen bg-cream-100 text-forest-800 antialiased">
+
+<div class="max-w-[1400px] mx-auto px-6 py-8">
+
+  <!-- Design Header -->
+  <div class="design-header">
+    <h1>UC-002 — Verify ONG/Company</h1>
+    <p>Admin verifies organization registrations by reviewing documents, CUI validity, and contact information before approving or rejecting.</p>
+    <div class="design-meta">
+      <span>Actor: <strong>Admin</strong></span>
+      <span>Group: <strong>Administration</strong></span>
+      <span>Priority: <strong>Critical</strong></span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: Verification Queue — Default State -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">1. Verification Queue — Default State</div>
+  <span class="design-state-label design-state-label--default">Default State</span>
+
+  <div class="design-screen mt-4">
+    <div class="flex min-h-[700px]">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-forest-900 text-forest-200 p-6 flex-shrink-0">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-xl bg-forest-700 flex items-center justify-center text-white font-display font-bold">A</div>
+          <div>
+            <p class="font-display font-semibold text-sm text-white">Admin Panel</p>
+            <p class="text-xs text-forest-400">VoluntX</p>
+          </div>
+        </div>
+        <nav class="space-y-1">
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Users
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-white bg-forest-700/50 border-l-[3px] border-coral-500 relative">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Verification Queue
+            <span class="ml-auto bg-coral-500 text-white font-display text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">4</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Content Moderation
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Statistics
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Configuration
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-display text-sm font-medium text-forest-400 hover:text-white hover:bg-forest-700/30 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Audit Log
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-8 overflow-auto bg-cream-50">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="font-display text-2xl font-bold text-forest-900">Verification Queue</h1>
+            <p class="font-body text-sm text-forest-500 mt-1">Review and verify organization registrations</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <select class="px-4 py-2 rounded-xl border border-cream-300 bg-white font-display text-sm focus:border-forest-400 outline-none">
+              <option>All Types</option>
+              <option>ONG</option>
+              <option>Company</option>
+            </select>
+            <select class="px-4 py-2 rounded-xl border border-cream-300 bg-white font-display text-sm focus:border-forest-400 outline-none">
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+              <option>All Statuses</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Verification Table -->
+        <div class="bg-white rounded-2xl border border-forest-100 overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-cream-200">
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">Organization</th>
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">CUI</th>
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">Type</th>
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">Submitted</th>
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">Status</th>
+                <th class="text-left font-display text-xs font-semibold text-forest-500 uppercase tracking-wider px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cream-100">
+              <tr class="hover:bg-cream-50 transition-colors cursor-pointer">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-coral-100 flex items-center justify-center font-display text-sm font-bold text-coral-600">EW</div>
+                    <div>
+                      <p class="font-display font-semibold text-sm text-forest-800">EcoWild Foundation</p>
+                      <p class="text-xs text-forest-400">contact@ecowild.ro</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO12345678</span></td>
+                <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-coral-100 text-coral-600 px-2.5 py-1 rounded-full">ONG</span></td>
+                <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 28, 2026</span></td>
+                <td class="px-5 py-4"><span class="status-pending text-xs font-display font-semibold px-2.5 py-1 rounded-full">Pending</span></td>
+                <td class="px-5 py-4">
+                  <div class="flex gap-2">
+                    <button class="text-xs font-display font-semibold bg-forest-500 hover:bg-forest-600 text-white px-3 py-1.5 rounded-lg transition-colors">Approve</button>
+                    <button class="text-xs font-display font-semibold bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition-colors">Reject</button>
+                    <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-2 py-1.5 transition-colors">View</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-cream-50 transition-colors cursor-pointer">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gold-100 flex items-center justify-center font-display text-sm font-bold text-gold-600">TR</div>
+                    <div>
+                      <p class="font-display font-semibold text-sm text-forest-800">TechRecruit SRL</p>
+                      <p class="text-xs text-forest-400">hr@techrecruit.ro</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO87654321</span></td>
+                <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-gold-100 text-gold-700 px-2.5 py-1 rounded-full">Company</span></td>
+                <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 27, 2026</span></td>
+                <td class="px-5 py-4"><span class="status-pending text-xs font-display font-semibold px-2.5 py-1 rounded-full">Pending</span></td>
+                <td class="px-5 py-4">
+                  <div class="flex gap-2">
+                    <button class="text-xs font-display font-semibold bg-forest-500 hover:bg-forest-600 text-white px-3 py-1.5 rounded-lg transition-colors">Approve</button>
+                    <button class="text-xs font-display font-semibold bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition-colors">Reject</button>
+                    <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-2 py-1.5 transition-colors">View</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-cream-50 transition-colors cursor-pointer">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-forest-100 flex items-center justify-center font-display text-sm font-bold text-forest-600">GC</div>
+                    <div>
+                      <p class="font-display font-semibold text-sm text-forest-800">Green Cities Romania</p>
+                      <p class="text-xs text-forest-400">info@greencities.ro</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO33445566</span></td>
+                <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-coral-100 text-coral-600 px-2.5 py-1 rounded-full">ONG</span></td>
+                <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 26, 2026</span></td>
+                <td class="px-5 py-4"><span class="status-pending text-xs font-display font-semibold px-2.5 py-1 rounded-full">Pending</span></td>
+                <td class="px-5 py-4">
+                  <div class="flex gap-2">
+                    <button class="text-xs font-display font-semibold bg-forest-500 hover:bg-forest-600 text-white px-3 py-1.5 rounded-lg transition-colors">Approve</button>
+                    <button class="text-xs font-display font-semibold bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition-colors">Reject</button>
+                    <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-2 py-1.5 transition-colors">View</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-cream-50 transition-colors cursor-pointer">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-coral-100 flex items-center justify-center font-display text-sm font-bold text-coral-600">HH</div>
+                    <div>
+                      <p class="font-display font-semibold text-sm text-forest-800">Helping Hands NGO</p>
+                      <p class="text-xs text-forest-400">admin@helpinghands.org</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO99887766</span></td>
+                <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-coral-100 text-coral-600 px-2.5 py-1 rounded-full">ONG</span></td>
+                <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 25, 2026</span></td>
+                <td class="px-5 py-4"><span class="status-pending text-xs font-display font-semibold px-2.5 py-1 rounded-full">Pending</span></td>
+                <td class="px-5 py-4">
+                  <div class="flex gap-2">
+                    <button class="text-xs font-display font-semibold bg-forest-500 hover:bg-forest-600 text-white px-3 py-1.5 rounded-lg transition-colors">Approve</button>
+                    <button class="text-xs font-display font-semibold bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition-colors">Reject</button>
+                    <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-2 py-1.5 transition-colors">View</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> Clicking a row or "View" opens the detail drawer (Section 2). "Approve" and "Reject" buttons trigger confirmation dialogs (Sections 4 & 5). The badge count on "Verification Queue" in the sidebar reflects the number of pending items.
+  </div>
+
+  <!-- Data Mapping -->
+  <table class="design-data-table mt-4">
+    <thead><tr><th>UI Element</th><th>Data Source</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Organization Name</td><td><code>organizations.name</code></td><td>From registration form</td></tr>
+      <tr><td>CUI</td><td><code>organizations.cui</code></td><td>Unique fiscal identification code</td></tr>
+      <tr><td>Type</td><td><code>organizations.type</code></td><td>Enum: ONG | Company</td></tr>
+      <tr><td>Submitted Date</td><td><code>organizations.created_at</code></td><td>Registration timestamp</td></tr>
+      <tr><td>Status</td><td><code>organizations.verification_status</code></td><td>Enum: pending | approved | rejected</td></tr>
+      <tr><td>Badge Count</td><td><code>COUNT(status='pending')</code></td><td>Real-time count of pending verifications</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: Organization Detail Drawer -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">2. Organization Detail Drawer</div>
+  <span class="design-state-label design-state-label--active">Active — Drawer Open</span>
+
+  <div class="design-screen mt-4">
+    <div class="flex min-h-[700px]">
+      <!-- Sidebar (collapsed hint) -->
+      <aside class="w-64 bg-forest-900 text-forest-200 p-6 flex-shrink-0 opacity-50">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-xl bg-forest-700 flex items-center justify-center text-white font-display font-bold">A</div>
+          <div>
+            <p class="font-display font-semibold text-sm text-white">Admin Panel</p>
+            <p class="text-xs text-forest-400">VoluntX</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main with overlay -->
+      <main class="flex-1 p-8 bg-cream-50 relative">
+        <!-- Dimmed background -->
+        <div class="absolute inset-0 bg-forest-900/20 rounded-r-2xl z-10"></div>
+
+        <!-- Drawer Panel -->
+        <div class="absolute right-0 top-0 bottom-0 w-[520px] bg-white shadow-2xl z-20 overflow-y-auto">
+          <div class="p-6">
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="font-display text-xl font-bold text-forest-900">Organization Details</h2>
+              <button class="w-8 h-8 rounded-lg bg-cream-100 hover:bg-cream-200 flex items-center justify-center transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-500"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <!-- Organization Info -->
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-coral-100 to-coral-200 flex items-center justify-center font-display text-2xl font-bold text-coral-600">EW</div>
+              <div>
+                <h3 class="font-display text-lg font-bold text-forest-900">EcoWild Foundation</h3>
+                <span class="text-xs font-display font-medium bg-coral-100 text-coral-600 px-2.5 py-1 rounded-full">ONG</span>
+                <span class="status-pending text-xs font-display font-semibold px-2.5 py-1 rounded-full ml-2">Pending</span>
+              </div>
+            </div>
+
+            <!-- Detail Fields -->
+            <div class="space-y-4 mb-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">CUI</label>
+                  <p class="font-mono text-sm text-forest-800 mt-1">RO12345678</p>
+                </div>
+                <div>
+                  <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Registration Date</label>
+                  <p class="font-display text-sm text-forest-800 mt-1">March 28, 2026</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Contact Email</label>
+                  <p class="font-display text-sm text-forest-800 mt-1">contact@ecowild.ro</p>
+                </div>
+                <div>
+                  <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Phone</label>
+                  <p class="font-display text-sm text-forest-800 mt-1">+40 721 123 456</p>
+                </div>
+              </div>
+              <div>
+                <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Website</label>
+                <p class="font-display text-sm text-forest-600 mt-1 underline">https://ecowild.ro</p>
+              </div>
+              <div>
+                <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Address</label>
+                <p class="font-display text-sm text-forest-800 mt-1">Str. Naturii 42, Cluj-Napoca, Romania</p>
+              </div>
+              <div>
+                <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider">Description</label>
+                <p class="font-body text-sm text-forest-700 mt-1 leading-relaxed">EcoWild Foundation is dedicated to preserving Romania's natural ecosystems through community-driven conservation projects and environmental education programs.</p>
+              </div>
+            </div>
+
+            <!-- Registration Documents -->
+            <div class="mb-6">
+              <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider mb-3 block">Registration Documents</label>
+              <div class="space-y-2">
+                <div class="flex items-center gap-3 p-3 bg-cream-50 rounded-xl border border-cream-200">
+                  <div class="w-10 h-10 rounded-lg bg-forest-100 flex items-center justify-center">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-600"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-display text-sm font-medium text-forest-800">certificat_fiscal_2026.pdf</p>
+                    <p class="text-xs text-forest-400">245 KB</p>
+                  </div>
+                  <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-3 py-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 transition-colors">Preview</button>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-cream-50 rounded-xl border border-cream-200">
+                  <div class="w-10 h-10 rounded-lg bg-forest-100 flex items-center justify-center">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-600"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-display text-sm font-medium text-forest-800">statut_ong.pdf</p>
+                    <p class="text-xs text-forest-400">1.2 MB</p>
+                  </div>
+                  <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-3 py-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 transition-colors">Preview</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Verification Checklist -->
+            <div class="mb-6">
+              <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider mb-3 block">Verification Checklist</label>
+              <div class="space-y-2">
+                <label class="flex items-center gap-3 p-3 bg-cream-50 rounded-xl border border-cream-200 cursor-pointer hover:bg-cream-100 transition-colors">
+                  <input type="checkbox" checked class="w-5 h-5 rounded-md border-forest-300 text-forest-600 focus:ring-forest-500">
+                  <div>
+                    <p class="font-display text-sm font-medium text-forest-800">CUI Valid</p>
+                    <p class="text-xs text-forest-400">Verified against ANAF registry</p>
+                  </div>
+                  <span class="ml-auto">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-green-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-cream-50 rounded-xl border border-cream-200 cursor-pointer hover:bg-cream-100 transition-colors">
+                  <input type="checkbox" checked class="w-5 h-5 rounded-md border-forest-300 text-forest-600 focus:ring-forest-500">
+                  <div>
+                    <p class="font-display text-sm font-medium text-forest-800">Documents Uploaded</p>
+                    <p class="text-xs text-forest-400">At least one registration document</p>
+                  </div>
+                  <span class="ml-auto">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-green-500"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-cream-50 rounded-xl border border-cream-200 cursor-pointer hover:bg-cream-100 transition-colors">
+                  <input type="checkbox" class="w-5 h-5 rounded-md border-forest-300 text-forest-600 focus:ring-forest-500">
+                  <div>
+                    <p class="font-display text-sm font-medium text-forest-800">Contact Info Verified</p>
+                    <p class="text-xs text-forest-400">Email and phone confirmed</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-4 border-t border-cream-200">
+              <button class="flex-1 font-display text-sm font-semibold bg-forest-600 hover:bg-forest-700 text-white px-5 py-3 rounded-xl transition-all hover:shadow-lg">Approve Organization</button>
+              <button class="flex-1 font-display text-sm font-semibold bg-red-50 hover:bg-red-100 text-red-600 px-5 py-3 rounded-xl transition-all border border-red-200">Reject</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> The drawer slides in from the right with a dim overlay on the main content. Checklist items can be toggled by the admin as they verify each criterion. "Preview" opens documents in a lightbox. The drawer can be closed by clicking the X button or the dim overlay.
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: Document Preview Lightbox -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">3. Document Preview Lightbox</div>
+  <span class="design-state-label design-state-label--active">Active — Preview Open</span>
+
+  <div class="design-screen mt-4">
+    <div class="relative min-h-[400px] bg-forest-900/90 flex items-center justify-center p-8">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-[600px] w-full overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-cream-200">
+          <div class="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-600"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span class="font-display text-sm font-semibold text-forest-800">certificat_fiscal_2026.pdf</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-3 py-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 transition-colors">Download</button>
+            <button class="w-8 h-8 rounded-lg bg-cream-100 hover:bg-cream-200 flex items-center justify-center transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-500"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="p-8 bg-cream-50 min-h-[300px] flex items-center justify-center">
+          <div class="text-center">
+            <div class="w-20 h-20 mx-auto rounded-2xl bg-forest-100 flex items-center justify-center mb-4">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-forest-400"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <p class="font-display text-sm text-forest-500">PDF Document Preview</p>
+            <p class="font-body text-xs text-forest-400 mt-1">Rendered preview of the uploaded document</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: Approve Confirmation Dialog -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">4. Approve Confirmation Dialog</div>
+  <span class="design-state-label design-state-label--success">Success Flow</span>
+
+  <div class="design-screen mt-4">
+    <div class="relative min-h-[400px] bg-forest-900/20 flex items-center justify-center p-8">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-[480px] w-full p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-green-600"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3 class="font-display text-lg font-bold text-forest-900">Approve Organization</h3>
+        </div>
+        <p class="font-body text-sm text-forest-600 mb-4">You are about to approve <strong class="text-forest-800">EcoWild Foundation</strong> (CUI: RO12345678). The organization will receive email notification and gain access to the platform.</p>
+
+        <div class="mb-4">
+          <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider mb-2 block">Admin Notes (optional)</label>
+          <textarea class="w-full px-4 py-3 rounded-xl border border-cream-300 bg-cream-50 font-body text-sm text-forest-800 focus:border-forest-400 outline-none resize-none" rows="3" placeholder="Add any notes about this verification...">All documents verified. CUI matches ANAF records. Organization mission aligns with platform guidelines.</textarea>
+        </div>
+
+        <div class="flex gap-3">
+          <button class="flex-1 font-display text-sm font-semibold bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl transition-all">Confirm Approval</button>
+          <button class="font-display text-sm font-medium text-forest-500 hover:text-forest-700 px-5 py-3 rounded-xl bg-cream-100 hover:bg-cream-200 transition-all">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> On "Confirm Approval", the system sends a welcome email to the organization, sets <code>verification_status = 'approved'</code>, and logs the action in the admin audit trail. The admin notes are stored for reference.
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: Reject with Reason Dialog -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">5. Reject with Reason Dialog</div>
+  <span class="design-state-label design-state-label--error">Rejection Flow</span>
+
+  <div class="design-screen mt-4">
+    <div class="relative min-h-[450px] bg-forest-900/20 flex items-center justify-center p-8">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-[480px] w-full p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <h3 class="font-display text-lg font-bold text-forest-900">Reject Organization</h3>
+        </div>
+        <p class="font-body text-sm text-forest-600 mb-4">You are rejecting <strong class="text-forest-800">EcoWild Foundation</strong>. The organization will be notified with the reason below.</p>
+
+        <div class="mb-4">
+          <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider mb-2 block">Rejection Reason</label>
+          <select class="w-full px-4 py-3 rounded-xl border border-cream-300 bg-cream-50 font-display text-sm text-forest-800 focus:border-forest-400 outline-none">
+            <option>Select a reason...</option>
+            <option>Invalid CUI / Fiscal Code</option>
+            <option>Missing registration documents</option>
+            <option>Incomplete contact information</option>
+            <option>Organization not eligible</option>
+            <option selected>Documents do not match CUI</option>
+            <option>Suspected fraudulent registration</option>
+            <option>Other (specify below)</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label class="font-display text-xs font-semibold text-forest-400 uppercase tracking-wider mb-2 block">Additional Details</label>
+          <textarea class="w-full px-4 py-3 rounded-xl border border-cream-300 bg-cream-50 font-body text-sm text-forest-800 focus:border-forest-400 outline-none resize-none" rows="3" placeholder="Provide additional context for the rejection...">The uploaded fiscal certificate shows a different CUI than the one provided in the registration form. Please re-submit with matching documents.</textarea>
+        </div>
+
+        <div class="flex gap-3">
+          <button class="flex-1 font-display text-sm font-semibold bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl transition-all">Confirm Rejection</button>
+          <button class="font-display text-sm font-medium text-forest-500 hover:text-forest-700 px-5 py-3 rounded-xl bg-cream-100 hover:bg-cream-200 transition-all">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> A rejection reason must be selected from the dropdown. The "Other" option enables the custom reason field as required. On "Confirm Rejection", a rejection notification email is sent to the organization with the selected reason and additional details. Status is set to <code>rejected</code>.
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6: Status Change States -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">6. Status Change States — Table Row Variants</div>
+
+  <div class="space-y-4 mt-4">
+    <!-- Approved Row -->
+    <div>
+      <span class="design-state-label design-state-label--success mb-2 inline-block">Approved State</span>
+      <div class="bg-white rounded-2xl border border-forest-100 overflow-hidden">
+        <table class="w-full">
+          <tbody>
+            <tr class="bg-green-50/50">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-coral-100 flex items-center justify-center font-display text-sm font-bold text-coral-600">EW</div>
+                  <div>
+                    <p class="font-display font-semibold text-sm text-forest-800">EcoWild Foundation</p>
+                    <p class="text-xs text-forest-400">contact@ecowild.ro</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO12345678</span></td>
+              <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-coral-100 text-coral-600 px-2.5 py-1 rounded-full">ONG</span></td>
+              <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 28, 2026</span></td>
+              <td class="px-5 py-4"><span class="bg-green-100 text-green-700 text-xs font-display font-semibold px-2.5 py-1 rounded-full">Approved</span></td>
+              <td class="px-5 py-4">
+                <span class="text-xs font-display text-forest-400">Approved by Admin</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Rejected Row -->
+    <div>
+      <span class="design-state-label design-state-label--error mb-2 inline-block">Rejected State</span>
+      <div class="bg-white rounded-2xl border border-forest-100 overflow-hidden">
+        <table class="w-full">
+          <tbody>
+            <tr class="bg-red-50/50">
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-gold-100 flex items-center justify-center font-display text-sm font-bold text-gold-600">TR</div>
+                  <div>
+                    <p class="font-display font-semibold text-sm text-forest-800">TechRecruit SRL</p>
+                    <p class="text-xs text-forest-400">hr@techrecruit.ro</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 py-4"><span class="font-mono text-sm text-forest-700">RO87654321</span></td>
+              <td class="px-5 py-4"><span class="text-xs font-display font-medium bg-gold-100 text-gold-700 px-2.5 py-1 rounded-full">Company</span></td>
+              <td class="px-5 py-4"><span class="font-display text-sm text-forest-500">Mar 27, 2026</span></td>
+              <td class="px-5 py-4"><span class="status-rejected text-xs font-display font-semibold px-2.5 py-1 rounded-full">Rejected</span></td>
+              <td class="px-5 py-4">
+                <button class="text-xs font-display font-medium text-forest-500 hover:text-forest-700 px-2 py-1.5 transition-colors underline">View Reason</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> After approval/rejection, the row background changes to reflect the new status (green tint for approved, red tint for rejected). Action buttons are replaced with status text or a "View Reason" link. The sidebar badge count decrements accordingly.
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7: Success Toast -->
+  <!-- ============================================================ -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">7. Success/Error Toasts</div>
+
+  <div class="space-y-4 mt-4">
+    <div>
+      <span class="design-state-label design-state-label--success mb-2 inline-block">Approval Success</span>
+      <div class="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-5 py-3 shadow-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-green-600"><polyline points="20 6 9 17 4 12"/></svg>
+        <div>
+          <p class="font-display text-sm font-semibold text-green-800">Organization Approved</p>
+          <p class="font-body text-xs text-green-600">EcoWild Foundation has been verified and notified.</p>
+        </div>
+        <button class="ml-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-400"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <span class="design-state-label design-state-label--error mb-2 inline-block">Rejection Confirmation</span>
+      <div class="inline-flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-3 shadow-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <div>
+          <p class="font-display text-sm font-semibold text-red-800">Organization Rejected</p>
+          <p class="font-body text-xs text-red-600">TechRecruit SRL has been rejected and notified.</p>
+        </div>
+        <button class="ml-4">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-400"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Interaction:</strong> Toasts appear at the top-right corner of the screen and auto-dismiss after 5 seconds. They can also be manually dismissed by clicking the X button.
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-000 — Landing Page — VoluntX Design</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="current-tailwind-config.js"></script>
+<link rel="stylesheet" href="current-theme.css">
+</head>
+<body class="bg-cream-100 text-forest-800 antialiased">
+
+<div class="max-w-[1400px] mx-auto px-6 py-8">
+
+  <!-- Design Header -->
+  <div class="design-header">
+    <h1>UC-000 — Landing Page</h1>
+    <p>The public-facing landing page for unauthenticated visitors. Primary conversion funnel entry point.</p>
+    <div class="design-meta">
+      <span>Actor: <strong>Visitor (Unauthenticated)</strong></span>
+      <span>Route: <strong>/</strong></span>
+      <span>Priority: <strong>Critical</strong></span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 1: Top Navigation Bar -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">1. Top Navigation Bar</div>
+
+  <div class="design-annotation">
+    <strong>Navigation:</strong> Fixed top bar with logo, nav links (Home, Opportunities, Careers[PRO], Dashboard, Profile, Messages, ONG Panel, Admin), language switcher (EN/RO), Sign In + Get Started buttons. For visitors, only Home, Opportunities, Sign In, Get Started are visible. Background: cream-100/90 with backdrop-blur.
+  </div>
+
+  <div class="design-screen">
+    <nav class="bg-cream-100/90 backdrop-blur-md border-b border-forest-100/50">
+      <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-forest-700 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z"/></svg>
+          </div>
+          <span class="font-display font-bold text-xl text-forest-800 tracking-tight">Volunt<span class="text-coral-500">X</span></span>
+        </div>
+
+        <!-- Nav Links -->
+        <div class="flex items-center gap-1">
+          <button class="px-4 py-2 rounded-lg font-display text-sm font-medium text-forest-800 bg-forest-50">Home</button>
+          <button class="px-4 py-2 rounded-lg font-display text-sm font-medium text-forest-600 hover:text-forest-800 hover:bg-forest-50">Opportunities</button>
+        </div>
+
+        <!-- Right side -->
+        <div class="flex items-center gap-3">
+          <!-- Language Switcher -->
+          <div class="lang-switcher">
+            <button class="lang-btn active">
+              <svg class="lang-flag" viewBox="0 0 640 480"><rect width="640" height="480" fill="#012169"/><path d="M75 0l244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z" fill="#fff"/><path d="M424 281l216 159v40L369 281h55zm-184 20l6 35L54 480H0l240-179zM640 0v3L391 191l2-44L590 0h50zM0 0l239 176h-60L0 42V0z" fill="#C8102E"/><path d="M241 0v480h160V0H241zM0 160v160h640V160H0z" fill="#fff"/><path d="M0 193v96h640v-96H0zM273 0v480h96V0h-96z" fill="#C8102E"/></svg>
+              EN
+            </button>
+            <div class="lang-divider"></div>
+            <button class="lang-btn">
+              <svg class="lang-flag" viewBox="0 0 640 480"><rect width="213" height="480" fill="#002B7F"/><rect x="213" width="214" height="480" fill="#FCD116"/><rect x="427" width="213" height="480" fill="#CE1126"/></svg>
+              RO
+            </button>
+          </div>
+          <button class="font-display text-sm font-medium text-forest-600">Sign In</button>
+          <button class="font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white px-5 py-2.5 rounded-xl">Get Started</button>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <div class="design-annotation">
+    <strong>Data mapping:</strong> Language switcher toggles i18n between EN/RO. "Sign In" navigates to <code>/login</code>. "Get Started" navigates to <code>/register</code>. Logo links to <code>/</code>.
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 2: Hero Section -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">2. Hero Section</div>
+
+  <div class="design-annotation">
+    <strong>Layout:</strong> Two-column grid (text left, profile card right). Gradient blobs (forest-300, coral-300, gold-300) animate with float keyframes. Badge "Romania's #1 Volunteer Platform" at top. Stats row: 12K+ volunteers, 340+ NGOs, 95K hours. Two CTAs: "Start Volunteering" (coral, primary) and "Browse Opportunities" (outlined).
+  </div>
+
+  <div class="design-screen">
+    <section class="relative overflow-hidden min-h-[80vh] flex items-center bg-cream-100">
+      <!-- Gradient Blobs -->
+      <div class="absolute w-[600px] h-[600px] rounded-full bg-forest-300 top-[-200px] right-[-100px] filter blur-[80px] opacity-30" style="animation: float 6s ease-in-out infinite; animation-delay:-2s"></div>
+      <div class="absolute w-[400px] h-[400px] rounded-full bg-coral-300 bottom-[-100px] left-[-50px] filter blur-[80px] opacity-30" style="animation: float 6s ease-in-out infinite; animation-delay:-4s"></div>
+      <div class="absolute w-[300px] h-[300px] rounded-full bg-gold-300 top-[30%] right-[20%] filter blur-[80px] opacity-[0.15]" style="animation: float 6s ease-in-out infinite; animation-delay:-1s"></div>
+
+      <div class="max-w-[1400px] mx-auto px-6 py-20 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+        <!-- Left column: Text -->
+        <div>
+          <span class="inline-flex items-center gap-2 bg-forest-50 border border-forest-200 text-forest-700 font-display text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <span class="w-2 h-2 rounded-full bg-forest-500 animate-pulse"></span>
+            Romania's #1 Volunteer Platform
+          </span>
+
+          <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-forest-900">
+            Turn Your <br>
+            <span class="relative inline-block">
+              <span class="relative z-10">Volunteer Work</span>
+              <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none"><path d="M2 8C60 2 180 2 298 8" stroke="#4a5eff" stroke-width="4" stroke-linecap="round"/></svg>
+            </span><br>
+            Into Career Capital
+          </h1>
+
+          <p class="font-body text-lg text-forest-600 mt-6 max-w-lg leading-relaxed">
+            Build a verified Social Resume. Get validated by NGOs. Access exclusive career opportunities from companies that value purpose-driven candidates.
+          </p>
+
+          <div class="flex flex-wrap gap-4 mt-10">
+            <button class="font-display font-semibold bg-coral-500 hover:bg-coral-600 text-white px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-xl hover:shadow-coral-500/25 active:scale-[0.97]">
+              Start Volunteering
+            </button>
+            <button class="font-display font-semibold bg-white hover:bg-forest-50 text-forest-700 px-8 py-4 rounded-2xl text-lg border-2 border-forest-200 hover:border-forest-300 transition-all">
+              Browse Opportunities
+            </button>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="flex items-center gap-8 mt-12">
+            <div>
+              <span class="font-display text-3xl font-bold text-forest-800">12K+</span>
+              <p class="text-sm text-forest-500 mt-0.5">Active Volunteers</p>
+            </div>
+            <div class="w-px h-10 bg-forest-200"></div>
+            <div>
+              <span class="font-display text-3xl font-bold text-forest-800">340+</span>
+              <p class="text-sm text-forest-500 mt-0.5">Partner NGOs</p>
+            </div>
+            <div class="w-px h-10 bg-forest-200"></div>
+            <div>
+              <span class="font-display text-3xl font-bold text-forest-800">95K</span>
+              <p class="text-sm text-forest-500 mt-0.5">Hours Logged</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column: Profile Card -->
+        <div class="relative">
+          <div class="relative bg-white rounded-3xl shadow-2xl shadow-forest-900/10 p-8 border border-forest-100">
+            <!-- Mini profile card -->
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-forest-400 to-forest-600 flex items-center justify-center text-white font-display font-bold text-xl">AM</div>
+              <div>
+                <h3 class="font-display font-semibold text-forest-800">Ana Marinescu</h3>
+                <p class="text-sm text-forest-500">Environmental Advocate & Youth Mentor</p>
+              </div>
+              <div class="ml-auto">
+                <span class="inline-flex items-center gap-1.5 bg-forest-50 text-forest-700 font-display text-xs font-semibold px-3 py-1.5 rounded-full">
+                  <span class="w-2 h-2 rounded-full bg-forest-500"></span> Available
+                </span>
+              </div>
+            </div>
+
+            <!-- Impact stats mini -->
+            <div class="grid grid-cols-4 gap-3 mb-6">
+              <div class="bg-cream-100 rounded-xl p-3 text-center">
+                <span class="font-display text-xl font-bold text-forest-800">248</span>
+                <p class="text-[11px] text-forest-500 mt-0.5">Hours</p>
+              </div>
+              <div class="bg-cream-100 rounded-xl p-3 text-center">
+                <span class="font-display text-xl font-bold text-forest-800">12</span>
+                <p class="text-[11px] text-forest-500 mt-0.5">Projects</p>
+              </div>
+              <div class="bg-cream-100 rounded-xl p-3 text-center">
+                <span class="font-display text-xl font-bold text-forest-800">7</span>
+                <p class="text-[11px] text-forest-500 mt-0.5">NGOs</p>
+              </div>
+              <div class="bg-cream-100 rounded-xl p-3 text-center">
+                <span class="font-display text-xl font-bold text-forest-800">15</span>
+                <p class="text-[11px] text-forest-500 mt-0.5">Skills</p>
+              </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="inline-flex items-center gap-1 bg-forest-50 text-forest-700 font-display text-xs font-medium px-3 py-1.5 rounded-full border border-forest-200">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#1D34FF"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                Project Management
+              </span>
+              <span class="inline-flex items-center gap-1 bg-forest-50 text-forest-700 font-display text-xs font-medium px-3 py-1.5 rounded-full border border-forest-200">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#1D34FF"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                Public Speaking
+              </span>
+              <span class="inline-flex items-center gap-1 bg-forest-50 text-forest-700 font-display text-xs font-medium px-3 py-1.5 rounded-full border border-forest-200">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#1D34FF"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                Environmental Science
+              </span>
+              <span class="bg-cream-200 text-forest-600 font-display text-xs font-medium px-3 py-1.5 rounded-full">+12 more</span>
+            </div>
+
+            <!-- Floating badges -->
+            <div class="absolute -top-4 -right-4 bg-gold-100 border border-gold-300 rounded-xl px-3 py-2 shadow-lg anim-float" style="animation-delay:-1s">
+              <span class="font-display text-xs font-semibold text-gold-700">Validated by 5 NGOs</span>
+            </div>
+            <div class="absolute -bottom-3 -left-3 bg-coral-50 border border-coral-200 rounded-xl px-3 py-2 shadow-lg anim-float" style="animation-delay:-3s">
+              <span class="font-display text-xs font-semibold text-coral-600">3 Career Offers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 3: How It Works -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">3. How It Works (3-Step Section)</div>
+
+  <div class="design-annotation">
+    <strong>Layout:</strong> White background section. Centered heading with coral uppercase label "HOW IT WORKS". Three cards in a 3-column grid. Each card: cream-50 bg, rounded-3xl, number badge, title, description, faint icon in top-right. Cards have card-hover effect (translateY(-4px) on hover).
+  </div>
+
+  <div class="design-screen">
+    <section class="py-24 bg-white">
+      <div class="max-w-[1200px] mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="font-display text-sm font-semibold text-coral-500 tracking-widest uppercase">How It Works</span>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-forest-900 mt-3">Three Steps to Your Social Resume</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Step 1 -->
+          <div class="relative bg-cream-50 rounded-3xl p-8 border border-cream-300 card-hover">
+            <div class="w-14 h-14 rounded-2xl bg-forest-100 flex items-center justify-center mb-6">
+              <span class="font-display text-2xl font-bold text-forest-700">1</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-forest-800 mb-3">Create Your Profile</h3>
+            <p class="font-body text-forest-600 leading-relaxed">Complete your profile with skills, education, and interests. Our guided wizard makes it effortless.</p>
+            <div class="absolute top-8 right-8 w-24 h-24 rounded-full bg-forest-50 flex items-center justify-center opacity-40">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1D34FF" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7"/></svg>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div class="relative bg-cream-50 rounded-3xl p-8 border border-cream-300 card-hover">
+            <div class="w-14 h-14 rounded-2xl bg-coral-100 flex items-center justify-center mb-6">
+              <span class="font-display text-2xl font-bold text-coral-600">2</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-forest-800 mb-3">Volunteer & Get Validated</h3>
+            <p class="font-body text-forest-600 leading-relaxed">Apply to opportunities, contribute your skills, and receive NGO-validated experience badges.</p>
+            <div class="absolute top-8 right-8 w-24 h-24 rounded-full bg-coral-50 flex items-center justify-center opacity-40">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4a5eff" stroke-width="1.5"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z"/></svg>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div class="relative bg-cream-50 rounded-3xl p-8 border border-cream-300 card-hover">
+            <div class="w-14 h-14 rounded-2xl bg-gold-100 flex items-center justify-center mb-6">
+              <span class="font-display text-2xl font-bold text-gold-600">3</span>
+            </div>
+            <h3 class="font-display text-xl font-bold text-forest-800 mb-3">Access Career Opportunities</h3>
+            <p class="font-body text-forest-600 leading-relaxed">Unlock the Walled Garden: exclusive jobs and internships from companies that value social impact.</p>
+            <div class="absolute top-8 right-8 w-24 h-24 rounded-full bg-gold-50 flex items-center justify-center opacity-40">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2940e6" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 4: Testimonials -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">4. Testimonials Section</div>
+
+  <div class="design-annotation">
+    <strong>Layout:</strong> Three testimonial cards in a 3-column grid. Each card: white bg, rounded-2xl, forest-100 border, card-hover. Star ratings (gold-400 for filled, cream-400 for empty). Quote text in forest-700. Avatar circle with initials + gradient. Cards 1 and 2 have 5 stars; card 3 has 4 stars.
+  </div>
+
+  <div class="design-screen">
+    <section class="py-24 bg-cream-100">
+      <div class="max-w-[1200px] mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="font-display text-sm font-semibold text-coral-500 tracking-widest uppercase">Testimonials</span>
+          <h2 class="font-display text-4xl font-bold text-forest-900 mt-3">Loved by Volunteers & NGOs</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Testimonial 1 -->
+          <div class="bg-white rounded-2xl p-6 border border-forest-100 card-hover">
+            <div class="flex gap-1 mb-4">
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <p class="font-body text-forest-700 leading-relaxed mb-4">"VoluntX helped me land a sustainability internship at Deloitte. My validated Social Resume was the differentiator in the interview."</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-coral-400 to-coral-600 flex items-center justify-center text-white font-display font-bold text-sm">MC</div>
+              <div>
+                <p class="font-display font-semibold text-sm text-forest-800">Maria Constantinescu</p>
+                <p class="text-xs text-forest-500">Volunteer, 320h logged</p>
+              </div>
+            </div>
+          </div>
+          <!-- Testimonial 2 -->
+          <div class="bg-white rounded-2xl p-6 border border-forest-100 card-hover">
+            <div class="flex gap-1 mb-4">
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <p class="font-body text-forest-700 leading-relaxed mb-4">"We reduced our volunteer management time by 60%. The certificate system with QR codes adds real credibility to our programs."</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-forest-400 to-forest-600 flex items-center justify-center text-white font-display font-bold text-sm">VP</div>
+              <div>
+                <p class="font-display font-semibold text-sm text-forest-800">Voluntariat pentru Paduri</p>
+                <p class="text-xs text-forest-500">Environmental NGO, 45 volunteers</p>
+              </div>
+            </div>
+          </div>
+          <!-- Testimonial 3 -->
+          <div class="bg-white rounded-2xl p-6 border border-forest-100 card-hover">
+            <div class="flex gap-1 mb-4">
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-5 h-5 text-cream-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <p class="font-body text-forest-700 leading-relaxed mb-4">"We hired 8 interns through the Walled Garden. Every candidate came with a verified track record. It changed our recruitment process."</p>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-white font-display font-bold text-sm">BC</div>
+              <div>
+                <p class="font-display font-semibold text-sm text-forest-800">BCR Innovation Hub</p>
+                <p class="text-xs text-forest-500">Company Partner</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- SECTION 5: Footer -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">5. Footer (4 Columns)</div>
+
+  <div class="design-annotation">
+    <strong>Layout:</strong> Dark footer (forest-900 bg). 4 columns: Brand (logo + description + social icons), Platform (links), Resources (links), Legal (links). Bottom row: copyright + language.
+  </div>
+
+  <div class="design-screen">
+    <footer class="bg-forest-900 text-white py-16">
+      <div class="max-w-[1200px] mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-10 mb-12">
+          <!-- Brand -->
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8Z"/></svg>
+              </div>
+              <span class="font-display font-bold text-xl tracking-tight">Volunt<span class="text-coral-300">X</span></span>
+            </div>
+            <p class="font-body text-sm text-forest-300 leading-relaxed mb-4">Transform volunteering into career capital. Build your verified Social Resume today.</p>
+            <div class="flex gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-forest-300 hover:text-white cursor-pointer">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557a9.83 9.83 0 01-2.828.775 4.932 4.932 0 002.165-2.724 9.864 9.864 0 01-3.127 1.195 4.916 4.916 0 00-8.384 4.482A13.944 13.944 0 011.671 3.149a4.916 4.916 0 001.523 6.574 4.897 4.897 0 01-2.229-.616v.062a4.918 4.918 0 003.946 4.827 4.902 4.902 0 01-2.224.084 4.918 4.918 0 004.6 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.945 13.945 0 007.557 2.209c9.054 0 14-7.497 14-13.987 0-.21 0-.42-.015-.63A9.936 9.936 0 0024 4.557z"/></svg>
+              </div>
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-forest-300 hover:text-white cursor-pointer">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </div>
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-forest-300 hover:text-white cursor-pointer">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+              </div>
+            </div>
+          </div>
+          <!-- Platform -->
+          <div>
+            <h4 class="font-display font-semibold text-sm uppercase tracking-wider text-forest-300 mb-4">Platform</h4>
+            <ul class="space-y-2.5">
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Browse Opportunities</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">For NGOs</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">For Companies</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Walled Garden</a></li>
+            </ul>
+          </div>
+          <!-- Resources -->
+          <div>
+            <h4 class="font-display font-semibold text-sm uppercase tracking-wider text-forest-300 mb-4">Resources</h4>
+            <ul class="space-y-2.5">
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Help Center</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Blog</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">API Documentation</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Community</a></li>
+            </ul>
+          </div>
+          <!-- Legal -->
+          <div>
+            <h4 class="font-display font-semibold text-sm uppercase tracking-wider text-forest-300 mb-4">Legal</h4>
+            <ul class="space-y-2.5">
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Privacy Policy</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Terms of Service</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">Cookie Policy</a></li>
+              <li><a class="font-body text-sm text-forest-400 hover:text-white transition-colors cursor-pointer">GDPR</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="border-t border-forest-800 pt-8 flex flex-wrap items-center justify-between gap-4">
+          <p class="font-body text-sm text-forest-400">&copy; 2026 VoluntX. All rights reserved.</p>
+          <p class="font-body text-sm text-forest-400">Made with purpose in Romania</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- DESIGN ANNOTATIONS: Data Mapping -->
+  <!-- ============================================================== -->
+  <div class="design-section-divider"></div>
+  <div class="design-section-title">Design Annotations &mdash; Data Mapping</div>
+
+  <table class="design-data-table">
+    <thead>
+      <tr><th>UI Element</th><th>Data Source</th><th>API Endpoint</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Stats (12K+, 340+, 95K)</td><td>Platform aggregates</td><td><code>GET /api/stats/platform</code></td><td>Cached, updated hourly</td></tr>
+      <tr><td>Testimonials</td><td>CMS / hardcoded</td><td><code>GET /api/testimonials</code></td><td>Admin-curated content</td></tr>
+      <tr><td>Hero profile card</td><td>Static demo data</td><td>N/A</td><td>Not real user data; marketing mockup</td></tr>
+      <tr><td>"Start Volunteering" CTA</td><td>N/A</td><td>Navigates to <code>/register</code></td><td>Primary conversion action</td></tr>
+      <tr><td>"Browse Opportunities" CTA</td><td>N/A</td><td>Navigates to <code>/opportunities</code></td><td>Secondary discovery action</td></tr>
+      <tr><td>Language switcher</td><td>i18n locale</td><td>Client-side toggle</td><td>Stores preference in localStorage</td></tr>
+    </tbody>
+  </table>
+
+  <div class="design-annotation">
+    <strong>Interaction notes:</strong> The landing page is the primary entry point. All navigation links for authenticated sections (Dashboard, Profile, Messages, etc.) are hidden for visitors. The "Get Started" button and "Sign In" link are the primary conversion touchpoints. Gradient blobs use CSS animation (float keyframes, 6s infinite). Profile card badges float independently.
+  </div>
+
+</div>
+
+</body>
+</html>

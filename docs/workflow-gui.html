@@ -547,7 +547,7 @@ const DATA = {
       triggers: ["prioritize", "what should I work on next", "recommend next task", "rank tasks"]
     },
     {
-      id: "frontend-design", cmd: "/frontend-design", name: "Frontend Design",
+      id: "design-screens", cmd: "/design-screens", name: "Design Screens",
       plugin: "core", phase: "construction-design",
       desc: "Creates screen design specifications as standalone HTML artifacts from the project wireframe. Uses Playwright to inspect wireframes and produces self-contained HTML with all screen states.",
       output: "docs/designs/UC-XXX-design.html",
@@ -616,7 +616,7 @@ const DATA = {
       output: "e2e/**/*.spec.ts, e2e/global-setup.ts",
       produces: "E2E tests running in real browser against running app with real database",
       inputs: ["docs/use_cases/UC-XXX.md", "docs/designs/UC-XXX-design.html"],
-      requires: ["implement", "frontend-design"],
+      requires: ["implement", "design-screens"],
       triggers: ["write Playwright tests", "create e2e tests", "test in the browser"],
       notes: "Design artifact MUST exist. Runs in isolated fork context in /deliver-use-case."
     },
@@ -884,7 +884,7 @@ function renderPipeline() {
     { num: 1, label: "Use Case Specification", cmd: "/use-case-spec", skill: "use-case-spec",
       color: "#3b82f6", desc: "Write detailed spec with MSS, alternative flows, business rules. Skipped if spec already exists.",
       tags: [{ label: "core", cls: "tag-core" }, { label: "skip if exists", cls: "tag-skip" }] },
-    { num: 2, label: "Frontend Design", cmd: "/frontend-design", skill: "frontend-design",
+    { num: 2, label: "Design Screens", cmd: "/design-screens", skill: "design-screens",
       color: "#3b82f6", desc: "Create HTML design artifact from wireframe with all screen states. Skipped if design already exists.",
       tags: [{ label: "core", cls: "tag-core" }, { label: "skip if exists", cls: "tag-skip" }] },
     { num: 3, label: "Entity Gate", cmd: "", skill: null,

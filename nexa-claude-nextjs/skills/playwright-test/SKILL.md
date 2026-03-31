@@ -36,7 +36,7 @@ user actions, navigation flow). Together they determine the test scenarios and a
 - **User interactions** derive from the frontend design's User Actions (triggers, results)
 - **Navigation expectations** derive from the frontend design's Navigation Flow and Screen Map
 
-If `docs/designs/$ARGUMENTS-design.html` does not exist, stop and tell the user to run `/frontend-design $ARGUMENTS` first.
+If `docs/designs/$ARGUMENTS-design.html` does not exist, stop and tell the user to run `/design-screens $ARGUMENTS` first.
 
 ## Test Philosophy: Journeys, Not Fragments
 

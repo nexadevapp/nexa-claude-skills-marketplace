@@ -516,7 +516,7 @@ For each selected use case, in dependency order:
 2. **Skip if** the use case has no user-facing interaction (e.g., background jobs, system-triggered
    processes with no UI). Log the skip reason.
 3. **Otherwise**, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/frontend-design/SKILL.md`
+   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/design-screens/SKILL.md`
    with the use case ID as the argument.
 4. **Verify:** The file exists and contains at least one screen definition.
 

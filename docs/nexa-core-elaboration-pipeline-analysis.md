@@ -14,7 +14,7 @@ Analysis of the skills in `nexa-claude-core` with a plan to create a unified **E
 | `/entity-model` | Elaboration | `docs/requirements.md` | `docs/entity_model.md` | ER diagram + attribute tables |
 | `/use-case-diagram` | Elaboration | `docs/requirements.md` | `docs/use_cases.puml` | PlantUML actors & use cases |
 | `/use-case-spec` | Elaboration | Use case ID | `docs/use_cases/UC-XXX.md` | Detailed use case specification |
-| `/frontend-design` | Elaboration | UC spec + wireframe | `docs/designs/UC-XXX-design.html` | Screen designs with states |
+| `/design-screens` | Elaboration | UC spec + wireframe | `docs/designs/UC-XXX-design.html` | Screen designs with states |
 | `/technical-task` | Elaboration | Task description | `docs/technical_tasks/TT-XXX.md` | Non-UC engineering work |
 | `/prioritize` | Elaboration | All specs | `docs/priority.md` | Recommended implementation order |
 | `/refine-use-cases` | Elaboration | All above | `docs/gap_analysis_*.md` | Batch specs + designs + gap analysis |
@@ -49,7 +49,7 @@ entity_model.md       use_cases.puml      wireframes/index.html
                │
                ├─────────────────────────────┐
                ▼                             ▼
-         /frontend-design              /technical-task
+         /design-screens               /technical-task
                │                             │
                ▼                             ▼
          UC-XXX-design.html            TT-XXX.md
@@ -172,7 +172,7 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 
 ### 1. Single Entry Point
 
-**Before:** User must know the sequence: `/requirements` → `/entity-model` → `/use-case-diagram` → `/use-case-spec` (for each) → `/frontend-design` (for each) → `/prioritize` → `/refine-use-cases`
+**Before:** User must know the sequence: `/requirements` → `/entity-model` → `/use-case-diagram` → `/use-case-spec` (for each) → `/design-screens` (for each) → `/prioritize` → `/refine-use-cases`
 
 **After:** User runs `/elaborate` once. Pipeline handles dependencies automatically.
 
@@ -201,7 +201,7 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 
 ### 4. Wireframe as Hard Gate
 
-**Before:** `/frontend-design` fails if wireframe missing, but user discovers this per-UC.
+**Before:** `/design-screens` fails if wireframe missing, but user discovers this per-UC.
 
 **After:** Wireframe existence checked early (Step 4). Clear message: "Provide wireframe before continuing."
 

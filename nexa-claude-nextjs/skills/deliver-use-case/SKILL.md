@@ -140,14 +140,14 @@ Alternative Flows, Postconditions, and Business Rules sections.
 ### Step 2: Frontend Design (Optional)
 
 This step is optional — the frontend design should typically be created beforehand
-using `/frontend-design`. Running spec and design across all use cases upfront allows
+using `/design-screens`. Running spec and design across all use cases upfront allows
 cross-referencing to identify gaps (missing entities, shared screens, conflicting flows)
 before implementation begins. The pipeline includes it as a convenience fallback.
 
 **Skip if** `docs/designs/$ARGUMENTS-design.html` already exists.
 
 Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/frontend-design/SKILL.md`
+`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/design-screens/SKILL.md`
 
 Inputs for this step: the use case specification from Step 1, plus any wireframe in `docs/wireframes/`
 matching the use case ID. See the skill's Inputs section for details.

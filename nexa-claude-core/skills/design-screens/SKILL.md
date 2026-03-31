@@ -1,5 +1,5 @@
 ---
-name: frontend-design
+name: design-screens
 description: >
   Creates screen design specifications as standalone HTML artifacts from the project wireframe.
   Uses Playwright to open the wireframe, identify the section relevant to the current use case,
@@ -261,7 +261,7 @@ The file `docs/designs/design-system.css` is the single source of truth for visu
 component styles. All design artifacts link to it. When a stylistic change arrives (brand colors,
 typography, spacing), update this one file and all designs reflect the change.
 
-**When to create it**: The first time `/frontend-design` runs on a project that has no
+**When to create it**: The first time `/design-screens` runs on a project that has no
 `docs/designs/design-system.css`. Derive token values from the wireframe's visual language.
 
 **When to update it**: If a design needs a new token category or component style not yet in the

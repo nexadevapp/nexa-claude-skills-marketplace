@@ -37,6 +37,7 @@ nexa-claude-marketplace/
 │   ├── .mcp.json                 # context7, Playwright
 │   └── skills/                   # All workflow steps as skills (slash commands)
 │       ├── setup-env-profiles/
+│       ├── setup-i18n/
 │       ├── prisma-migration/
 │       ├── build-web-middleware/
 │       ├── implement/
@@ -95,6 +96,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Phase        | Skill (slash command)   | Description                                                        |
 |--------------|-------------------------|--------------------------------------------------------------------|
 | Setup        | `/setup-env-profiles`   | Set up local/dev/prod environment profiles with database URLs      |
+| Setup        | `/setup-i18n`           | Set up server-side internationalization with next-intl              |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/build-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |

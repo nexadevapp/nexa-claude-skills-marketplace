@@ -45,6 +45,7 @@ nexa-claude-marketplace/
 │       ├── playwright-test/
 │       ├── code-quality/
 │       ├── deliver-use-case/
+│       ├── sprint-audit/
 │       ├── aws-dockerize/
 │       └── aws-setup-apprunner/
 └── README.md
@@ -104,6 +105,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run ESLint and Prettier checks                                     |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
+| Verification | `/sprint-audit`         | Cross-cutting sprint quality checks (i18n, a11y, styles, auth, nav)|
 | Transition   | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
 | Transition   | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |
 

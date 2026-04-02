@@ -169,6 +169,159 @@ If verification fails, fix the issues and re-verify. Do not proceed until both c
 
 ---
 
+### Step 3.5: Implementation Audit (Isolated Agent)
+
+After implementation passes build and unit tests, run an isolated audit to catch i18n gaps,
+accessibility issues, and visual deviations before E2E tests are written. Fixing these issues
+now avoids rewriting tests later when the UI changes.
+
+**Skip if** the project does not use internationalization (no `messages/` directory and no
+`i18n/` directory exist).
+
+#### Phase 1: Audit (Isolated Agent)
+
+Launch an **isolated agent** (using the Agent tool) to audit the implementation from a clean
+context. The agent has no knowledge of implementation decisions — it works only from the
+specification, design, message files, and the running application.
+
+Agent prompt:
+> You are an independent implementation auditor. Audit the implementation of $ARGUMENTS
+> by running the following lenses **sequentially**. For each lens, collect all findings before
+> moving to the next one. At the end, produce a single structured report.
+>
+> **Your inputs:**
+> - Use case specification: `docs/use_cases/$ARGUMENTS.md`
+> - Frontend design: `docs/designs/$ARGUMENTS-design.html`
+> - Entity model: `docs/entity_model.md`
+> - i18n configuration: `i18n/config.ts` (for supported locales)
+> - Message files: `messages/*.json` (one per locale)
+>
+> ---
+>
+> **Lens 1: i18n Completeness** (file analysis — no browser)
+>
+> Identify every user-facing string introduced or modified for $ARGUMENTS. For each string:
+> 1. Verify it uses a translation function (`t('key')`, `getTranslations`, `useTranslations`),
+>    not a hardcoded literal. Search `.tsx` and `.ts` files in the implementation for:
+>    - JSX text content that is not wrapped in a translation call
+>    - String literals passed to UI props (`placeholder`, `title`, `aria-label`, `alt`) that
+>      are not translation keys
+>    - Validation error messages and toast messages that are hardcoded
+> 2. For every translation key used, verify it exists in **all** locale files under `messages/`.
+>    Read `i18n/config.ts` to get the list of supported locales.
+> 3. Flag any key that exists in the default locale but is missing in other locales.
+> 4. Flag any key in non-default locales that still has a `[TRANSLATE]` prefix (placeholder
+>    not yet translated).
+>
+> **Lens 2: i18n Correctness** (file analysis — no browser)
+>
+> For every translation key used by $ARGUMENTS, compare the values across all locale files:
+> 1. Verify placeholders (e.g., `{name}`, `{count}`) match across all locales — same names,
+>    same count.
+> 2. Verify pluralization rules are correct for each locale (if `{count}` is used, check that
+>    `one`/`other` forms exist for languages that require them).
+> 3. Flag translations that appear to be machine-translated gibberish or that are identical
+>    to the default locale (suggesting they were not actually translated).
+> 4. Flag translations where the meaning clearly diverges from the default locale.
+>
+> **Lens 3: Error Message i18n** (file analysis — no browser)
+>
+> Search all implementation files for $ARGUMENTS and identify every error-handling path:
+> 1. `catch` blocks that display messages to the user
+> 2. `error.tsx` boundary components
+> 3. Form validation error messages (both client-side zod schemas and server-side)
+> 4. Toast/notification error messages
+> 5. API route error responses that surface to the UI
+>
+> For each error path, verify the message uses a translation key, not a hardcoded string.
+> Hardcoded error strings like `"Something went wrong"`, `"Invalid input"`, or
+> `"Please try again"` are findings.
+>
+> **Lens 4: Accessibility** (Playwright MCP — browser required)
+>
+> Start the dev server if not running (`npm run dev`). For each screen defined in the
+> frontend design (`docs/designs/$ARGUMENTS-design.html`):
+> 1. Navigate to the screen using the Playwright MCP tools (`browser_navigate`).
+> 2. Run an axe-core accessibility audit by executing this in `browser_evaluate`:
+>    ```javascript
+>    await import('https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.9.1/axe.min.js');
+>    return axe.run();
+>    ```
+> 3. Collect all violations with their impact level (critical, serious, moderate, minor).
+> 4. Additionally check:
+>    - Every `<img>` has a non-empty `alt` attribute (or `alt=""` for decorative images with
+>      `role="presentation"`)
+>    - Every form input has an associated `<label>` or `aria-label`
+>    - Focus order is logical (tab through the page with `browser_press_key`)
+>    - Color contrast meets WCAG AA (axe-core covers this, but flag if axe is unavailable)
+>
+> **Lens 5: Screen Styles vs Design** (Playwright MCP — browser required)
+>
+> For each screen defined in the frontend design:
+> 1. Open the design HTML artifact in the browser (`browser_navigate` to the file path or
+>    serve it locally).
+> 2. Take a snapshot of the design (`browser_snapshot`).
+> 3. Navigate to the corresponding implemented screen in the running app.
+> 4. Take a snapshot of the implementation (`browser_snapshot`).
+> 5. Compare the two and flag:
+>    - Missing components (present in design but absent in implementation)
+>    - Layout deviations (different arrangement, alignment, or spacing)
+>    - Typography mismatches (headings, font sizes, font weights)
+>    - Color mismatches (background, text, border colors)
+>    - Missing states (the design specifies an empty state but implementation doesn't handle it)
+>
+> **Lens 6: Loading and Error States** (Playwright MCP — browser required)
+>
+> For each screen that performs async operations (data fetching, form submissions):
+> 1. Navigate to the screen.
+> 2. Check that a `loading.tsx` or loading skeleton exists and renders (use `browser_snapshot`
+>    or check the DOM for loading indicators).
+> 3. Check that an `error.tsx` boundary exists for the route segment.
+> 4. If the screen displays data, check that an empty state is handled (no data → meaningful
+>    message, not a blank page or broken layout).
+>
+> ---
+>
+> **Output Format:**
+>
+> Produce a structured report with one section per lens. For each finding, include:
+> - **Severity:** Critical / Major / Minor
+> - **Location:** file path and line number (or screen name for Playwright lenses)
+> - **Finding:** what is wrong
+> - **Suggested fix:** how to fix it
+>
+> Use this severity guide:
+> - **Critical:** User sees broken/untranslated text, app crashes, WCAG A violation
+> - **Major:** Missing translation in non-default locale, WCAG AA violation, missing error state
+> - **Minor:** Placeholder not yet translated (`[TRANSLATE]`), minor style deviation, missing
+>   decorative alt text
+>
+> End the report with a summary: total findings by severity, and a verdict:
+> - **PASS** — 0 Critical, 0 Major
+> - **PASS WITH OBSERVATIONS** — 0 Critical, Minor findings only
+> - **FAIL** — any Critical or Major findings
+
+#### Phase 2: Fix (Main Context)
+
+If the audit reports Critical or Major findings:
+
+1. Fix each finding in the main context (do not modify specification or design documents).
+2. Re-run `npx next build` and `npx vitest run` to confirm fixes don't break anything.
+3. Re-launch the audit agent for **only the lenses that had findings** (pass the previous
+   report so it knows what to re-check).
+
+#### Iteration
+
+Cap at **2 fix iterations**. After 2 iterations, if Critical or Major findings remain,
+log them to `docs/delivery/$ARGUMENTS-iterations.md` under a `## Implementation Audit`
+heading and continue to Step 4. These findings will be visible to the E2E test author
+and evaluator.
+
+**Log every iteration** — append the audit results and fixes applied to
+`docs/delivery/$ARGUMENTS-iterations.md` (see Iteration Artifacts).
+
+---
+
 ### Step 4: E2E Tests
 
 This step has two phases: an isolated agent **writes and self-fixes** the tests, then the
@@ -500,6 +653,7 @@ Display the pipeline report to the user:
 | Frontend Design             | ...    |
 | Entity Gate                 | ...    |
 | Implementation              | ...    |
+| Implementation Audit        | ...    |
 | E2E Tests                   | ...    |
 | E2E Evaluation Iterations   | N / 3  |
 ```

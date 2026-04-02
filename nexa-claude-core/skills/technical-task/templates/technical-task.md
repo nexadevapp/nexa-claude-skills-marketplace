@@ -20,6 +20,16 @@
 
 - [Other TT-XXX or UC-XXX that must be completed first, or "None"]
 
+## Decisions
+
+| Decision | Provenance | Source/Reasoning |
+|----------|------------|------------------|
+| [Technical or design decision made] | EXPLICIT / INFERRED | [Quote source or state reasoning] |
+
+**Provenance Legend:**
+- **EXPLICIT** — Directly stated in requirements, refinement docs, or stakeholder input
+- **INFERRED** — Deduced by the implementer; requires review if challenged
+
 ---
 
 ## Reference

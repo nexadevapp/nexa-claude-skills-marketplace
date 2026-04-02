@@ -117,6 +117,11 @@ if a report for today already exists, append a counter: `gap_analysis_YYYY-MM-DD
 
 10. **Business rule conflicts** — Rules in one use case that contradict rules in another.
 
+11. **Decision provenance gaps** — Business rules, acceptance criteria, or behavioral details
+    that lack clear provenance. Flag items where it's unclear whether the decision came from
+    explicit requirements or was inferred by the agent. These are high-risk areas that require
+    stakeholder validation before implementation.
+
 #### Report template
 
 ```markdown
@@ -198,6 +203,9 @@ After addressing gaps, re-run `/refine-use-cases` to verify all gaps are closed.
   use cases.
 - **Intentional Gap** — An identified gap that requires human judgment to resolve. The
   system cannot determine the right action — flag it for the user to decide.
+- **Decision Provenance Gap** — A business rule or behavioral detail that lacks clear
+  provenance (unclear if EXPLICIT from requirements or INFERRED by agent). High-risk
+  for implementation — requires stakeholder validation.
 
 ---
 

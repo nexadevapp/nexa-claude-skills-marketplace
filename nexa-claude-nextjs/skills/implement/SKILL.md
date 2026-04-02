@@ -24,6 +24,7 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 - Use raw SQL queries (use Prisma Client)
 - Use client components when server components suffice
 - Put database calls in client components or API routes called only by server components
+- Make implementation decisions without documenting their provenance (EXPLICIT vs INFERRED)
 
 ## External Dependencies
 
@@ -97,6 +98,12 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Run tests with `npx vitest run` to verify they pass
 9. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
 10. Verify the implementation compiles successfully with `next build`
+11. Document implementation decisions in a `DECISIONS.md` file (or in the PR description):
+    - For each non-trivial decision made during implementation, record:
+      - **Decision:** What was decided
+      - **Provenance:** EXPLICIT (from spec/requirements) or INFERRED (agent reasoning)
+      - **Source/Reasoning:** Quote the source document or explain the reasoning
+    - INFERRED decisions are candidates for stakeholder review before merge
 
 ## DoD Check
 

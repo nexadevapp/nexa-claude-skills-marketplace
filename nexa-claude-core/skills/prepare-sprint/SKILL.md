@@ -207,6 +207,12 @@ business rules, detail acceptance criteria, flesh out alternative flows).
    - Identify new requirements implied by the selected use cases but missing from requirements.md
    - Flag open questions that require human input
 
+**Decision Provenance:** Every decision made during refinement must be classified as either:
+- **EXPLICIT** — Directly stated in the requirements, refinement documents, or user input. Quote the source.
+- **INFERRED** — Deduced by the agent based on context, patterns, or common sense. State the reasoning.
+
+This distinction must be documented in the refinement proposal and carried through to implementation tickets.
+
 #### Step 3b: Propose Entity Model Changes
 
 1. Read `docs/entity_model.md`.
@@ -276,6 +282,13 @@ Produce `docs/sprints/sprint-YYYY-MM-DD/refinement-proposal.md`:
 - [Added business rule: Admin must respond within 48 hours]
 - [Added alternative flow: incomplete submission handling]
 - [Acceptance criteria: list specific testable criteria]
+
+**Decisions:**
+| Decision | Provenance | Source/Reasoning |
+|----------|------------|------------------|
+| ONG must upload registration certificate | EXPLICIT | FR-015: "valid registration documents" |
+| 48-hour admin response SLA | INFERRED | Industry standard; no explicit SLA in requirements |
+| Incomplete submissions trigger email reminder | INFERRED | UX best practice; requirements silent on handling |
 
 ## Entity Model Changes
 

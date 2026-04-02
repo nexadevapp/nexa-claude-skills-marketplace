@@ -81,10 +81,19 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Handle errors with `error.tsx`
     - Handle empty states
     - When a design artifact exists, match the specified layout, components, states, and navigation
+    - When implementing forms where users enter data, always add client-side and server-side validation:
+        - Define a zod schema for each form's input fields
+        - Apply client-side validation to show inline field errors before submission
+        - Validate again on the server side in the server action or API route handler (never trust client-only validation)
+        - Display server-side validation errors back to the user
 8. Write unit tests for the implemented logic:
     - Test API route handlers with mocked Prisma Client
     - Test server actions with mocked dependencies
     - Test client components with React Testing Library
+    - When forms are involved, write dedicated validation unit tests:
+        - Test the zod schema directly: valid inputs pass, invalid inputs produce the expected errors
+        - Test that server actions and API route handlers reject invalid input and return appropriate error responses
+        - Test that form components display validation errors for invalid input
     - Run tests with `npx vitest run` to verify they pass
 9. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
 10. Verify the implementation compiles successfully with `next build`

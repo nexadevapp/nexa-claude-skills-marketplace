@@ -5,7 +5,27 @@ import path from 'node:path';
 
 const STATE_FILE = path.join(__dirname, '.global-state.json');
 
+/**
+ * Clean up orphaned Testcontainers from previous crashed runs.
+ * This prevents container buildup when tests are killed (SIGKILL) or crash.
+ * Ryuk (Testcontainers' reaper) handles most cases, but explicit cleanup
+ * catches edge cases where Ryuk didn't run.
+ */
+function cleanupOrphanedContainers() {
+  try {
+    execSync(
+      'docker rm -f $(docker ps -aq --filter "label=org.testcontainers=true") 2>/dev/null || true',
+      { stdio: 'pipe' }
+    );
+  } catch {
+    // No orphaned containers or Docker not available
+  }
+}
+
 async function globalSetup() {
+  // 0. Clean up any orphaned containers from previous crashed runs
+  cleanupOrphanedContainers();
+
   // 1. Start PostgreSQL Testcontainer
   const container: StartedPostgreSqlContainer = await new PostgreSqlContainer('postgres:16')
     .withDatabase('testdb')

@@ -3,7 +3,27 @@ import { execSync } from 'node:child_process';
 
 let container: StartedPostgreSqlContainer;
 
+/**
+ * Clean up orphaned Testcontainers from previous crashed runs.
+ * This prevents container buildup when tests are killed (SIGKILL) or crash.
+ * Ryuk (Testcontainers' reaper) handles most cases, but explicit cleanup
+ * catches edge cases where Ryuk didn't run.
+ */
+function cleanupOrphanedContainers() {
+  try {
+    execSync(
+      'docker rm -f $(docker ps -aq --filter "label=org.testcontainers=true") 2>/dev/null || true',
+      { stdio: 'pipe' }
+    );
+  } catch {
+    // No orphaned containers or Docker not available
+  }
+}
+
 export async function setup() {
+  // Clean up any orphaned containers from previous crashed runs
+  cleanupOrphanedContainers();
+
   container = await new PostgreSqlContainer('postgres:16')
     .withDatabase('testdb')
     .withUsername('test')

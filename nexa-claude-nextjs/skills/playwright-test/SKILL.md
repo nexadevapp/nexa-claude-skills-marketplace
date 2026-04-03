@@ -172,6 +172,18 @@ Testcontainer, runs Prisma migrations, seeds the database, and starts the Next.j
 
 If `e2e/global-setup.ts` does not exist, create it using [templates/global-setup.ts](templates/global-setup.ts).
 
+### Container Cleanup
+
+The global setup template includes a pre-run cleanup step that removes orphaned Testcontainers
+from previous crashed runs. This prevents container buildup when tests are killed (SIGKILL) or
+crash unexpectedly. Ryuk (Testcontainers' reaper) handles most cases, but explicit cleanup
+catches edge cases where Ryuk didn't run.
+
+If you experience container buildup, you can also run manually:
+```bash
+docker rm -f $(docker ps -aq --filter "label=org.testcontainers=true") 2>/dev/null || true
+```
+
 Ensure `playwright.config.ts` references the global setup and does **not** use `webServer`
 (the global setup handles both the database and the dev server).
 

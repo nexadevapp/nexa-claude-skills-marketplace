@@ -15,7 +15,7 @@ graph TD
     end
 
     subgraph "SPRINT N — Repeat per sprint"
-        PS["/prepare-sprint UC-XXX UC-YYY<br/>→ refinement-proposal.md<br/>→ changelog.md<br/>→ readiness-report.md"]
+        PS["/sprint-prepare UC-XXX UC-YYY<br/>→ refinement-proposal.md<br/>→ changelog.md<br/>→ readiness-report.md"]
 
         PM["/prisma-migration<br/>→ schema.prisma + migration SQL"]
         MW["/build-web-middleware<br/>→ middleware.ts<br/><i>(first sprint only)</i>"]
@@ -59,7 +59,7 @@ graph TD
 
 ### Phase B: Sprint Loop (repeat per sprint)
 
-4. **`/prepare-sprint UC-XXX UC-YYY ...`** — Select, refine, validate, generate specs and designs
+4. **`/sprint-prepare UC-XXX UC-YYY ...`** — Select, refine, validate, generate specs and designs
 5. **`/prisma-migration`** — Generate DB migration if entity model changed
 6. **`/build-web-middleware`** — Set up auth/RBAC/security middleware (first sprint only)
 7. **`/deliver-use-case UC-XXX`** — For each UC in delivery order: implement, test, evaluate, iterate

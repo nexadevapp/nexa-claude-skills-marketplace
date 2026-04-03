@@ -1,5 +1,5 @@
 ---
-name: prepare-sprint
+name: sprint-prepare
 description: >
   Selects a subset of use cases for a sprint, refines requirements, evolves the
   entity model and use case diagram, generates specs and designs, and produces a

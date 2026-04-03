@@ -34,7 +34,7 @@ Claude generates a PlantUML diagram mapping actors to use cases, giving you a bi
 
 Claude analyzes dependencies, business value, and risk to recommend an implementation order.
 
-### 6. Prepare a sprint → `/prepare-sprint`
+### 6. Prepare a sprint → `/sprint-prepare`
 
 Select which use cases to tackle. Claude refines requirements, evolves the entity model, and produces a sprint readiness report.
 

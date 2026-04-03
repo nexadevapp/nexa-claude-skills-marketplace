@@ -105,7 +105,7 @@ Delivered:
 - <UC ID> — <Name> (each row)
 
 Next steps: run /sprint-audit for cross-cutting quality checks, then
-/sprint-demo to close the sprint.
+/sprint-close to archive artifacts and close the sprint.
 ```
 
 Otherwise, display the selected use case and the overall progress:

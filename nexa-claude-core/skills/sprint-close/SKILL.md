@@ -1,0 +1,200 @@
+---
+name: sprint-close
+description: >
+  Closes the current sprint by archiving artifacts, generating a summary report, and
+  preparing for the next sprint. Archives docs/sprints/next-sprint/ to a numbered
+  sprint folder, creates a sprint retrospective summary, and resets next-sprint for
+  future use. Use when the user asks to "close the sprint", "finish the sprint",
+  "archive the sprint", or "wrap up the sprint".
+user_invocable: true
+arguments: none
+---
+
+# Sprint Close
+
+## Instructions
+
+Close the current sprint by archiving delivery artifacts, generating a summary report,
+and preparing the workspace for the next sprint.
+
+## Prerequisites
+
+- Sprint has been delivered (`/sprint-deliver` completed)
+- Sprint audit has been run (`/sprint-audit` completed) — optional but recommended
+- All use cases in the sprint scope have been delivered
+
+## Outputs
+
+1. Archived sprint folder: `docs/sprints/sprint-N/`
+2. Sprint summary report: `docs/sprints/sprint-N/SUMMARY.md`
+3. Clean `docs/sprints/next-sprint/` folder for future use
+
+## DO NOT
+
+- Close a sprint with undelivered use cases without user confirmation
+- Delete delivery logs or iteration files
+- Skip the summary generation
+- Archive without determining the correct sprint number
+
+## Workflow
+
+### Phase 1 — Validate Sprint Completion
+
+1. Check if `docs/sprints/next-sprint/` exists
+   - If not, stop: "No active sprint found. Run `/sprint-prepare` to start a sprint."
+
+2. Read `docs/sprints/next-sprint/readiness-report.md` to get the sprint scope
+   - Extract the Delivery Order table to know which UCs were planned
+
+3. Check delivery status for each planned UC:
+   - Look for `docs/delivery/<UC-ID>-iterations.md`
+   - Mark as delivered if iteration log exists
+
+4. If any UCs are not delivered, ask the user:
+   > **Sprint has undelivered use cases:**
+   > - UC-XXX: [name] — NOT DELIVERED
+   > - UC-YYY: [name] — delivered ✓
+   >
+   > **Options:**
+   > 1. Close anyway (undelivered UCs will be noted in summary)
+   > 2. Cancel and continue delivery
+   >
+   > **What would you like to do?**
+
+### Phase 2 — Determine Sprint Number
+
+5. List existing sprint folders in `docs/sprints/`:
+   - Pattern: `sprint-1/`, `sprint-2/`, etc.
+   - Find the highest number N
+   - New sprint number = N + 1
+   - If no numbered sprints exist, start with sprint-1
+
+### Phase 3 — Generate Sprint Summary
+
+6. Create the sprint summary by gathering:
+   - **Delivered UCs**: List from iteration logs
+   - **Audit results**: Read `docs/delivery/sprint-audit-report.md` if exists
+   - **Issues encountered**: Extract from iteration logs (retries, blockers)
+   - **Sprint duration**: Calculate from git history or file timestamps
+
+7. Write `docs/sprints/next-sprint/SUMMARY.md` using the template below
+
+### Phase 4 — Archive the Sprint
+
+8. Rename the sprint folder:
+   ```bash
+   mv docs/sprints/next-sprint docs/sprints/sprint-N
+   ```
+
+9. Move delivery artifacts:
+   ```bash
+   # Move iteration logs to sprint archive
+   mv docs/delivery/*-iterations.md docs/sprints/sprint-N/delivery/
+   
+   # Move audit report if exists
+   mv docs/delivery/sprint-audit-report.md docs/sprints/sprint-N/ 2>/dev/null || true
+   ```
+
+10. Create fresh `docs/sprints/next-sprint/` folder:
+    ```bash
+    mkdir -p docs/sprints/next-sprint
+    ```
+
+### Phase 5 — Commit and Report
+
+11. Create a git commit:
+    ```bash
+    git add docs/sprints/
+    git commit -m "Close sprint-N: [brief summary of delivered UCs]"
+    ```
+
+12. Report to user:
+    > **Sprint N closed successfully!**
+    >
+    > **Delivered:**
+    > - UC-XXX: [name]
+    > - UC-YYY: [name]
+    >
+    > **Summary:** `docs/sprints/sprint-N/SUMMARY.md`
+    >
+    > **Next steps:**
+    > - Run `/sprint-prepare` to plan the next sprint
+    > - Review the summary for retrospective insights
+
+## Sprint Summary Template
+
+```markdown
+# Sprint N Summary
+
+**Closed:** [date]
+**Duration:** [N days / N weeks]
+
+## Delivered Use Cases
+
+| UC ID | Name | Iterations | Status |
+|-------|------|------------|--------|
+| UC-XXX | [name] | N | ✅ Delivered |
+| UC-YYY | [name] | N | ✅ Delivered |
+| UC-ZZZ | [name] | — | ⚠️ Not delivered |
+
+## Sprint Metrics
+
+| Metric | Value |
+|--------|-------|
+| Planned UCs | N |
+| Delivered UCs | N |
+| Completion rate | N% |
+| Total iterations | N |
+| Avg iterations/UC | N.N |
+
+## Audit Results
+
+**Verdict:** [PASS / PASS WITH OBSERVATIONS / FAIL]
+
+| Finding | Severity | Resolved |
+|---------|----------|----------|
+| [finding] | [Critical/Major/Minor] | [Yes/No] |
+
+*(If no audit was run, note: "Audit not run this sprint")*
+
+## Issues Encountered
+
+### Blockers
+
+- [Issue description and resolution]
+
+### Retries
+
+- UC-XXX required N retries due to [reason]
+
+## Lessons Learned
+
+- [Key insight from this sprint]
+- [Process improvement suggestion]
+
+## Carryover to Next Sprint
+
+- [ ] UC-ZZZ — not delivered, needs [reason]
+- [ ] [Technical debt item]
+
+---
+
+*Generated by `/sprint-close`*
+```
+
+## Folder Structure After Close
+
+```
+docs/
+├── sprints/
+│   ├── sprint-1/
+│   │   ├── readiness-report.md      # From original next-sprint
+│   │   ├── SUMMARY.md               # Generated by sprint-close
+│   │   └── delivery/
+│   │       ├── UC-001-iterations.md
+│   │       └── UC-002-iterations.md
+│   ├── sprint-2/
+│   │   ├── ...
+│   └── next-sprint/                  # Fresh, empty, ready for next sprint
+└── delivery/                         # Cleared of sprint-specific files
+```

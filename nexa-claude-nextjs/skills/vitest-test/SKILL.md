@@ -15,7 +15,7 @@ description: >
 Create Vitest integration tests for Next.js API routes, server actions, and components based on the use case $ARGUMENTS.
 Unit tests are already created by the `/implement` skill — this skill focuses on integration tests that hit real dependencies via Testcontainers.
 
-Read and follow the dependency strategies in `../../nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/mocking/MOCKING.md`.
 
 Use the context7 MCP server for Next.js documentation when needed.
 

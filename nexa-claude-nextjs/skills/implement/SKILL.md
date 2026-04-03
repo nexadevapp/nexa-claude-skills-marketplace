@@ -28,7 +28,7 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 
 ## External Dependencies
 
-Read and follow the instructions in `../../nexa-claude-core/shared/mocking/MOCKING.md`.
+Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/mocking/MOCKING.md`.
 
 ## Project Readiness Gate
 
@@ -42,15 +42,15 @@ Do not proceed with implementation until all items pass or the user explicitly w
 
 ## DoR Check
 
-- For **UC-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_READY.md`.
-- For **TT-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_READY_TT.md`.
-- For **BUG-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_READY_BUG.md`.
+- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_READY.md`.
+- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_READY_TT.md`.
+- For **BUG-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_READY_BUG.md`.
 
 Do not proceed with implementation until all items pass or the user explicitly waives failures.
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `../../nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -107,15 +107,15 @@ Read and follow the **Before Implementation** steps in `../../nexa-claude-core/s
 
 ## DoD Check
 
-- For **UC-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_DONE.md`.
-- For **TT-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_DONE_TT.md`.
-- For **BUG-XXX**: Read and follow `../../nexa-claude-core/shared/readiness/DEFINITION_OF_DONE_BUG.md`.
+- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_DONE.md`.
+- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_DONE_TT.md`.
+- For **BUG-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/readiness/DEFINITION_OF_DONE_BUG.md`.
 
 Do not proceed to post-implementation tracking until all items pass or the user explicitly waives failures.
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `../../nexa-claude-core/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/latest/shared/tracking/TRACKING.md`.
 
 ## Resources
 

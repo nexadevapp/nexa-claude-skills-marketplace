@@ -18,9 +18,9 @@ Select, refine, and validate a subset of use cases for sprint-scoped delivery. A
 as $ARGUMENTS (e.g., `UC-001 UC-002 UC-003`). If no arguments are provided, display the status
 table from Phase 1 and ask the user which use cases to include.
 
-This skill produces sprint-scoped artifacts in `docs/sprints/sprint-YYYY-MM-DD/` (using today's
-date) and ensures every selected use case has a complete specification and frontend design derived
-from refined requirements before delivery begins.
+This skill produces sprint-scoped artifacts in `docs/sprints/next-sprint/` and ensures every
+selected use case has a complete specification and frontend design derived from refined
+requirements before delivery begins.
 
 ## Prerequisites
 
@@ -94,10 +94,15 @@ Phase 4. The sprint changelog records every change for traceability.
 All sprint-scoped artifacts go in:
 
 ```
-docs/sprints/sprint-YYYY-MM-DD/
+docs/sprints/next-sprint/
 ```
 
-If a sprint directory for today already exists, append a counter: `sprint-YYYY-MM-DD_2/`.
+This is always the upcoming or in-progress sprint. When a sprint is completed, the user
+renames it to `sprint-N/` (e.g., `sprint-1/`, `sprint-2/`). This skill always writes to
+`next-sprint/`.
+
+If `docs/sprints/next-sprint/` already exists and contains a `readiness-report.md`, warn
+the user that a previous sprint preparation exists and ask whether to overwrite or abort.
 
 ## Pipeline
 
@@ -129,8 +134,8 @@ Print a status table with delivered use cases clearly separated:
 
 | UC ID  | Name               | Delivered In      | Dependencies |
 |--------|--------------------|-------------------|--------------|
-| UC-001 | Register with Email | sprint-2026-03-15 | None        |
-| UC-001A| Verify Email       | sprint-2026-03-15 | UC-001       |
+| UC-001 | Register with Email | sprint-1          | None        |
+| UC-001A| Verify Email       | sprint-1          | UC-001       |
 
 ### Undelivered (available for sprint)
 
@@ -239,12 +244,12 @@ This distinction must be documented in the refinement proposal and carried throu
 
 #### Output
 
-Produce `docs/sprints/sprint-YYYY-MM-DD/refinement-proposal.md`:
+Produce `docs/sprints/next-sprint/refinement-proposal.md`:
 
 ```markdown
 # Sprint Refinement Proposal
 
-**Sprint:** YYYY-MM-DD
+**Sprint:** next-sprint
 **Use Cases in Scope:** UC-XXX, UC-YYY, UC-ZZZ
 
 ## Scope Summary
@@ -406,13 +411,12 @@ Apply the user-approved changes from Phase 3 to the living documents.
 
 #### Step 4d: Save Change Log
 
-Produce `docs/sprints/sprint-YYYY-MM-DD/changelog.md`:
+Produce `docs/sprints/next-sprint/changelog.md`:
 
 ```markdown
 # Sprint Change Log
 
-**Sprint:** YYYY-MM-DD
-**Date:** YYYY-MM-DD
+**Sprint:** next-sprint
 
 ## Requirements Changes
 
@@ -512,7 +516,7 @@ For each selected use case, in dependency order:
    `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
    with the use case ID as the argument.
    **Important:** When generating the spec, use the refined requirements from
-   `docs/sprints/sprint-YYYY-MM-DD/refinement-proposal.md` as the primary source of business
+   `docs/sprints/next-sprint/refinement-proposal.md` as the primary source of business
    rules, acceptance criteria, and behavioral details — not the broad `docs/requirements.md`.
    Also read `docs/use_cases.puml` for the UC's actor, relationships, and structural context.
 3. **Verify:** The file exists and contains Overview, Main Success Scenario, Alternative Flows,
@@ -557,15 +561,13 @@ Run a focused analysis on only the sprint-scoped use cases and produce the readi
 
 #### Output
 
-Produce `docs/sprints/sprint-YYYY-MM-DD/readiness-report.md`:
+Produce `docs/sprints/next-sprint/readiness-report.md`:
 
 ```markdown
 # Sprint Readiness Report
 
-**Sprint:** YYYY-MM-DD
+**Sprint:** next-sprint
 **Use Cases:** UC-XXX, UC-YYY, UC-ZZZ
-**Date:** YYYY-MM-DD
-
 ## Verdict: READY FOR DELIVERY | BLOCKERS REMAIN
 
 [1-2 sentence summary]
@@ -616,9 +618,9 @@ Recommended order for running `/deliver-use-case` on each selected use case:
 
 ## Sprint Artifacts
 
-- `docs/sprints/sprint-YYYY-MM-DD/refinement-proposal.md`
-- `docs/sprints/sprint-YYYY-MM-DD/changelog.md`
-- `docs/sprints/sprint-YYYY-MM-DD/readiness-report.md` (this file)
+- `docs/sprints/next-sprint/refinement-proposal.md`
+- `docs/sprints/next-sprint/changelog.md`
+- `docs/sprints/next-sprint/readiness-report.md` (this file)
 
 ## Next Steps
 

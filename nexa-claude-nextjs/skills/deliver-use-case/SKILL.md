@@ -52,7 +52,7 @@ Maintain a delivery log at `docs/delivery/$ARGUMENTS-iterations.md` that records
 iteration attempt. This file gives agents in subsequent iterations full context of what
 was already tried and what failed, preventing repeated mistakes.
 
-**Create the file** at the start of Step 4 (before launching the first E2E agent). Use
+**Create the file** at the start of Step 3 (before launching the first E2E agent). Use
 this format:
 
 ```markdown
@@ -73,13 +73,13 @@ this format:
 ---
 ```
 
-**Update the file** after every Phase 2 verification in Step 4 and after every QA evaluation
-and test run in Step 5. Append a new iteration section each time. For Step 5, add an
+**Update the file** after every Phase 2 verification in Step 3 and after every QA evaluation
+and test run in Step 4. Append a new iteration section each time. For Step 4, add an
 `## E2E Evaluation Iterations` heading and include both the QA gap analysis summary and
 the subsequent test run result.
 
 **Pass the file to agents** on every re-launch. When re-launching the E2E agent for fix
-iterations (Step 4) or gap fixes (Step 5), include this in the agent prompt:
+iterations (Step 3) or gap fixes (Step 4), include this in the agent prompt:
 
 > **Previous iteration history** (read `docs/delivery/$ARGUMENTS-iterations.md` for full
 > context of what was already attempted and what failed — do NOT repeat fixes that did not
@@ -91,7 +91,7 @@ This ensures agents never retry a fix that already failed.
 
 **This check runs before any pipeline step and is a hard stop.**
 
-After the use case specification exists (Step 1), identify every entity referenced in
+After verifying artifacts exist (Step 1), identify every entity referenced in
 `docs/use_cases/$ARGUMENTS.md` (from scenario steps, alternative flows, business rules,
 and postconditions).
 
@@ -122,41 +122,32 @@ before moving to the next step. Treat $ARGUMENTS as the argument for every sub-s
 
 ---
 
-### Step 1: Use Case Specification (Optional)
+### Step 1: Verify Specification and Design Exist
 
-This step is optional — the use case specification should typically be created beforehand
-using `/use-case-spec`. The pipeline includes it as a convenience fallback.
+The use case specification and frontend design must exist before delivery begins.
+These artifacts are created during sprint preparation (`/sprint-prepare`) or individually
+via `/use-case-spec` and `/design-screens`. This pipeline does not generate them.
 
-**Skip if** `docs/use_cases/$ARGUMENTS.md` already exists.
+Check that both files exist:
+1. `docs/use_cases/$ARGUMENTS.md`
+2. `docs/designs/$ARGUMENTS-design.html`
 
-Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
+If either is missing, stop and report:
 
-**Verify:** The file `docs/use_cases/$ARGUMENTS.md` exists and contains Overview, Main Success Scenario,
-Alternative Flows, Postconditions, and Business Rules sections.
+```
+PIPELINE STOPPED: Missing artifacts for $ARGUMENTS
 
----
+- Specification (docs/use_cases/$ARGUMENTS.md): [exists / MISSING]
+- Frontend Design (docs/designs/$ARGUMENTS-design.html): [exists / MISSING]
 
-### Step 2: Frontend Design (Optional)
-
-This step is optional — the frontend design should typically be created beforehand
-using `/design-screens`. Running spec and design across all use cases upfront allows
-cross-referencing to identify gaps (missing entities, shared screens, conflicting flows)
-before implementation begins. The pipeline includes it as a convenience fallback.
-
-**Skip if** `docs/designs/$ARGUMENTS-design.html` already exists.
-
-Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/design-screens/SKILL.md`
-
-Inputs for this step: the use case specification from Step 1, plus any wireframe in `docs/wireframes/`
-matching the use case ID. See the skill's Inputs section for details.
-
-**Verify:** The file `docs/designs/$ARGUMENTS-design.html` exists and contains at least one screen definition.
+Run /use-case-spec $ARGUMENTS and /design-screens $ARGUMENTS to create
+the missing artifacts, or run /sprint-prepare to generate them as part
+of a sprint.
+```
 
 ---
 
-### Step 3: Implementation
+### Step 2: Implementation
 
 Read and follow:
 `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/implement/SKILL.md`
@@ -169,7 +160,7 @@ If verification fails, fix the issues and re-verify. Do not proceed until both c
 
 ---
 
-### Step 3.5: Implementation Audit (Isolated Agent)
+### Step 2.5: Implementation Audit (Isolated Agent)
 
 After implementation passes build and unit tests, run an isolated audit to catch i18n gaps,
 accessibility issues, and visual deviations before E2E tests are written. Fixing these issues
@@ -314,7 +305,7 @@ If the audit reports Critical or Major findings:
 
 Cap at **2 fix iterations**. After 2 iterations, if Critical or Major findings remain,
 log them to `docs/delivery/$ARGUMENTS-iterations.md` under a `## Implementation Audit`
-heading and continue to Step 4. These findings will be visible to the E2E test author
+heading and continue to Step 3. These findings will be visible to the E2E test author
 and evaluator.
 
 **Log every iteration** — append the audit results and fixes applied to
@@ -322,7 +313,7 @@ and evaluator.
 
 ---
 
-### Step 4: E2E Tests
+### Step 3: E2E Tests
 
 This step has two phases: an isolated agent **writes and self-fixes** the tests, then the
 main context **independently verifies** them. The main agent is the only authority that can
@@ -435,9 +426,9 @@ Delivery log: docs/delivery/$ARGUMENTS-iterations.md
 
 ---
 
-### Step 5: E2E Test Evaluation Loop (up to 3 iterations)
+### Step 4: E2E Test Evaluation Loop (up to 3 iterations)
 
-After E2E tests pass in Step 4, run an evaluation–fix loop to ensure the tests actually
+After E2E tests pass in Step 3, run an evaluation–fix loop to ensure the tests actually
 cover the use case journeys. This loop iterates up to **3 times**.
 
 #### Phase 1: QA Evaluation (Isolated Agent)
@@ -607,17 +598,17 @@ iteration history as input:
 > When you are done, return a summary listing: each test file created/modified, the number
 > of tests, and whether your own run showed them passing or failing (with error output if failing).
 
-After the E2E agent returns, **independently verify** the tests pass (same as Step 4 Phase 2):
+After the E2E agent returns, **independently verify** the tests pass (same as Step 3 Phase 2):
 run `npx playwright test`, confirm 0 failed, 0 skipped, exit code 0.
 
 **Log the test run result** — append the verification outcome (pass/fail, test counts,
 errors) to `docs/delivery/$ARGUMENTS-iterations.md`.
 
-**Post the test run outcome to the GitHub issue** (same as Step 4 — heading, iteration number,
+**Post the test run outcome to the GitHub issue** (same as Step 3 — heading, iteration number,
 pass/fail result, test counts, failure details if any, Playwright summary output, and the
 `🤖 Generated by /deliver-use-case — E2E Test Run` footer).
 
-If tests fail, apply the same fix loop from Step 4 to get them passing before the next
+If tests fail, apply the same fix loop from Step 3 to get them passing before the next
 evaluation iteration.
 
 #### Iteration
@@ -649,8 +640,7 @@ Display the pipeline report to the user:
 
 | Step                        | Status |
 |-----------------------------|--------|
-| Use Case Spec               | ...    |
-| Frontend Design             | ...    |
+| Artifact Check (Spec+Design)| ...    |
 | Entity Gate                 | ...    |
 | Implementation              | ...    |
 | Implementation Audit        | ...    |

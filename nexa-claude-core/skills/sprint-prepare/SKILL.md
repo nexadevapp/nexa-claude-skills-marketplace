@@ -88,6 +88,9 @@ Phase 4. The sprint changelog records every change for traceability.
 - Generate specs or designs using broad requirements — always use refined requirements
 - Invent use cases that have no basis in requirements or the use case diagram
 - Add inline provenance tags to `docs/requirements.md` — use the changelog instead
+- Skip the external dependency audit — every selected UC must be checked for third-party
+  accounts, API keys, infrastructure, manual configuration, and secrets before proceeding
+- Include a use case that depends on a technical task (TT-XXX) unless that TT is resolved or included in the sprint
 
 ## Sprint Directory
 
@@ -231,7 +234,33 @@ This distinction must be documented in the requirements refinement proposal and 
    - **New relationships** between existing entities
    - **Modified attributes** (type changes, new constraints)
 
-#### Step 3c: Propose Use Case Diagram Changes
+#### Step 3c: External Dependency Audit
+
+For each selected use case, run through this checklist to detect dependencies that require
+provisioning, configuration, or human action outside the codebase:
+
+- **External accounts or API keys** — Does this UC integrate with a third-party service
+  (OAuth provider, payment gateway, email/SMS service, maps API, etc.)? If yes: who
+  provisions the developer/production credentials? Are they already available?
+- **Infrastructure provisioning** — Does this UC require infrastructure that doesn't exist
+  yet (message queue, object storage bucket, CDN, search index, cron scheduler)?
+- **Manual configuration** — Does this UC depend on configuration that must be done in an
+  external system (DNS records, webhook URLs registered with a partner, allowlist entries)?
+- **Third-party contracts or approvals** — Does this UC depend on an agreement, approval,
+  or sandbox access from an external party?
+- **Environment variables or secrets** — Does this UC introduce new secrets that must be
+  provisioned in each environment?
+
+For every "yes" answer:
+
+1. Create a **technical task** (TT-XXX) that describes the provisioning/configuration work.
+2. Add the technical task as a **dependency** of the use case in the diagram changes (Step 3d).
+3. **Ask the user** whether the prerequisite is already satisfied. If the user confirms it's
+   done, mark the TT as pre-satisfied in the proposal rather than creating a new task.
+
+This audit prevents discovering missing credentials or infrastructure mid-implementation.
+
+#### Step 3d: Propose Use Case Diagram Changes
 
 1. Read `docs/use_cases.puml`.
 2. Based on the refined requirements, determine if:
@@ -344,6 +373,20 @@ Produce `docs/sprints/next-sprint/requirements-refinement-proposal.md`:
 |--------|--------|-----------|
 | Add include | UC-003 includes UC-015 | Triggers audit |
 
+## Technical Tasks (External Dependencies)
+
+[Technical tasks discovered by the external dependency audit. If none, state "No external
+dependencies detected."]
+
+| TT ID  | Name                          | Required By | Status       | Notes |
+|--------|-------------------------------|-------------|--------------|-------|
+| TT-010 | Provision Google OAuth App    | UC-045      | New          | Need Google Developer Console access |
+| TT-011 | Provision LinkedIn OAuth App  | UC-046      | New          | Need LinkedIn Developer account |
+| TT-012 | Configure S3 Bucket for Uploads | UC-020   | Pre-satisfied | User confirmed bucket exists |
+
+**Questions for the user:**
+- [List questions about who provisions credentials, whether accounts exist, etc.]
+
 ### Change Requests for Delivered Use Cases
 
 [If refinement reveals that a delivered UC needs changes, they become new UCs:]
@@ -442,6 +485,13 @@ Produce `docs/sprints/next-sprint/changelog.md`:
 | Added    | UC-015 | Audit Trail (system-triggered) |
 | Added    | UC-016 | Registration Email (change request for delivered UC-001) |
 
+## Technical Tasks (External Dependencies)
+
+| Action | TT ID  | Name                       | Required By | Status |
+|--------|--------|----------------------------|-------------|--------|
+| Added  | TT-010 | Provision Google OAuth App | UC-045      | Pending |
+| Noted  | TT-012 | Configure S3 Bucket        | UC-020      | Pre-satisfied |
+
 ## Migration Required
 
 [Yes/No — if entity model changed, /prisma-migration must run before delivery]
@@ -469,6 +519,13 @@ Check that the sprint is viable after all changes have been applied.
 4. **Migration check:** If entity model was changed in Phase 4, flag that `/prisma-migration`
    must be run before delivery.
 
+5. **External dependency check:** For each technical task (TT-XXX) created in the external
+   dependency audit:
+   - If marked as pre-satisfied: OK (user confirmed it's done)
+   - If new and can be done by the team before delivery: OK (note ordering constraint —
+     TT must be completed before its dependent UC)
+   - If new and requires external party action with unknown timeline: report as blocker
+
 Print the validation report:
 
 ```markdown
@@ -489,11 +546,19 @@ Print the validation report:
 | Use Case | Must Come After | Reason |
 |----------|-----------------|--------|
 
+### External Dependency Tasks
+
+| TT ID  | Name                       | Required By | Status        | Blocker? |
+|--------|----------------------------|-------------|---------------|----------|
+| TT-010 | Provision Google OAuth App | UC-045      | Pending       | Yes — needs external access |
+| TT-012 | Configure S3 Bucket        | UC-020      | Pre-satisfied | No       |
+
 ### Pre-Delivery Actions Required
 
 | Action | Skill | Reason |
 |--------|-------|--------|
 | Run Prisma migration | `/prisma-migration` | Entity model changed |
+| Complete TT-010 | Manual | UC-045 depends on Google OAuth credentials |
 ```
 
 **Step gate:** If blockers exist, stop and present them to the user. The user must resolve blockers
@@ -598,11 +663,18 @@ Recommended order for running `/deliver-use-case` on each selected use case:
 | 2 | UC-005a| Basic Import       | No dependency on UC-004                    |
 | 3 | UC-004 | Generate Report    | Depends on delivered UC-002                |
 
+## Technical Tasks (External Dependencies)
+
+| TT ID  | Name                       | Required By | Status        |
+|--------|----------------------------|-------------|---------------|
+[List all TTs from the external dependency audit, or "No external dependencies."]
+
 ## Pre-Delivery Actions
 
 | # | Action | Command | Status |
 |---|--------|---------|--------|
 | 1 | Run Prisma migration for entity changes | `/prisma-migration` | Required |
+| 2 | Provision Google OAuth credentials | TT-010 (manual) | Required before UC-045 |
 
 ## Gaps
 

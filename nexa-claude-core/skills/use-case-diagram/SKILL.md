@@ -46,6 +46,15 @@ user --> UC003
 
 - Each use case has a unique id and a description
 - Use Case ID: UC-{3-digit} (UC-001, UC-002, ...)
+- **Technical Task ID: TT-{3-digit}** (TT-001, TT-002, ...) — for provisioning, infrastructure,
+  or configuration work that a use case depends on but that has no user-facing scenario.
+  Technical tasks are represented with a `<<technical>>` stereotype and dashed border.
+  Use cases that depend on them use a dotted dependency arrow with a `<<requires>>` label.
+  Example:
+  ```plantuml
+  usecase "TT-010\nProvision OAuth App" as TT010 <<technical>>
+  UC045 ..> TT010 : <<requires>>
+  ```
 - Each use case should trace to at least one functional requirement
 - Add notes sparingly, only where relationships need clarification
 

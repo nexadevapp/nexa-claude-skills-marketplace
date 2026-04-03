@@ -138,8 +138,11 @@ before moving to the next step. Treat $ARGUMENTS as the argument for every sub-s
 ### Step 1: Verify Specification and Design Exist
 
 The use case specification and frontend design must exist before delivery begins.
-These artifacts are created during sprint preparation (`/sprint-prepare`) or individually
-via `/use-case-spec` and `/design-screens`. This pipeline does not generate them.
+This pipeline does not generate them.
+
+`docs/requirements.md` is a living document — `/sprint-prepare` updates it with
+refined requirements (Phase 4a) before generating specs (Phase 6). All skills that
+read requirements use the same canonical source: `docs/requirements.md`.
 
 Check that both files exist:
 1. `docs/use_cases/$ARGUMENTS.md`
@@ -153,9 +156,11 @@ PIPELINE STOPPED: Missing artifacts for $ARGUMENTS
 - Specification (docs/use_cases/$ARGUMENTS.md): [exists / MISSING]
 - Frontend Design (docs/designs/$ARGUMENTS-design.html): [exists / MISSING]
 
-Run /use-case-spec $ARGUMENTS and /design-screens $ARGUMENTS to create
-the missing artifacts, or run /sprint-prepare to generate them as part
-of a sprint.
+If this UC is part of a sprint:
+  Re-run /sprint-prepare to generate them.
+
+If this is a standalone delivery:
+  Run /use-case-spec $ARGUMENTS then /design-screens $ARGUMENTS.
 ```
 
 ---

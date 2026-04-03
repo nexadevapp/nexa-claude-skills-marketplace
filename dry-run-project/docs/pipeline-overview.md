@@ -15,7 +15,7 @@ graph TD
     end
 
     subgraph "SPRINT N — Repeat per sprint"
-        PS["/sprint-prepare UC-XXX UC-YYY<br/>→ refinement-proposal.md<br/>→ changelog.md<br/>→ readiness-report.md"]
+        PS["/sprint-prepare UC-XXX UC-YYY<br/>→ requirements-refinement-proposal.md<br/>→ changelog.md<br/>→ readiness-report.md"]
 
         PM["/prisma-migration<br/>→ schema.prisma + migration SQL"]
         MW["/build-web-middleware<br/>→ middleware.ts<br/><i>(first sprint only)</i>"]

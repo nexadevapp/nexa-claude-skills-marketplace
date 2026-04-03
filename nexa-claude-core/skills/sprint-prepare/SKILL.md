@@ -216,7 +216,7 @@ business rules, detail acceptance criteria, flesh out alternative flows).
 - **EXPLICIT** — Directly stated in the requirements, refinement documents, or user input. Quote the source.
 - **INFERRED** — Deduced by the agent based on context, patterns, or common sense. State the reasoning.
 
-This distinction must be documented in the refinement proposal and carried through to implementation tickets.
+This distinction must be documented in the requirements refinement proposal and carried through to implementation tickets.
 
 #### Step 3b: Propose Entity Model Changes
 
@@ -244,10 +244,10 @@ This distinction must be documented in the refinement proposal and carried throu
 
 #### Output
 
-Produce `docs/sprints/next-sprint/refinement-proposal.md`:
+Produce `docs/sprints/next-sprint/requirements-refinement-proposal.md`:
 
 ```markdown
-# Sprint Refinement Proposal
+# Requirements Refinement Proposal
 
 **Sprint:** next-sprint
 **Use Cases in Scope:** UC-XXX, UC-YYY, UC-ZZZ
@@ -357,9 +357,9 @@ Produce `docs/sprints/next-sprint/refinement-proposal.md`:
 [Ambiguities requiring human input. If none, state "No open questions."]
 ```
 
-**Present the refinement proposal to the user for review.**
+**Present the requirements refinement proposal to the user for review.**
 
-**Step gate:** User must review and approve the refinement proposal before proceeding. The user may:
+**Step gate:** User must review and approve the requirements refinement proposal before proceeding. The user may:
 - Approve as-is
 - Request changes (update the proposal and re-present)
 - Remove proposed changes they disagree with
@@ -516,7 +516,7 @@ For each selected use case, in dependency order:
    `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
    with the use case ID as the argument.
    **Important:** When generating the spec, use the refined requirements from
-   `docs/sprints/next-sprint/refinement-proposal.md` as the primary source of business
+   `docs/sprints/next-sprint/requirements-refinement-proposal.md` as the primary source of business
    rules, acceptance criteria, and behavioral details — not the broad `docs/requirements.md`.
    Also read `docs/use_cases.puml` for the UC's actor, relationships, and structural context.
 3. **Verify:** The file exists and contains Overview, Main Success Scenario, Alternative Flows,
@@ -618,7 +618,7 @@ Recommended order for running `/deliver-use-case` on each selected use case:
 
 ## Sprint Artifacts
 
-- `docs/sprints/next-sprint/refinement-proposal.md`
+- `docs/sprints/next-sprint/requirements-refinement-proposal.md`
 - `docs/sprints/next-sprint/changelog.md`
 - `docs/sprints/next-sprint/readiness-report.md` (this file)
 

@@ -206,6 +206,56 @@ Create the `docs/snapshots/` directory if it does not exist.
      and `design-data-table` CSS classes from the theme for design artifact structure
 9. Include a **navigation flow** section showing how screens connect
 10. Include **responsive behavior** using Tailwind responsive prefixes and CSS media queries
+11. Include a **Mobile Layout** section showing how the design adapts to mobile viewports
+
+## Mobile Layout Section
+
+Every design artifact MUST include a dedicated **Mobile Layout** section that explicitly shows
+how the UI adapts for mobile viewports (< 768px). Responsiveness cannot be assumed to work
+"out of the box" — mobile requires explicit design decisions.
+
+### What to include
+
+1. **Navigation changes** — e.g., hamburger menu replacing horizontal nav
+2. **Layout reflows** — e.g., sidebar collapses, grid becomes single column
+3. **Component adaptations** — e.g., data tables become cards, horizontal tabs become dropdowns
+4. **Touch targets** — buttons/links sized for finger taps (minimum 44x44px)
+5. **Hidden/revealed elements** — what's hidden on mobile, what's shown differently
+
+### HTML structure for Mobile Layout section
+
+```html
+<!-- ============================================================== -->
+<!-- MOBILE LAYOUT -->
+<!-- ============================================================== -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Mobile Layout (< 768px)</div>
+
+<div class="design-annotation">
+  <strong>Navigation:</strong> [How nav transforms — hamburger, drawer, etc.]
+</div>
+
+<div class="design-annotation">
+  <strong>Layout changes:</strong>
+  <ul class="list-disc ml-5 mt-2">
+    <li>[Change 1 — e.g., "2-column grid → single column stack"]</li>
+    <li>[Change 2 — e.g., "Sidebar collapses into bottom sheet"]</li>
+    <li>[Change 3 — e.g., "Data table → card list with key fields only"]</li>
+  </ul>
+</div>
+
+<div class="design-screen">
+  <!-- Mobile viewport rendering of the main screen -->
+  <div class="max-w-[375px] mx-auto border border-cream-300 rounded-xl overflow-hidden">
+    <!-- Mobile layout here -->
+  </div>
+</div>
+
+<div class="design-annotation">
+  <strong>Touch targets:</strong> All interactive elements meet 44x44px minimum.
+  <strong>Gestures:</strong> [Any swipe, pull-to-refresh, or other mobile gestures]
+</div>
+```
 
 ## HTML Structure
 
@@ -317,6 +367,9 @@ The design HTML must follow this structure:
 
 - **Wireframe-faithful** — The layout, component placement, and navigation structure must match
   the wireframe. Do not invent layouts.
+- **Mobile-explicit** — Every design includes a dedicated Mobile Layout section. Do not assume
+  responsiveness works automatically — mobile requires explicit decisions about navigation,
+  layout reflows, and component adaptations.
 - **CSS-separated theming** — All visual identity (colors, fonts, spacing tokens) lives in
   external CSS theme files and Tailwind configs. HTML never contains hardcoded brand values.
   Changing the theme = swapping CSS files. This is the most important architectural principle.

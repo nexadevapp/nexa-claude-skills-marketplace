@@ -28,27 +28,97 @@ The active sprint is always `docs/sprints/next-sprint/`.
 If `docs/sprints/next-sprint/` does not exist, stop and tell the user to run
 `/sprint-prepare` first.
 
-## Step 2: Read the Delivery Order
+## Step 2: Read and Validate the Readiness Report
 
 Read `docs/sprints/next-sprint/readiness-report.md`.
+
+If the readiness report does not exist, stop and tell the user to run `/sprint-prepare` first.
+
+### Check the Verdict
+
+Find the `## Verdict` line. If the verdict is **BLOCKERS REMAIN**, stop and display:
+
+```
+SPRINT NOT READY — blockers found in readiness report.
+
+[paste the Gaps section from the readiness report]
+
+Resolve these blockers and re-run /sprint-prepare, or address them manually
+before running /sprint-deliver again.
+```
+
+### Check Pre-Delivery Actions
+
+Find the **Pre-Delivery Actions** table. For each action listed:
+
+1. **Prisma migration** (`/prisma-migration`): Check if `prisma/schema.prisma` contains
+   the entities listed in the readiness report's Entity Model Changes. If the changelog
+   says "Migration Required: Yes" and the schema is missing expected models, stop and tell
+   the user:
+   ```
+   PRE-DELIVERY ACTION REQUIRED: Run /prisma-migration before delivery.
+   The entity model was updated during sprint preparation but the Prisma
+   schema has not been migrated yet.
+   ```
+2. **Other actions**: Display them to the user and ask for confirmation that they have
+   been completed before proceeding.
+
+### Check for Warnings
+
+Find the **Gaps** section in the readiness report. If there are any warning-severity gaps
+(items that are not blockers but represent risks), display them to the user:
+
+```
+WARNINGS from sprint readiness report:
+
+[paste each warning-severity gap with its Type, Affected UCs, and Description]
+
+These warnings did not block sprint readiness but represent risks.
+Proceed with delivery, or address them first and re-run /sprint-prepare?
+```
+
+Wait for the user to confirm before proceeding. If the user chooses to address the
+warnings, stop — they will re-run `/sprint-prepare` or fix the issues manually.
+
+### Read the Delivery Order
 
 Find the **Delivery Order** table. This table lists use cases in recommended delivery
 sequence with columns: `#`, `UC ID`, `Name`, `Rationale`.
 
-If the readiness report does not exist or has no Delivery Order table, stop and tell the
-user to run `/sprint-prepare` first — the sprint is not ready for delivery.
+If there is no Delivery Order table, stop and tell the user to run `/sprint-prepare`
+first — the sprint is not ready for delivery.
 
-## Step 3: Identify the First Priority
+## Step 3: Identify the Next Undelivered Use Case
 
-Select the use case in row `# 1` of the Delivery Order table. Extract its `UC ID`
-(e.g., `UC-003`).
+Walk the Delivery Order table from row `# 1` downward. For each row, check whether
+`docs/delivery/<UC ID>-iterations.md` exists. If it does, that use case has already
+been delivered — skip it and move to the next row.
 
-Display the selected use case to the user:
+Select the **first row whose UC has no iteration log** as the next use case to deliver.
+
+If all rows have been delivered, stop and report:
+
+```
+SPRINT COMPLETE — all use cases in the delivery order have been delivered.
+
+Delivered:
+- <UC ID> — <Name> (each row)
+
+Next steps: run /sprint-audit for cross-cutting quality checks, then
+/sprint-demo to close the sprint.
+```
+
+Otherwise, display the selected use case and the overall progress:
 
 ```
 Sprint: next-sprint
-Delivering: <UC ID> — <Name>
+Progress: <N delivered> / <total> use cases
+
+Next: <UC ID> — <Name>
 Rationale: <Rationale from table>
+
+Previously delivered this sprint:
+- <UC ID> — <Name> (for each already-delivered row, or "None" if first)
 ```
 
 ## Step 4: Deliver the Use Case

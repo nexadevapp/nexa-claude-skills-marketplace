@@ -48,7 +48,7 @@ For each use case ID, in diagram order:
 
 1. **Skip if** `docs/use_cases/UC-XXX.md` already exists.
 2. Otherwise, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
+   `../use-case-spec/SKILL.md`
    with the use case ID as the argument.
 3. **Verify:** The file exists and contains Overview, Main Success Scenario,
    Alternative Flows, Postconditions, and Business Rules sections.
@@ -65,7 +65,7 @@ For each use case ID from Step 1, in diagram order:
 2. **Skip if** the use case has no user-facing interaction (e.g., background jobs,
    system-triggered processes with no UI). Log the skip reason.
 3. Otherwise, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/design-screens/SKILL.md`
+   `../design-screens/SKILL.md`
    with the use case ID as the argument.
 4. **Verify:** The file exists and contains at least one screen definition.
 

@@ -63,8 +63,8 @@ $ARGUMENTS may specify the app name, region, or special requirements.
 
 Use these reference templates from the plugin:
 
-- **Deploy script**: `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/aws-setup-apprunner/templates/deploy-apprunner.sh`
-- **GitHub Actions workflow**: `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/aws-setup-apprunner/templates/github-actions/deploy-ecr-apprunner.yml`
+- **Deploy script**: `../aws-setup-apprunner/templates/deploy-apprunner.sh`
+- **GitHub Actions workflow**: `../aws-setup-apprunner/templates/github-actions/deploy-ecr-apprunner.yml`
 
 ### GitHub Actions Workflow Placeholders
 

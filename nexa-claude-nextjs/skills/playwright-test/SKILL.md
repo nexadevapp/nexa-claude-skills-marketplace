@@ -163,7 +163,7 @@ If `e2e/helpers/test-user.ts` does not exist, create it from the template.
 
 ## External Dependencies
 
-Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
+Read and follow the dependency strategies in `../../nexa-claude-core/shared/mocking/MOCKING.md`.
 
 ## Testcontainers Global Setup
 
@@ -368,7 +368,7 @@ await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `../../nexa-claude-core/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -416,4 +416,4 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `../../nexa-claude-core/shared/tracking/TRACKING.md`.

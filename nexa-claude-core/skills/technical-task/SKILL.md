@@ -62,4 +62,4 @@ Use [templates/technical-task.md](templates/technical-task.md) as the document s
 5. Identify affected areas of the codebase
 6. List dependencies on other TTs or UCs
 7. Set status to Draft (or Approved if the user confirms)
-8. Create a GitHub tracking issue by following the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`
+8. Create a GitHub tracking issue by following the **Before Implementation** steps in `../shared/tracking/TRACKING.md`

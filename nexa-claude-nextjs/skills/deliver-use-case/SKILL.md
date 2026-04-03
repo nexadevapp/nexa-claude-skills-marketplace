@@ -1,11 +1,13 @@
 ---
 name: deliver-use-case
 description: >
-  Orchestrates the full per-use-case pipeline: specification, design, migration,
-  implementation, testing, and E2E evaluation. Iterates automatically
-  until all quality gates pass. Use when the user asks to "deliver a use case",
-  "build a use case", "run the full pipeline", "implement end-to-end", or wants
-  to automate the complete workflow for a use case.
+  Orchestrates the full per-use-case delivery pipeline: verifies that the
+  specification and design exist, implements the use case, runs an implementation
+  audit, writes E2E tests, and evaluates test coverage against the spec. Iterates
+  automatically until all quality gates pass. Specification and design must be
+  created beforehand via /sprint-prepare, /use-case-spec, or /design-screens.
+  This skill must only be invoked explicitly via /deliver-use-case or by
+  /sprint-deliver — never inferred from user messages.
 ---
 
 # Deliver Use Case Pipeline
@@ -113,6 +115,17 @@ Missing from prisma/schema.prisma:
 Run /entity-model to update the entity model, then /prisma-migration to create
 the database migration before re-running /deliver-use-case $ARGUMENTS.
 ```
+
+## Rollback Checkpoint
+
+Before any pipeline step begins, record the current git commit hash:
+
+```
+git rev-parse HEAD
+```
+
+Store this as the **rollback point**. If the pipeline fails and the user chooses to
+roll back, all changes made after this commit will be reverted.
 
 ## Pipeline
 
@@ -411,18 +424,8 @@ Then act based on the classification:
 3. **Mixed:** Fix implementation bugs first, then re-launch the E2E agent for remaining
    test bugs.
 
-After **3 iterations**, if tests still fail, stop and present a failure report to the user:
-```
-E2E VERIFICATION FAILED: $ARGUMENTS (3 iterations exhausted)
-
-Failing tests:
-- [test name]: [classification: test bug / implementation bug] — [one-line error summary]
-
-Playwright output (last run):
-[paste full output]
-
-Delivery log: docs/delivery/$ARGUMENTS-iterations.md
-```
+After **3 iterations**, if tests still fail, stop and present a failure report to the user,
+then follow the **Failure Recovery** procedure at the end of this document.
 
 ---
 
@@ -616,15 +619,9 @@ evaluation iteration.
 Go back to Phase 1 (QA Evaluation) with the updated tests. Repeat until the QA specialist
 reports no gaps or **3 iterations** are exhausted.
 
-After 3 iterations, if the QA specialist still reports gaps, present a report to the user:
-```
-E2E EVALUATION FAILED: $ARGUMENTS (3 iterations exhausted)
-
-Remaining gaps:
-- [gap description from latest QA evaluation]
-
-Delivery log: docs/delivery/$ARGUMENTS-iterations.md
-```
+After 3 iterations, if the QA specialist still reports gaps, stop and present a failure
+report to the user, then follow the **Failure Recovery** procedure at the end of this
+document.
 
 ## Completion
 
@@ -672,3 +669,54 @@ Post the pipeline report as a comment on the GitHub issue for `$ARGUMENTS`:
 
 3. If no issue is found, skip this step and inform the user that no GitHub issue was found
    for `$ARGUMENTS` so the report was not posted.
+
+## Failure Recovery
+
+When the pipeline fails (any step exhausts its retry limit), present the failure report
+and then offer the user a choice:
+
+```
+DELIVERY FAILED: $ARGUMENTS
+
+[failure details — failing tests, remaining gaps, or error summary]
+
+Delivery log: docs/delivery/$ARGUMENTS-iterations.md
+
+---
+
+Roll back changes from this delivery attempt?
+
+Recommended: Roll back all changes. This resets to the state before
+/deliver-use-case started, removing implementation code, tests, and
+the delivery log. The next attempt starts clean.
+
+Alternative: Keep code and test files, remove only the delivery log.
+Warning: the next delivery attempt will start from scratch but may
+encounter conflicts with leftover code.
+
+Roll back all changes? (Y/n)
+```
+
+### If the user chooses to roll back (default)
+
+1. Reset to the rollback checkpoint:
+   ```
+   git reset --hard <saved-commit-hash>
+   ```
+2. Confirm to the user that all delivery changes have been reverted.
+
+### If the user chooses to keep code
+
+1. Delete only the delivery log:
+   ```
+   rm docs/delivery/$ARGUMENTS-iterations.md
+   ```
+2. Warn the user:
+   ```
+   Kept implementation code and tests. The delivery log has been removed
+   so /sprint-deliver will not consider $ARGUMENTS as delivered.
+
+   On the next /deliver-use-case run, Step 2 (Implementation) will see
+   existing code and may produce conflicts or duplicates. Review the
+   leftover code before re-running.
+   ```

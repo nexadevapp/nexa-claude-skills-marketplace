@@ -1,52 +1,61 @@
 ---
 name: seed-data
 description: >
-  Creates or updates the Prisma seed script (prisma/seed.ts) with reference data and
-  test fixtures. Reads the entity model to identify seedable entities (countries, roles,
-  categories, statuses, etc.) and generates idempotent upsert statements.
-  Use when the user asks to "create seed data", "add reference data", "populate the
-  database", "create test fixtures", or when refine-use-cases identifies seed data gaps.
+  Creates or updates the Prisma seed script (prisma/seed.ts) with production reference data
+  (countries, currencies, roles, statuses, etc.). This is runtime seeding — data that must
+  exist for the application to function in any environment including production.
+  For test-only fixtures, use /seed-test-data instead.
+  Use when the user asks to "create seed data", "add reference data", "populate lookup tables",
+  or when refine-use-cases identifies reference data gaps.
 user_invocable: true
 arguments: optional — entity names to seed (e.g., "Country, Role, Category")
 ---
 
-# Seed Data
+# Seed Data (Production Reference Data)
 
 ## Instructions
 
-Create or update the Prisma seed script (`prisma/seed.ts`) with reference data and test fixtures.
-The seed script populates the database with baseline data needed for the application to function
-and for tests to run.
+Create or update the Prisma seed script (`prisma/seed.ts`) with **production reference data**.
+This is data that must exist for the application to function — lookup tables, configuration,
+and reference entities.
 
-If $ARGUMENTS is provided, seed only the specified entities. Otherwise, analyze the entity model
-and seed all seedable entities.
+**This skill is for production-safe data only.** For test fixtures (sample users, mock data),
+use `/seed-test-data` instead.
+
+## What Belongs Here vs. seed-test-data
+
+| This skill (seed-data) | seed-test-data |
+|------------------------|----------------|
+| Countries, currencies, languages | Test users with known passwords |
+| Roles, permissions | Sample organizations |
+| Status enums, categories | Mock transactions/orders |
+| Industry codes, priorities | Fake content for UI testing |
+| **Runs in ALL environments** | **Runs in dev/test ONLY** |
 
 ## Prerequisites
 
 - `prisma/schema.prisma` exists with defined models
-- `docs/entity_model.md` exists (optional but recommended for understanding entity purpose)
+- `docs/entity_model.md` exists (optional but recommended)
 
 ## Output
 
-- `prisma/seed.ts` — The seed script
+- `prisma/seed.ts` — The seed script (production reference data only)
 - Updated `package.json` with prisma seed configuration (if not present)
 
 ## Seedable Entity Categories
 
 | Category | Examples | Characteristics |
 |----------|----------|-----------------|
-| **Reference data** | Country, Currency, Language, Timezone | Rarely changes, often ISO standards |
-| **Configuration** | Role, Permission, Status, Category | Application-specific enums as data |
-| **Lookup tables** | Industry, Department, Priority | Business domain classifications |
-| **Test fixtures** | Sample User, Sample Organization | Dev/test environment data only |
+| **Reference data** | Country, Currency, Language, Timezone | ISO standards, rarely changes |
+| **Configuration** | Role, Permission, Status, Priority | Application-specific enums as data |
+| **Lookup tables** | Industry, Department, Category | Business domain classifications |
 
 ## DO NOT
 
-- Seed user-generated content (orders, posts, comments)
+- Include test fixtures (users, sample content) — use `/seed-test-data` for those
 - Hard-code environment-specific values (URLs, API keys)
 - Create non-idempotent operations (use upsert, not create)
-- Seed production-inappropriate data in the default seed (keep test fixtures separate)
-- Skip null checks for optional relations
+- Include any data that wouldn't be appropriate in production
 
 ## Idempotent Upsert Pattern
 
@@ -78,28 +87,22 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding reference data...');
 
-  // 1. Reference data (order matters for relations)
+  // Reference data (order matters for relations)
   await seedCountries();
   await seedCurrencies();
   
-  // 2. Configuration data
+  // Configuration data
   await seedRoles();
   await seedPermissions();
   await seedRolePermissions();
   
-  // 3. Lookup tables
+  // Lookup tables
   await seedCategories();
   await seedStatuses();
-  
-  // 4. Test fixtures (dev/test only)
-  if (process.env.NODE_ENV !== 'production') {
-    await seedTestUsers();
-    await seedTestOrganizations();
-  }
 
-  console.log('✅ Seeding complete');
+  console.log('✅ Reference data seeding complete');
 }
 
 // ── Reference Data ──────────────────────────────────────────────────
@@ -109,6 +112,7 @@ async function seedCountries() {
     { code: 'US', name: 'United States', currency: 'USD' },
     { code: 'GB', name: 'United Kingdom', currency: 'GBP' },
     { code: 'DE', name: 'Germany', currency: 'EUR' },
+    { code: 'RO', name: 'Romania', currency: 'RON' },
     // Add more as needed
   ];
 
@@ -141,41 +145,6 @@ async function seedRoles() {
   console.log(`  ✓ Roles: ${roles.length}`);
 }
 
-// ── Test Fixtures ───────────────────────────────────────────────────
-
-async function seedTestUsers() {
-  // Only for dev/test environments
-  const testUsers = [
-    {
-      email: 'admin@example.com',
-      name: 'Test Admin',
-      role: 'ADMIN',
-    },
-    {
-      email: 'user@example.com', 
-      name: 'Test User',
-      role: 'USER',
-    },
-  ];
-
-  for (const user of testUsers) {
-    const role = await prisma.role.findUnique({ where: { name: user.role } });
-    if (!role) continue;
-
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: { name: user.name },
-      create: {
-        email: user.email,
-        name: user.name,
-        roleId: role.id,
-        // Use a known test password hash or leave auth to the auth system
-      },
-    });
-  }
-  console.log(`  ✓ Test users: ${testUsers.length}`);
-}
-
 // ── Main ────────────────────────────────────────────────────────────
 
 main()
@@ -200,42 +169,22 @@ Ensure `package.json` has the prisma seed configuration:
 }
 ```
 
-If using `ts-node` instead of `tsx`:
-
-```json
-{
-  "prisma": {
-    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-  }
-}
-```
-
 ## Workflow
 
 1. Read `prisma/schema.prisma` to identify all models
 2. Read `docs/entity_model.md` (if exists) to understand entity purposes
-3. Categorize entities into: reference data, configuration, lookup tables, user-generated
+3. Identify reference data entities (exclude user-generated content)
 4. If $ARGUMENTS specified, filter to only those entities
 5. For each seedable entity:
    - Identify the unique constraint (for upsert `where` clause)
-   - Determine appropriate seed values (ISO standards, business defaults, etc.)
+   - Determine appropriate seed values (ISO standards, business defaults)
    - Generate upsert function
 6. Check if `prisma/seed.ts` exists:
-   - **If exists**: Read it and add/update only the new entities, preserving existing seeds
+   - **If exists**: Read it, add/update only new reference entities
    - **If not exists**: Create from scratch using the template
-7. Check `package.json` for prisma seed configuration:
-   - **If missing**: Add the configuration
+7. Check `package.json` for prisma seed configuration
 8. Run `npx prisma db seed` to verify the seed works
-9. Inform the user what was seeded:
-
-> **Seed script updated: `prisma/seed.ts`**
->
-> **Seeded entities:**
-> - Countries (250 records)
-> - Roles (3 records)
-> - Test users (2 records, dev/test only)
->
-> **Run manually:** `npx prisma db seed`
+9. Inform the user what was seeded
 
 ## Common Reference Data Sources
 
@@ -248,39 +197,13 @@ If using `ts-node` instead of `tsx`:
 
 ## Handling Relations
 
-When seeding entities with relations, seed in dependency order:
+Seed in dependency order:
 
 ```typescript
 // 1. Seed parent first
 await seedRoles();
 
 // 2. Then seed child that references parent
-await seedUsers(); // Users have roleId FK
-```
-
-For many-to-many relations, seed the junction table after both sides:
-
-```typescript
-await seedRoles();
 await seedPermissions();
 await seedRolePermissions(); // Junction table
-```
-
-## Environment-Specific Seeding
-
-```typescript
-// Production-safe reference data
-await seedCountries();
-await seedCurrencies();
-
-// Dev/test only
-if (process.env.NODE_ENV !== 'production') {
-  await seedTestUsers();
-  await seedSampleData();
-}
-
-// Staging-specific (optional)
-if (process.env.NODE_ENV === 'staging') {
-  await seedDemoData();
-}
 ```

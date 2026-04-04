@@ -126,7 +126,8 @@ use case diagram as input.
 4. Read `docs/priority.md` if it exists.
 5. Scan `docs/use_cases/` for existing specification files.
 6. Scan `docs/designs/` for existing design files.
-7. Scan `docs/delivery/` for iteration logs (indicating a use case has been delivered).
+7. Check if `docs/designs/DESIGN_RULES.md` exists.
+8. Scan `docs/delivery/` for iteration logs (indicating a use case has been delivered).
 
 Print a status table with delivered use cases clearly separated:
 
@@ -157,14 +158,25 @@ Print a status table with delivered use cases clearly separated:
 - **Mapped FRs**: Functional requirements from `docs/requirements.md` that trace to this UC
 - **Status**: "Ready" if all dependencies are delivered or in scope, "Blocked" otherwise
 
-Also print a brief requirements coverage summary:
+Also print a brief requirements coverage summary and design rules status:
 
 ```markdown
 ### Requirements Coverage
 
 - **Total FRs:** 80 | **Mapped to UCs:** 72 | **Unmapped:** 8 (FR-AUTH-05, FR-MSG-07, ...)
 - **Total UCs:** 15 | **Delivered:** 2 | **Remaining:** 13
+
+### Design Rules
+
+- **Status:** ✅ `docs/designs/DESIGN_RULES.md` exists | ⚠️ No design rules defined
 ```
+
+If design rules do not exist, print a recommendation:
+
+> **Recommendation:** Before generating designs, consider creating `docs/designs/DESIGN_RULES.md`
+> with project-wide layout rules (shared header/footer, sidebar, navigation patterns, etc.).
+> These rules are enforced by `/design-screens`, `/implement`, and `/evaluate`. Without them,
+> each screen is designed in isolation and may miss shared elements like headers and footers.
 
 ---
 
@@ -591,6 +603,18 @@ For each selected use case, in dependency order:
 
 #### Step 6b: Generate Frontend Designs
 
+**Design rules check:** Before generating any designs, check if `docs/designs/DESIGN_RULES.md`
+exists. If it does NOT exist, ask the user:
+
+> No project design rules found (`docs/designs/DESIGN_RULES.md`). Design rules define shared
+> layout elements (header, footer, sidebar), navigation patterns, and other constraints that
+> apply to every screen. Without them, designs may be inconsistent.
+>
+> Would you like to define design rules now, or proceed without them?
+
+If the user wants to define rules, help them create `docs/designs/DESIGN_RULES.md` before
+generating designs. If they choose to proceed without, continue and log it in the readiness report.
+
 For each selected use case, in dependency order:
 
 1. **If** `docs/designs/UC-XXX-design.html` already exists AND the use case was not changed
@@ -644,6 +668,10 @@ Produce `docs/sprints/next-sprint/readiness-report.md`:
 | docs/requirements.md | 2 added, 3 refined | changelog.md |
 | docs/entity_model.md | 1 entity added, 2 attributes added | changelog.md |
 | docs/use_cases.puml | 1 UC split, 1 UC added | changelog.md |
+
+## Design Rules
+
+[✅ `docs/designs/DESIGN_RULES.md` exists — [N] rules defined | ⚠️ No design rules — designs may lack shared layout elements]
 
 ## Artifact Status
 

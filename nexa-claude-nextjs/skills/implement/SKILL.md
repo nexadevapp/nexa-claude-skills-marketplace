@@ -83,6 +83,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Handle errors with `error.tsx`
     - Handle empty states
     - When a design artifact exists, match the specified layout, components, states, and navigation
+    - When project design rules exist (read in step 4), enforce every rule — e.g., include shared layout elements, follow mandatory navigation patterns, and apply required brand guidelines
     - When implementing forms where users enter data, always add client-side and server-side validation:
         - Define a zod schema for each form's input fields
         - Apply client-side validation to show inline field errors before submission

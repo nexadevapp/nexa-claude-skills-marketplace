@@ -60,20 +60,21 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - For **BUG-XXX**: Read the bug report from `docs/bugs/`
 2. Read the entity model from `docs/entity_model.md` (if applicable)
 3. Read the design artifact from `docs/designs/` (if it exists for this UC). When a design artifact exists, the implementation must match the specified screens, layout, components, states, and navigation flow.
-4. Check existing code for patterns and conventions
-5. Implement API route handlers (if needed for client-side fetching):
+4. Read project design rules from `docs/designs/DESIGN_RULES.md` (if it exists). These are project-specific constraints — e.g., shared layout elements (header, footer, sidebar), mandatory components, or navigation patterns — that every implementation must follow. Missing a shared element specified in design rules is a defect.
+5. Check existing code for patterns and conventions
+6. Implement API route handlers (if needed for client-side fetching):
     - Create route handlers in `app/api/**/route.ts`
     - Export named functions matching HTTP methods (`GET`, `POST`, `PUT`, `DELETE`)
     - Validate request bodies with zod
     - Use Prisma Client for data access
     - Return `NextResponse.json()` with appropriate status codes
-6. Implement server actions (if needed for form mutations):
+7. Implement server actions (if needed for form mutations):
     - Create actions in `app/actions/` or colocate with the page
     - Mark with `"use server"` directive
     - Validate input with zod
     - Use Prisma Client for data access
     - Call `revalidatePath()` or `revalidateTag()` for cache invalidation
-7. Implement the UI:
+8. Implement the UI:
     - Create or update `page.tsx` and `layout.tsx` files
     - Use server components by default for data fetching with Prisma
     - Use client components (`"use client"`) only for interactivity (forms, event handlers, state)
@@ -87,7 +88,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
         - Apply client-side validation to show inline field errors before submission
         - Validate again on the server side in the server action or API route handler (never trust client-only validation)
         - Display server-side validation errors back to the user
-8. Write unit tests for the implemented logic:
+9. Write unit tests for the implemented logic:
     - Test API route handlers with mocked Prisma Client
     - Test server actions with mocked dependencies
     - Test client components with React Testing Library
@@ -96,9 +97,9 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
         - Test that server actions and API route handlers reject invalid input and return appropriate error responses
         - Test that form components display validation errors for invalid input
     - Run tests with `npx vitest run` to verify they pass
-9. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
-10. Verify the implementation compiles successfully with `next build`
-11. Document implementation decisions in a `DECISIONS.md` file (or in the PR description):
+10. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+11. Verify the implementation compiles successfully with `next build`
+12. Document implementation decisions in a `DECISIONS.md` file (or in the PR description):
     - For each non-trivial decision made during implementation, record:
       - **Decision:** What was decided
       - **Provenance:** EXPLICIT (from spec/requirements) or INFERRED (agent reasoning)

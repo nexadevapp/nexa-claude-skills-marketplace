@@ -113,6 +113,7 @@ Reference examples are available in this skill's `examples/` directory:
 | Use case specification | `docs/use_cases/UC-XXX.md` | Yes |
 | Entity model | `docs/entity_model.md` | If applicable |
 | Wireframe | `docs/wireframes/index.html` | Yes |
+| Design rules | `docs/designs/DESIGN_RULES.md` | Optional — project-specific design constraints |
 | Theme CSS | `docs/designs/current-theme.css` | Optional — created automatically if missing |
 | Tailwind config | `docs/designs/current-tailwind-config.js` | Optional — created automatically if missing |
 
@@ -127,6 +128,63 @@ Do NOT create a `.md` file. The file extension MUST be `.html` and the content M
 `<!DOCTYPE html>`. If you find yourself writing Markdown syntax (headings with `#`, lists with `-`,
 tables with `|`), STOP — you are producing the wrong format.**
 
+## Internationalization (i18n)
+
+When the project uses internationalization, all placeholder text in design artifacts MUST use
+**correct, native-quality text** for the target locale — including every diacritical mark and
+accent required by the language.
+
+### Rules
+
+1. **Never approximate accented characters.** Use the exact Unicode characters the language
+   requires. For example, Romanian requires ă, â, î, ș (with comma below, U+0219), and
+   ț (with comma below, U+021B) — never substitute with ş (cedilla, U+015F) or t̜.
+   Similarly, French requires é, è, ê, ë, ç, etc. Missing or wrong diacritics are treated
+   as bugs.
+2. **Set the `lang` attribute** on `<html>` to match the project's primary locale (e.g.,
+   `lang="ro"` for Romanian, `lang="fr"` for French). If the project supports multiple
+   locales, use the default locale.
+3. **Detect the project locale automatically.** Check these sources in order:
+   - i18n configuration files (e.g., `next-intl` config, `i18n.ts`, `middleware.ts` locale list)
+   - Translation files in `messages/` or `locales/` directories
+   - The use case specification (which may contain localized text)
+   - If no locale information is found, default to `lang="en"`
+4. **All visible UI text** — labels, buttons, placeholders, headings, error messages, empty
+   states, success messages — must be written in the project's primary locale with correct
+   accents. This includes placeholder content that demonstrates realistic data.
+5. **Ensure fonts support the required character set.** Google Fonts loaded in the HTML head
+   must include the character subsets needed for the locale (e.g., `&subset=latin-ext` for
+   Romanian, Polish, Czech, etc.). Add the subset parameter to the Google Fonts URL when the
+   locale requires characters beyond basic Latin.
+
+### Example — Romanian
+
+```html
+<html lang="ro">
+<!-- Google Fonts with latin-ext subset -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&subset=latin-ext&display=swap" rel="stylesheet">
+
+<!-- Correct Romanian text -->
+<button>Înregistrează-te</button>
+<label>Adresă de email</label>
+<input placeholder="exemplu@email.com">
+<p class="error">Câmpul este obligatoriu</p>
+<p>Încărcați documentele necesare</p>
+<span>Verificare în curs de procesare</span>
+```
+
+### Common mistakes to avoid
+
+| Wrong | Correct | Language |
+|-------|---------|----------|
+| Inregistreaza-te | Înregistrează-te | Romanian |
+| Adresa de email | Adresă de email | Romanian |
+| Incarcati documentele | Încărcați documentele | Romanian |
+| Campul este obligatoriu | Câmpul este obligatoriu | Romanian |
+| Reusit | Reușit | Romanian |
+| Resumé | Résumé | French |
+| Uber | Über | German |
+
 ## DO NOT
 
 - **Produce Markdown** — the output is HTML, never `.md`. No Markdown syntax anywhere in the file.
@@ -137,9 +195,14 @@ tables with `|`), STOP — you are producing the wrong format.**
   in the theme CSS files only. The HTML `<style>` block is for screen-specific layout rules only.
 - Use any framework-specific code (no React, no Next.js, no component libraries)
 - Use lorem ipsum — use realistic placeholder content that matches entity model attributes
+- **Strip or approximate diacritics/accents** — all UI text must use correct Unicode characters
+  for the project locale (see Internationalization section)
 - Design screens for steps not in the use case specification
 - Omit error states or empty states
 - Ignore the wireframe layout — the wireframe takes precedence over assumptions
+- **Ignore project design rules** — if `docs/designs/DESIGN_RULES.md` exists, every rule in it
+  must be followed. Missing a shared element (header, footer, sidebar) specified in design rules
+  is a defect.
 
 ## Workflow
 
@@ -149,7 +212,15 @@ tables with `|`), STOP — you are producing the wrong format.**
 2. Read the entity model from `docs/entity_model.md` (if applicable)
 3. Read the example files from this skill's `examples/` directory to understand the expected
    output format, HTML structure, and theming patterns
-4. Check if `docs/designs/current-theme.css` exists:
+4. **Read project design rules** from `docs/designs/DESIGN_RULES.md` (if it exists).
+   These are project-specific constraints that every design artifact must follow — e.g.,
+   shared layout elements (header, footer, sidebar), mandatory components, consistent
+   navigation patterns, accessibility requirements, or brand guidelines. Every rule in this
+   file applies to **all** design artifacts unless the rule itself specifies a narrower scope.
+5. **Detect the project locale** following the rules in the Internationalization section.
+   Determine the `lang` attribute value and whether `&subset=latin-ext` (or other subsets)
+   are needed for the Google Fonts URL.
+6. Check if `docs/designs/current-theme.css` exists:
    - **If it exists**: Read it and the active theme CSS it imports — all design tokens and base
      styles are already defined.
    - **If it does NOT exist**: You will create the theme infrastructure during Phase 3.
@@ -263,14 +334,14 @@ The design HTML must follow this structure:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="[project locale, e.g. en, ro, fr — see Internationalization section]">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UC-XXX — [Use Case Name] — [Project] Design</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500[&subset=latin-ext if needed]&display=swap" rel="stylesheet">
 <script src="current-tailwind-config.js"></script>
 <link rel="stylesheet" href="current-theme.css">
 </head>

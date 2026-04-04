@@ -60,6 +60,10 @@ If a design artifact exists in `docs/designs/`, compare the implementation again
 
 If no design artifact exists, skip this dimension and note it in the report.
 
+**Design Rules Compliance:** If `docs/designs/DESIGN_RULES.md` exists, verify the
+implementation follows every rule defined there (e.g., shared header/footer is present,
+navigation patterns are consistent). Non-compliance with design rules is a defect.
+
 ### 3. Completeness
 
 - Are there specification requirements with no corresponding implementation?
@@ -72,12 +76,13 @@ If no design artifact exists, skip this dimension and note it in the report.
    - For **UC-XXX**: Read from `docs/use_cases/`
    - For **TT-XXX**: Read from `docs/technical_tasks/`
 2. Read the design artifact from `docs/designs/` (if it exists)
-3. Read the entity model from `docs/entity_model.md` (if applicable)
-4. Identify all implementation files related to this use case or task
-5. Trace each specification requirement to its implementation
-6. Trace each design element to its implementation (if design exists)
-7. Check for unspecified behavior in the implementation
-8. Produce a structured evaluation report
+3. Read project design rules from `docs/designs/DESIGN_RULES.md` (if it exists)
+4. Read the entity model from `docs/entity_model.md` (if applicable)
+5. Identify all implementation files related to this use case or task
+6. Trace each specification requirement to its implementation
+7. Trace each design element to its implementation (if design exists)
+8. Check for unspecified behavior in the implementation
+9. Produce a structured evaluation report
 
 ## Output Format
 

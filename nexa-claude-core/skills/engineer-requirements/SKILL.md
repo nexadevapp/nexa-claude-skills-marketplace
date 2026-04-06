@@ -311,25 +311,25 @@ PO sub-agent in the next step. Format:
 
 ### Requirements Changes
 
-| Action  | ID/Target  | Detail                                          | Confidence      |
-|---------|------------|-------------------------------------------------|-----------------|
-| Add     | FR-NEW-01  | "As a Manager, I want to archive projects..."   | HIGH CONFIDENCE |
-| Refine  | FR-045     | Clarify scope — currently too vague              | HIGH CONFIDENCE |
-| Add     | FR-NEW-02  | "As a Member, I want to see task dependencies..." | CRITICAL AMBIGUITY — see Q3 |
+| Action  | ID/Target  | Detail                                          | Confidence      | PO Verdict |
+|---------|------------|-------------------------------------------------|-----------------|------------|
+| Add     | FR-NEW-01  | "As a Manager, I want to archive projects..."   | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Refine  | FR-045     | Clarify scope — currently too vague              | HIGH CONFIDENCE | |
+| Add     | FR-NEW-02  | "As a Member, I want to see task dependencies..." | CRITICAL AMBIGUITY — see Q3 | |
 
 ### Entity Model Changes
 
-| Action         | Target              | Detail                              | Confidence      |
-|----------------|---------------------|-------------------------------------|-----------------|
-| Add attribute  | Project.archivedAt  | DateTime?, for archive flow         | HIGH CONFIDENCE |
-| Add entity     | TaskDependency      | Many-to-many between Task and Task  | CRITICAL AMBIGUITY — see Q2 |
+| Action         | Target              | Detail                              | Confidence      | PO Verdict |
+|----------------|---------------------|-------------------------------------|-----------------|------------|
+| Add attribute  | Project.archivedAt  | DateTime?, for archive flow         | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Add entity     | TaskDependency      | Many-to-many between Task and Task  | CRITICAL AMBIGUITY — see Q2 | |
 
 ### Use Case Diagram Changes
 
-| Action   | Target | Detail                                    | Confidence      |
-|----------|--------|-------------------------------------------|-----------------|
-| Add UC   | UC-NEW | Archive Project (Manager)                 | HIGH CONFIDENCE |
-| Add rel  | UC-014 | includes new UC for dependency check      | CRITICAL AMBIGUITY — see Q2 |
+| Action   | Target | Detail                                    | Confidence      | PO Verdict |
+|----------|--------|-------------------------------------------|-----------------|------------|
+| Add UC   | UC-NEW | Archive Project (Manager)                 | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Add rel  | UC-014 | includes new UC for dependency check      | CRITICAL AMBIGUITY — see Q2 | |
 
 ## Critical Questions (max 5)
 
@@ -337,11 +337,15 @@ PO sub-agent in the next step. Format:
 > **Context:** [Why this matters, what depends on the answer]
 > **Options:** a) [option] b) [option] c) [option]
 >
+> **PO Answer:** _(filled after PO review)_ [Option chosen] — [one-sentence rationale] `CONFIDENT` / `NEEDS_HUMAN`
+
 > **Q2:** UC-014 allows deleting tasks. Should tasks with active dependencies be blocked
 > from deletion, or should deletion cascade and remove the dependencies too?
 > **Context:** This affects whether we need a TaskDependency entity and a pre-delete check flow.
 > **Options:** a) Block deletion b) Cascade c) Soft-delete only (archive)
 >
+> **PO Answer:** _(filled after PO review)_ [Option chosen] — [one-sentence rationale] `CONFIDENT` / `NEEDS_HUMAN`
+
 > [... up to Q5]
 
 ## High-Confidence Decisions (pre-approved)
@@ -349,12 +353,12 @@ PO sub-agent in the next step. Format:
 These decisions are based on explicit requirements or strong patterns. They will be applied
 unless you override any of them.
 
-| # | Decision                                      | Rationale                                  |
-|---|-----------------------------------------------|--------------------------------------------|
-| 1 | Add "Archive Project" use case (UC-NEW)       | CRUD gap: no way to remove/archive projects |
-| 2 | Add Project.archivedAt attribute              | Required by the archive use case           |
-| 3 | Add alternative flow to UC-010 for invalid members | Exception path: member not in system  |
-| 4 | Map FR-045 to UC-011                          | Traceability gap: FR-045 describes project viewing |
+| # | Decision                                      | Rationale                                  | PO Verdict |
+|---|-----------------------------------------------|--------------------------------------------|------------|
+| 1 | Add "Archive Project" use case (UC-NEW)       | CRUD gap: no way to remove/archive projects | _(filled after PO review)_ AGREE / CHALLENGE — [rationale] |
+| 2 | Add Project.archivedAt attribute              | Required by the archive use case           | |
+| 3 | Add alternative flow to UC-010 for invalid members | Exception path: member not in system  | |
+| 4 | Map FR-045 to UC-011                          | Traceability gap: FR-045 describes project viewing | |
 ```
 
 #### Step 2c: Product Owner Review (Sub-Agent)
@@ -385,42 +389,61 @@ Agent prompt:
 >
 > 1. Read all input files.
 > 2. For each **Critical Question** in the analysis:
+>    - **Duplicate the full question verbatim** in your review (question text, context, and options)
+>      so the review document is self-contained and readable without the analysis file
 >    - Choose an option and provide a one-sentence rationale
 >    - Tag your answer as `CONFIDENT` or `NEEDS_HUMAN`
 >    - Use `NEEDS_HUMAN` when: the requirements are silent, multiple options have equal merit,
 >      the decision has significant cost/scope implications, or it touches business strategy
 > 3. For each **High-Confidence Decision** in the analysis:
+>    - Include the decision's full description (not just a number reference)
 >    - Mark as `AGREE` or `CHALLENGE` with a one-sentence rationale
 >    - Only challenge if the decision contradicts explicit requirements or adds unnecessary scope
 > 4. For each **Proposed Change** (requirements, entity model, use case diagram):
+>    - Include the change's full detail (not just an ID reference)
 >    - Mark as `APPROVE` or `DEFER` with rationale
 >    - Defer changes that are not essential for the current cluster's use cases to function
 >
 > **Output format:**
+>
+> The PO review document must be **self-contained** — a reader must be able to understand every
+> question and answer without opening the analysis file. Each critical question is duplicated
+> in full (question text, context, and options) with the PO answer immediately below it.
 >
 > ```markdown
 > # PO Review: Cluster N — [Cluster Name]
 >
 > ## Critical Question Answers
 >
-> | Q# | Decision | Tag | Rationale |
-> |----|----------|-----|-----------|
-> | Q1 | Option b | CONFIDENT | [rationale referencing specific requirement] |
-> | Q2 | Option c | NEEDS_HUMAN | [rationale explaining why this needs human input] |
+> > **Q1:** [Full question text — copied verbatim from the analysis]
+> > **Context:** [Full context — copied verbatim from the analysis]
+> > **Options:** a) [option] b) [option] c) [option]
+> >
+> > **PO Answer:** Option b — [one-sentence rationale referencing specific requirement] `CONFIDENT`
+>
+> > **Q2:** [Full question text — copied verbatim from the analysis]
+> > **Context:** [Full context — copied verbatim from the analysis]
+> > **Options:** a) [option] b) [option] c) [option]
+> >
+> > **PO Answer:** Option c — [one-sentence rationale explaining why this needs human input] `NEEDS_HUMAN`
+>
+> [Repeat for each critical question]
 >
 > ## High-Confidence Decision Review
 >
-> | # | Verdict | Rationale |
-> |---|---------|-----------|
-> | 1 | AGREE | [rationale] |
-> | 2 | CHALLENGE | [rationale — what's wrong and what to do instead] |
+> Each decision is listed with its full description so the review is readable standalone.
+>
+> | # | Decision | Verdict | Rationale |
+> |---|----------|---------|-----------|
+> | 1 | Add "Archive Project" use case (UC-NEW) — CRUD gap: no way to remove/archive projects | AGREE | [rationale] |
+> | 2 | Add Project.archivedAt attribute — Required by the archive use case | CHALLENGE | [rationale — what's wrong and what to do instead] |
 >
 > ## Proposed Changes Review
 >
-> | Change | Verdict | Rationale |
-> |--------|---------|-----------|
-> | Add FR-NEW-01 | APPROVE | [rationale] |
-> | Add TaskDependency entity | DEFER | [rationale — not needed for MVP] |
+> | Change | Detail | Verdict | Rationale |
+> |--------|--------|---------|-----------|
+> | Add FR-NEW-01 | "As a Manager, I want to archive projects..." | APPROVE | [rationale] |
+> | Add TaskDependency entity | Many-to-many between Task and Task | DEFER | [rationale — not needed for MVP] |
 >
 > ## Summary
 >
@@ -432,13 +455,33 @@ Agent prompt:
 
 Write the PO agent's output to `docs/engineering/cluster-N-po-review.md`.
 
+#### Step 2c-bis: Merge PO Answers into Analysis Document
+
+After the PO agent completes its review, update `docs/engineering/cluster-N-analysis.md` so that
+every question and decision includes the PO's answer **inline**:
+
+1. **Critical Questions:** Under each question block, fill in the `**PO Answer:**` line with the
+   PO's chosen option, rationale, and `CONFIDENT` / `NEEDS_HUMAN` tag.
+2. **High-Confidence Decisions:** Fill in the `PO Verdict` column for each decision with `AGREE`
+   or `CHALLENGE` and the PO's rationale.
+3. **Proposed Changes tables:** Add a `PO Verdict` column and fill it with `APPROVE` or `DEFER`
+   and the PO's rationale.
+
+After this step, the analysis document is the **single source of truth** — a reader can see every
+question, every answer, every decision, and every verdict in one place without cross-referencing
+the PO review file. The separate `cluster-N-po-review.md` is kept as an audit trail but is not
+the primary document for human review.
+
 #### Step 2d: Human Review (Reduced Scope)
 
-Present to the user **only** the items that need human input:
+The analysis document (`docs/engineering/cluster-N-analysis.md`) now contains all questions and
+PO answers inline. Present to the user **only** the items that need human input, quoting the
+relevant Q&A pairs directly from the analysis document so the user sees question and answer together:
 
-1. **NEEDS_HUMAN questions** — The PO agent could not confidently decide. The user must answer.
-2. **CHALLENGE items** — The PO agent disagrees with the RE's high-confidence decisions.
-   Show the RE's reasoning and the PO's counter-reasoning. The user breaks the tie.
+1. **NEEDS_HUMAN questions** — Show the full question block including the PO's answer and rationale.
+   The PO could not confidently decide. The user must answer.
+2. **CHALLENGE items** — Show the RE's high-confidence decision and the PO's challenge rationale
+   side by side. The user breaks the tie.
 3. **Summary of CONFIDENT + AGREE items** — Presented as a compact table for optional override.
    The user does not need to act on these unless they disagree.
 
@@ -573,11 +616,15 @@ After all clusters are complete, run a final analysis across the entire project:
    and `AGREE`/`CHALLENGE`/`APPROVE`/`DEFER` tagging. Write the output to
    `docs/engineering/cross-cutting-po-review.md`.
 
-5. Present to the user only `NEEDS_HUMAN` items, challenges, and a summary of confident
-   decisions (same reduced-scope approach as Step 2d).
-6. Revise if needed (same approach as Step 2e).
-7. Apply approved changes to living documents.
-8. Update progress manifest — mark cross-cutting analysis as complete.
+5. **Merge PO answers into the cross-cutting analysis document** (same approach as Step 2c-bis):
+   update `docs/engineering/cross-cutting-analysis.md` to include PO verdicts inline next to each
+   finding's recommendation and each critical question, so the document is self-contained.
+
+6. Present to the user only `NEEDS_HUMAN` items, challenges, and a summary of confident
+   decisions (same reduced-scope approach as Step 2d), quoting Q&A pairs from the merged document.
+7. Revise if needed (same approach as Step 2e).
+8. Apply approved changes to living documents.
+9. Update progress manifest — mark cross-cutting analysis as complete.
 
 ---
 

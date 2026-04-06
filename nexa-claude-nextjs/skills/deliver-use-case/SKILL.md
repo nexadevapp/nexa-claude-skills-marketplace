@@ -442,19 +442,21 @@ cover the use case journeys. This loop iterates up to **3 times**.
 #### Phase 1: QA Evaluation (Isolated Agent)
 
 Launch an **isolated agent** (using the Agent tool) to evaluate the E2E tests against the
-use case specification.
+use case specification and functional requirements.
 
 Agent prompt:
 > You are a QA specialist. Review the Playwright end-to-end tests introduced for $ARGUMENTS
-> and compare them against the use case specification in `docs/use_cases/$ARGUMENTS.md`.
+> and compare them against the use case specification in `docs/use_cases/$ARGUMENTS.md`
+> AND the functional requirements in `docs/requirements.md`.
 >
 > Your report MUST include:
 >
-> 1. **Coverage Matrix** — a table mapping every spec flow (MSS steps, each alternative flow,
->    each business rule) to the test that covers it, with a verdict: Covered, Partial, or Missing.
+> 1. **Coverage Matrix** — a table mapping every requirement (FR), spec flow (MSS steps, each
+>    alternative flow), and business rule to the test that covers it, with a verdict:
+>    Covered, Partial, or Missing.
 > 2. **Gap Analysis** — for each Partial or Missing item, explain what is not tested and why
->    it matters. Be specific: name the spec step, the expected behavior, and what the test
->    should assert.
+>    it matters. Be specific: name the FR ID or spec step, the expected behavior, and what
+>    the test should assert.
 > 3. **What's Done Well** — acknowledge tests that go beyond the spec or cover smart edge cases.
 > 4. **Recommendations** — prioritized list of gaps to fix, with concrete guidance on how to
 >    test each one.
@@ -463,18 +465,20 @@ Agent prompt:
 >
 > **Severity rules — what counts as a gap:**
 >
-> - **Missing:** An entire spec flow (MSS step group, alternative flow, or business rule) has
->   ZERO tests exercising it. This is the only severity that requires a fix.
-> - **Partial:** A spec flow is tested but a significant behavioral branch within it is not
->   (e.g., only one of three account types is tested when the spec defines type-specific behavior).
->   Flag it, but only recommend a fix if the untested branch has meaningfully different behavior.
+> - **Missing:** An entire requirement or spec flow (MSS step group, alternative flow, or
+>   business rule) has ZERO tests exercising it. This is the only severity that requires a fix.
+> - **Partial:** A requirement or spec flow is tested but a significant behavioral branch within
+>   it is not (e.g., only one of three account types is tested when the spec defines
+>   type-specific behavior). Flag it, but only recommend a fix if the untested branch has
+>   meaningfully different behavior.
 > - **Observation:** Minor coverage improvements that would be nice but are not required.
 >   Examples: additional edge case variations within a covered flow, assertion enrichments,
 >   extra boundary values.
 >
-> **Definition of PASS:** If every MSS step, every alternative flow, and every business rule
-> has at least one test exercising its primary path, the verdict is **PASS**. Missing edge case
-> variations within a covered flow are observations, not gaps.
+> **Definition of PASS:** If every functional requirement (FR), every MSS step, every
+> alternative flow, and every business rule has at least one test exercising its primary path,
+> the verdict is **PASS**. Missing edge case variations within a covered flow are
+> observations, not gaps.
 >
 > **Do NOT flag as gaps:**
 >
@@ -495,9 +499,12 @@ Agent prompt:
 >
 > Coverage Matrix
 >
-> | Spec Flow | Test Coverage | Verdict |
-> |-----------|---------------|---------|
-> | MSS (steps 1-N) — [summary] | [test name] | Covered / Partial / Missing |
+> | Target | Spec/Req Flow | Test Coverage | Verdict |
+> |--------|---------------|---------------|---------|
+> | FR-XXX | [Requirement title] | [test name] | Covered / Partial / Missing |
+> | UC-XXX | MSS (steps 1-N) — [summary] | [test name] | Covered / Partial / Missing |
+> | UC-XXX | A1 — [trigger] | [test name] | Covered / Partial / Missing |
+> | BR-XXX | [rule name] | [test name] | Covered / Partial / Missing |
 > | A1 — [trigger] | [test name] | Covered / Partial / Missing |
 > | BR-001 — [rule] | [test name] | Covered / Partial / Missing |
 >

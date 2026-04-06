@@ -635,6 +635,8 @@ Run a focused analysis on only the sprint-scoped use cases and produce the readi
 
 #### What to analyze
 
+**Structural checks:**
+
 1. **Spec completeness** — Every selected use case has a specification with all required sections.
 2. **Design completeness** — Every user-facing selected use case has a design artifact.
 3. **Entity coverage** — All entities referenced in sprint use case specs exist in `docs/entity_model.md`.
@@ -646,6 +648,32 @@ Run a focused analysis on only the sprint-scoped use cases and produce the readi
    to at least one FR.
 8. **Pre-existing spec warning** — Use cases that had pre-existing specs (not generated from refined
    requirements) are flagged. Their specs may not reflect the refined business rules.
+
+**Content validation** (cross-references generated specs and designs against refined requirements):
+
+9. **Requirements-to-spec fidelity** — For each selected use case, compare the refined requirements
+   (from `docs/sprints/next-sprint/requirements-refinement-proposal.md`) against the generated spec
+   (`docs/use_cases/UC-XXX.md`). Flag business rules, acceptance criteria, or behavioral details
+   in the refined requirements that are missing or contradicted in the spec.
+10. **Spec-to-design fidelity** — For each user-facing use case, compare the spec's main success
+    scenario steps and alternative flows against the design (`docs/designs/UC-XXX-design.html`).
+    Flag steps that have no corresponding UI element, missing form fields implied by entity
+    attributes, and interaction states (loading, error, empty) not represented in the design.
+11. **Entity-to-spec field coverage** — For each entity referenced in a spec, verify that the spec's
+    data inputs/outputs match the entity model's attributes. Flag entity attributes that are
+    referenced in the spec but missing from the entity model, and entity attributes that exist
+    in the model but are never referenced in any sprint spec (warning only — may be used by
+    other use cases).
+12. **Alternative flow coverage** — Check each spec for missing error handling and edge cases
+    implied by the refined requirements' business rules. Flag business rules that should produce
+    an alternative flow but have no corresponding flow in the spec.
+13. **Decision provenance** — Flag business rules, acceptance criteria, or behavioral details in
+    the specs that lack clear provenance — unclear whether the decision came from explicit
+    requirements or was inferred during spec generation. These are high-risk areas that may
+    need stakeholder validation before implementation.
+14. **Design consistency** — Across all sprint designs, check for inconsistent naming, layout
+    patterns, or interaction patterns for shared concepts (e.g., the same entity displayed
+    differently in two screens, inconsistent button labels for the same action).
 
 #### Output
 
@@ -709,7 +737,7 @@ Recommended order for running `/deliver-use-case` on each selected use case:
 
 ### GAP-001: [Short title]
 
-- **Type:** [Entity Gap | Spec Inconsistency | Design Missing | Business Rule Conflict | Traceability Gap]
+- **Type:** [Entity Gap | Spec Inconsistency | Design Missing | Business Rule Conflict | Traceability Gap | Requirements Fidelity Gap | Spec-Design Mismatch | Missing Alternative Flow | Decision Provenance Gap | Design Consistency Issue]
 - **Severity:** Blocker | Warning
 - **Affected:** [use case IDs]
 - **Description:** [What is missing or inconsistent]

@@ -618,7 +618,7 @@ After all clusters are complete, run a final analysis across the entire project:
 
 ## Next Steps
 
-The project is ready for `/sprint-prepare` or `/refine-use-cases`.
+The project is ready for `/sprint-prepare`.
 ```
 
 2. Print the final summary to the user:
@@ -649,6 +649,5 @@ The project is ready for `/sprint-prepare` or `/refine-use-cases`.
 - `docs/engineering/cross-cutting-analysis.md`
 - `docs/engineering/cross-cutting-po-review.md`
 
-**Recommended next step:** `/sprint-prepare` to scope your first sprint, or
-`/refine-use-cases` for a full gap analysis with spec and design generation.
+**Recommended next step:** `/sprint-prepare` to scope your first sprint.
 ```

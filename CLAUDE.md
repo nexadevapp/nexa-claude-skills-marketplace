@@ -28,7 +28,6 @@ nexa-claude-marketplace/
 │       ├── sprint-prepare/
 │       ├── generate-wireframe/
 │       ├── design-screens/
-│       ├── refine-use-cases/
 │       ├── code-review/
 │       ├── evaluate/
 │       └── report-bug/
@@ -89,7 +88,6 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/generate-wireframe` | Generate low-fidelity wireframe from use cases |
 | Construction | `/sprint-prepare`     | Select, refine, and validate use cases for sprint delivery |
 | Construction | `/design-screens`     | Create screen design specifications    |
-| Elaboration  | `/refine-use-cases`   | Generate all specs & designs, then GAP analysis |
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
 | Verification | `/report-bug`         | Create structured bug report documents                             |

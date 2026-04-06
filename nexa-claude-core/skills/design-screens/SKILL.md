@@ -38,10 +38,10 @@ Switching the entire visual theme across all design artifacts requires changing 
 docs/designs/
 ├── current-theme.css              # Theme switcher — @imports the active theme
 ├── current-tailwind-config.js     # Active Tailwind config (colors, fonts)
-├── green-theme-001.css            # Green/Forest theme (CSS custom properties + components)
-├── green-tailwind-config.js       # Green/Forest Tailwind color/font config
-├── blue-theme-001.css             # Blue/Indigo theme (CSS custom properties + components)
-├── blue-tailwind-config.js        # Blue/Indigo Tailwind color/font config
+├── <main-theme>-001.css           # Main theme derived from wireframe (CSS custom properties + components)
+├── <main-theme>-tailwind-config.js# Main Tailwind color/font config
+├── <alt-theme>-001.css            # Optional alternative theme variant
+├── <alt-theme>-tailwind-config.js # Optional alternative Tailwind config
 ├── UC-000-design.html             # Design artifact (references current-theme.css)
 ├── UC-001-design.html
 └── ...
@@ -51,38 +51,50 @@ docs/designs/
 
 **`current-theme.css`** contains a single `@import` pointing to the active theme:
 ```css
-@import url('green-theme-001.css');
+@import url('<main-theme>-001.css');
 ```
 
 **`current-tailwind-config.js`** contains the active Tailwind configuration that maps semantic
-color names (forest, coral, cream, gold) to the theme's palette:
+color names to the theme's palette. Each theme defines four color palette roles with evocative
+names derived from the wireframe's visual language:
+
+| Role | Purpose | Example names |
+|------|---------|---------------|
+| **Primary** | Main brand color | `forest`, `ocean`, `ember`, `indigo` |
+| **Accent** | Secondary/accent color | `coral`, `azure`, `mint`, `amber` |
+| **Neutral** | Background/surface neutrals | `cream`, `slate`, `sand`, `mist` |
+| **Highlight** | Premium/highlight color | `gold`, `lemon`, `copper`, `silver` |
+
 ```js
 tailwind.config = {
   theme: {
     extend: {
       colors: {
-        forest: { 50:'...', 100:'...', /* ... */ 900:'...' },
-        coral:  { 50:'...', 100:'...', /* ... */ 900:'...' },
-        cream:  { 50:'...', 100:'...', /* ... */ },
-        gold:   { 50:'...', 100:'...', /* ... */ 900:'...' },
+        // Names derived from the wireframe's visual language — NOT prescribed
+        [primary]: { 50:'...', 100:'...', /* ... */ 900:'...' },
+        [accent]:  { 50:'...', 100:'...', /* ... */ 900:'...' },
+        [neutral]: { 50:'...', 100:'...', /* ... */ },
+        [highlight]:{ 50:'...', 100:'...', /* ... */ 900:'...' },
       },
       fontFamily: {
-        display: ['Outfit', 'sans-serif'],
-        body: ['Lora', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        display: ['...', 'sans-serif'],
+        body: ['...', 'serif'],
+        mono: ['...', 'monospace'],
       }
     }
   }
 }
 ```
 
-To switch from green to blue: change `@import url('green-theme-001.css')` to
-`@import url('blue-theme-001.css')` and replace `current-tailwind-config.js` contents with
-`blue-tailwind-config.js`. All design HTML files instantly reflect the new theme.
+To switch themes: change the `@import` in `current-theme.css` and replace
+`current-tailwind-config.js` contents with the matching config. All design HTML files instantly
+reflect the new theme.
 
 ## Examples
 
-Reference examples are available in this skill's `examples/` directory:
+Reference examples are available in this skill's `examples/` directory. These examples use a
+**green/forest theme** — study the **structure and patterns**, not the specific color names.
+Your project's theme must be derived from its own wireframe:
 
 | File | Purpose |
 |------|---------|
@@ -97,8 +109,8 @@ Reference examples are available in this skill's `examples/` directory:
 | `examples/blue-tailwind-config.js` | Blue/Indigo Tailwind color palette |
 
 **Study these examples before producing output.** They demonstrate:
-- How HTML uses Tailwind utility classes with semantic names (`bg-forest-800`, `text-coral-500`)
-- How CSS custom properties (`var(--forest-600)`, `var(--bg-card)`) are used in component styles
+- How HTML uses Tailwind utility classes with semantic names (e.g., `bg-forest-800`, `text-coral-500` in the green example)
+- How CSS custom properties (e.g., `var(--forest-600)`, `var(--bg-card)`) are used in component styles
 - The section-by-section design layout with `design-section-divider`, `design-annotation`,
   `design-screen` patterns
 - How `design-header`, `design-meta`, `design-annotation`, `design-data-table` classes annotate
@@ -189,8 +201,8 @@ accent required by the language.
 
 - **Produce Markdown** — the output is HTML, never `.md`. No Markdown syntax anywhere in the file.
 - Skip reading the use case specification first
-- **Hardcode colors, fonts, or spacing in HTML** — use Tailwind utility classes with semantic
-  color names (forest, coral, cream, gold) and CSS custom properties from the theme
+- **Hardcode colors, fonts, or spacing in HTML** — use Tailwind utility classes with the theme's
+  semantic color names and CSS custom properties from the theme
 - **Embed CSS custom property definitions in the HTML `<style>` block** — token definitions belong
   in the theme CSS files only. The HTML `<style>` block is for screen-specific layout rules only.
 - Use any framework-specific code (no React, no Next.js, no component libraries)
@@ -251,23 +263,27 @@ Create the `docs/snapshots/` directory if it does not exist.
 
 ### Phase 3 — Produce the HTML design artifact
 
-6. If the theme infrastructure does not exist, create it now using the **Write** tool:
-   - Create a **theme CSS file** (e.g., `docs/designs/green-theme-001.css`) following the
-     structure from the examples. Populate `:root` custom properties with values derived from
+6. If the theme infrastructure does not exist, create it now using the **Write** tool.
+   **The wireframe's visual language dictates the theme** — extract colors, fonts, and spacing
+   from the wireframe screenshots taken in Phase 2 and use them as the basis for the theme tokens.
+   - Choose evocative **palette names** that reflect the wireframe's color identity (e.g., `ocean`
+     for a blue maritime palette, `ember` for warm reds, `forest` for greens). Do NOT default to
+     the example names (`forest`, `coral`, `cream`, `gold`) — those belong to the green example theme.
+   - Create a **theme CSS file** (e.g., `docs/designs/ocean-theme-001.css`) following the
+     structure from the examples. Populate `:root` custom properties with values extracted from
      the wireframe. Include all base resets, animations, and component styles.
-   - Create the matching **Tailwind config** (e.g., `docs/designs/green-tailwind-config.js`)
+   - Create the matching **Tailwind config** (e.g., `docs/designs/ocean-tailwind-config.js`)
      with color palettes matching the theme CSS tokens.
    - Create **`current-theme.css`** with a single `@import` pointing to the theme CSS.
    - Create **`current-tailwind-config.js`** with contents matching the active Tailwind config.
-   - Optionally create a second theme variant (e.g., blue) to demonstrate the theme switching
-     capability.
+   - Optionally create a second theme variant to demonstrate the theme switching capability.
 7. Using the **Write** tool, create `docs/designs/UC-XXX-design.html` following the HTML structure
    below. The file content MUST be valid HTML starting with `<!DOCTYPE html>` — never Markdown.
 8. For each screen identified in the wireframe:
    - Reproduce the **layout and visual structure** from the wireframe
-   - Use **Tailwind utility classes** with semantic color names (`bg-forest-800`, `text-coral-500`,
-     `border-cream-200`) for layout and styling — never hardcode hex values in class attributes
-   - Use **CSS custom properties** (`var(--forest-600)`, `var(--bg-card)`) in the theme CSS for
+   - Use **Tailwind utility classes** with the theme's semantic color names (e.g., `bg-[primary]-800`,
+     `text-[accent]-500`, `border-[neutral]-200`) for layout and styling — never hardcode hex values
+   - Use **CSS custom properties** (`var(--[primary]-600)`, `var(--bg-card)`) in the theme CSS for
      component styles that can't be expressed as Tailwind utilities
    - Map **components** to use case steps using `data-uc-step` attributes
    - Map **data fields** to entity model attributes using `data-entity` attributes
@@ -317,7 +333,7 @@ how the UI adapts for mobile viewports (< 768px). Responsiveness cannot be assum
 
 <div class="design-screen">
   <!-- Mobile viewport rendering of the main screen -->
-  <div class="max-w-[375px] mx-auto border border-cream-300 rounded-xl overflow-hidden">
+  <div class="max-w-[375px] mx-auto border border-[neutral]-300 rounded-xl overflow-hidden">
     <!-- Mobile layout here -->
   </div>
 </div>
@@ -345,7 +361,7 @@ The design HTML must follow this structure:
 <script src="current-tailwind-config.js"></script>
 <link rel="stylesheet" href="current-theme.css">
 </head>
-<body class="bg-cream-100 text-forest-800 antialiased">
+<body class="bg-[neutral]-100 text-[primary]-800 antialiased">
 
 <div class="max-w-[1400px] mx-auto px-6 py-8">
 
@@ -373,7 +389,7 @@ The design HTML must follow this structure:
 
   <div class="design-screen">
     <!-- Actual screen content using Tailwind utility classes -->
-    <!-- Use semantic color names: bg-forest-800, text-coral-500, border-cream-200 -->
+    <!-- Use the theme's semantic color names (e.g., bg-[primary]-800, text-[accent]-500) -->
   </div>
 
   <div class="design-annotation">
@@ -445,8 +461,9 @@ The design HTML must follow this structure:
   external CSS theme files and Tailwind configs. HTML never contains hardcoded brand values.
   Changing the theme = swapping CSS files. This is the most important architectural principle.
 - **Semantic HTML + Tailwind** — Use appropriate elements (`form`, `table`, `nav`, `button`,
-  `input`) styled with Tailwind utility classes using semantic color names (forest, coral, cream,
-  gold). Custom component styles use CSS custom properties from the theme.
+  `input`) styled with Tailwind utility classes using the theme's semantic color names (four
+  palettes: primary, accent, neutral, highlight — with evocative names derived from the wireframe).
+  Custom component styles use CSS custom properties from the theme.
 - **All states visible** — Every state (default, loading, empty, error, success) is rendered as a
   visible section. This makes the design a complete reference — no hidden requirements.
 - **Traceable** — Every interactive element traces back to a use case step via `data-uc-step`.
@@ -457,8 +474,9 @@ The design HTML must follow this structure:
 
 ## Theme CSS Structure
 
-Each theme CSS file (e.g., `green-theme-001.css`, `blue-theme-001.css`) contains the **complete**
-visual identity. All theme files share identical structure but differ in `:root` token values.
+Each theme CSS file contains the **complete** visual identity. All theme files for a project share
+identical structure but differ in `:root` token values. The theme name reflects the wireframe's
+visual language (e.g., `ocean-theme-001.css` for a blue palette, `ember-theme-001.css` for warm tones).
 
 ### Required sections
 
@@ -468,7 +486,7 @@ visual identity. All theme files share identical structure but differ in `:root`
 
 /* ── CSS Custom Properties (Theme Tokens) ── */
 :root {
-  /* Color palettes: --forest-*, --coral-*, --cream-*, --gold-* (50-900 scale) */
+  /* Color palettes: --[primary]-*, --[accent]-*, --[neutral]-*, --[highlight]-* (50-900 scale) */
   /* Semantic aliases: --bg-page, --bg-card, --text-primary, --accent, etc. */
   /* Sizing: --radius-*, --shadow-*, --nav-height */
 }
@@ -486,14 +504,20 @@ visual identity. All theme files share identical structure but differ in `:root`
 
 ### Semantic color names
 
-All themes use the same semantic names so HTML never changes:
+Each project defines four palette names derived from the wireframe's visual identity. All themes
+within the same project use the same four names so HTML never changes — only the `:root` values
+differ between themes.
 
-| Name | Green theme | Blue theme | Purpose |
-|------|-------------|------------|---------|
-| `forest` | Green/emerald scale | Blue/indigo scale | Primary brand color |
-| `coral` | Orange/amber accent | Blue accent variant | Secondary/accent color |
-| `cream` | Green-tinted neutrals | Blue-tinted neutrals | Background/surface neutrals |
-| `gold` | True gold scale | Blue-shifted gold | Premium/highlight color |
+| Role | Purpose | Example (green theme) | Example (ocean theme) |
+|------|---------|----------------------|----------------------|
+| **Primary** | Main brand color | `forest` (emerald scale) | `ocean` (deep blue scale) |
+| **Accent** | Secondary/accent color | `coral` (orange/amber) | `azure` (sky blue) |
+| **Neutral** | Background/surface neutrals | `cream` (green-tinted) | `mist` (blue-tinted) |
+| **Highlight** | Premium/highlight color | `gold` (true gold) | `copper` (warm metallic) |
 
-The HTML always writes `bg-forest-600` or `var(--forest-600)` — the actual rendered color depends
-entirely on which theme CSS is active.
+The HTML always writes `bg-[primary]-600` or `var(--[primary]-600)` using the project's chosen
+palette names — the actual rendered color depends entirely on which theme CSS is active.
+
+> **Note:** The examples in this skill's `examples/` directory use `forest`/`coral`/`cream`/`gold`
+> as their palette names. These are specific to the green example theme, not universal defaults.
+> Your project's palette names should reflect its own wireframe.

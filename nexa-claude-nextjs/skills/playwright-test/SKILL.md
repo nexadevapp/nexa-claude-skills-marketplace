@@ -55,6 +55,9 @@ A typical use case produces **3–8 tests total**, not dozens.
 - The test starts at the application's entry point (e.g., landing page, login screen)
 - Every navigation happens through UI interactions (clicks, form submissions) — never `page.goto()` to internal pages
 - The test verifies intermediate states along the way, not just the final outcome
+- The test verifies **Postconditions**:
+    - For success flows: data is visible and correctly stored in the system.
+    - For failure flows: the system state remains unchanged (e.g., no partial records created, original values preserved). Use API calls in `afterEach` or inline to verify deep system state if UI-only verification is insufficient.
 - The test ends with a verifiable outcome (data visible, confirmation shown, redirect happened)
 
 **`page.goto()` is only used ONCE per test** — to open the application entry point (e.g., `page.goto('/')` or `page.goto('/login')`). All subsequent navigation must happen through the UI.

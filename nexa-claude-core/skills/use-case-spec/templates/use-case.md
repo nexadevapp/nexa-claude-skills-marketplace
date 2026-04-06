@@ -33,10 +33,13 @@
 ### Success Postconditions
 
 - [State of the system after successful completion]
+- [Specific data stored or updated]
 
 ### Failure Postconditions
 
-- [State of the system if the use case fails]
+- [State of the system if the use case fails (e.g., "No reservation created", "Original data remains unchanged")]
+- [Specific errors displayed to the actor]
+- [Deep system state: no partial records or side effects]
 
 ## Business Rules
 

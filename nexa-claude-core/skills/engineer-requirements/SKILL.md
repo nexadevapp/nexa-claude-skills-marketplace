@@ -4,13 +4,14 @@ description: >
   Lead Requirements Engineer that systematically elaborates all use cases through
   structured analysis, probing questions, and iterative refinement. Processes use
   cases in thematic clusters, applies CRUD matrix analysis, actor-goal
-  completeness, exception path probing, and traceability checks. Spawns a Product
-  Owner sub-agent to answer clarification questions — only genuinely ambiguous
-  decisions reach the human. Updates requirements, entity model, and use case
-  diagram as living documents. Use when the user asks to "engineer requirements",
-  "elaborate use cases", "analyze use cases", "validate use case completeness",
-  "deep-dive on requirements", or mentions requirements engineering, use case
-  elaboration, or completeness analysis.
+  completeness, exception path probing, MoSCoW prioritization, and traceability
+  checks. Spawns a Product Owner sub-agent to answer clarification questions —
+  only genuinely ambiguous decisions reach the human. Updates requirements, entity
+  model, and use case diagram as living documents. Use when the user asks to
+  "engineer requirements", "elaborate use cases", "analyze use cases", "validate
+  use case completeness", "deep-dive on requirements", "prioritize requirements",
+  or mentions requirements engineering, use case elaboration, MoSCoW, or
+  completeness analysis.
 ---
 
 # Engineer Requirements
@@ -22,7 +23,7 @@ through structured analysis, targeted questions, and iterative refinement of liv
 
 This skill processes use cases in **thematic clusters** — groups of related use cases that share
 actors, domain concepts, or entity dependencies. Each cluster is analyzed by the RE, reviewed by
-a Product Owner sub-agent, and only unresolved items are escalated to the user. After all clusters
+a Nexa Product Owner agent, and only unresolved items are escalated to the user. After all clusters
 are complete, a cross-cutting analysis catches inter-cluster issues.
 
 Accepts an optional $ARGUMENTS value:
@@ -67,14 +68,14 @@ Throughout this skill, adopt the perspective of a senior requirements engineer w
 - **Guards completeness** — Every entity needs CRUD coverage, every actor needs goals covered
 - **Respects scope** — Flags scope creep and keeps elaboration proportional to project complexity
 
-## Persona: Product Owner (Sub-Agent)
+## Persona: Nexa Product Owner Agent
 
 A sub-agent is spawned with this persona to review each cluster analysis and answer the RE's
 questions before they reach the human. This reduces the human's review burden to only genuinely
 ambiguous decisions.
 
-**Proportionality rule:** The PO sub-agent is always involved regardless of project size — every
-RE question must receive a documented PO answer. However, the RE must scale its analysis depth
+**Proportionality rule:** The Nexa PO agent is always involved regardless of project size — every
+RE question must receive a documented Nexa PO answer. However, the RE must scale its analysis depth
 to match the project's complexity:
 
 - **Single cluster (1-5 use cases):** Keep analysis lean. Apply each technique but expect short
@@ -84,10 +85,10 @@ to match the project's complexity:
 - **2-3 clusters (6-15 use cases):** Standard depth. All techniques apply fully.
 - **4+ clusters (16+ use cases):** Full depth with cross-cutting analysis.
 
-All questions from the RE and all answers from the PO agent must be documented in the cluster
-analysis and PO review files, regardless of project size.
+All questions from the RE and all answers from the Nexa PO agent must be documented in the cluster
+analysis and Nexa PO review files, regardless of project size.
 
-The Product Owner agent:
+The Nexa Product Owner agent:
 
 - **Optimizes for MVP scope** — When in doubt, chooses the simpler option and defers the rest
 - **Protects user value** — Every decision is justified by concrete user benefit
@@ -117,7 +118,7 @@ When documenting findings, reference specific wireframe screens by their anchor 
 
 ## Analysis Techniques
 
-Apply these techniques to every cluster:
+Apply these techniques to every cluster (all eight are mandatory):
 
 ### 1. CRUD Matrix Analysis
 
@@ -158,7 +159,37 @@ For each use case in the cluster, determine:
   covered: who creates it, who reads it, who updates it, who deletes/archives it?
 - Flag entities with unclear ownership or partial lifecycle coverage
 
-### 7. Use Case Granularity Check
+### 7. MoSCoW Prioritization
+
+Classify every functional requirement mapped to the cluster's use cases using the MoSCoW method:
+
+| Category | Code | Meaning | Decision Criteria |
+|----------|------|---------|-------------------|
+| **Must have** | M | Without this the system has no value; the release cannot ship | Core user journey, legal/compliance obligation, or blocks other Must-haves |
+| **Should have** | S | Important, painful to omit, but the system is still usable without it | Significant user value but a workaround exists; no other requirement depends on it exclusively |
+| **Could have** | C | Desirable; included only if time and budget allow | Nice-to-have UX improvement, secondary actor convenience, cosmetic enhancement |
+| **Won't have (this time)** | W | Explicitly out of scope for the current release but acknowledged for the future | Deferred by stakeholder decision, too risky for MVP, or depends on unfinished infrastructure |
+
+**How to classify:**
+
+1. Start from the existing `Priority` column in `docs/requirements.md` as a baseline hint
+   (High → likely M/S, Medium → likely S/C, Low → likely C/W), but do NOT blindly map —
+   apply the decision criteria above using evidence from the other analysis techniques:
+   - A requirement that fills a **CRUD gap** for a core entity is likely **Must have**
+   - A requirement with **no traceability** to any use case is likely **Won't have** or should be removed
+   - A requirement whose exception paths are complex and deferrable may be downgraded from
+     Must to **Should have** (deliver the happy path first)
+   - A requirement that serves a **secondary actor** with low frequency may be **Could have**
+2. Justify every classification with a one-sentence rationale referencing a specific analysis finding
+3. Flag requirements where the classification is uncertain as **CRITICAL AMBIGUITY** — the
+   Nexa PO agent and/or human must decide
+
+**Constraints:**
+- At least 60% of requirements in a cluster should be **Must have** or **Should have** —
+  if most requirements are Could/Won't, the cluster may be scoped too broadly
+- Every **Won't have** must have an explicit reason — "Won't have" is not a trash bin
+
+### 8. Use Case Granularity Check
 
 A use case must represent a **complete user goal** — an end-to-end journey that delivers value to the
 actor. Individual steps, validations, or UI interactions within that journey are **not** separate use
@@ -214,7 +245,7 @@ Execute these phases in order.
    - If it exists and all clusters are complete: skip to Phase 3 (cross-cutting analysis).
    - If it does not exist: proceed to clustering.
 4. **Granularity pre-check:** Before clustering, scan all undelivered use cases for over-granularity
-   using technique #7 (Use Case Granularity Check). If multiple use cases clearly represent steps
+   using technique #8 (Use Case Granularity Check). If multiple use cases clearly represent steps
    within the same user journey rather than independent user goals, propose merging them upfront.
    Present any proposed merges to the user as part of the clustering approval in step 5. This
    prevents wasted analysis effort on use cases that will be merged anyway.
@@ -272,20 +303,20 @@ For each cluster, in the order defined in Phase 1:
 
 #### Step 2a: Analyze
 
-Run all seven analysis techniques against the cluster's use cases. Produce a structured analysis
+Run all eight analysis techniques against the cluster's use cases. Produce a structured analysis
 document. Classify every finding as:
 
 - **HIGH CONFIDENCE** — The skill is confident in the decision based on explicit requirements
   or strong patterns. Pre-approved unless the user overrides.
 - **CRITICAL AMBIGUITY** — The skill genuinely cannot decide alone. These questions are sent
-  to the PO sub-agent first; only those the PO tags as `NEEDS_HUMAN` reach the user. Maximum
+  to the Nexa PO agent first; only those the Nexa PO tags as `NEEDS_HUMAN` reach the user. Maximum
   5 per cluster. If more exist, prioritize the ones with the highest downstream impact and
   defer the rest as high-confidence inferences with clear reasoning.
 
 #### Step 2b: Present Cluster Analysis
 
 Write the analysis to `docs/engineering/cluster-N-analysis.md`. This file serves as input to the
-PO sub-agent in the next step. Format:
+Nexa PO agent in the next step. Format:
 
 ```markdown
 # Cluster N: [Cluster Name] — Analysis
@@ -333,69 +364,72 @@ PO sub-agent in the next step. Format:
 |---------|------------|------------|------------|---------------------|---------------|
 | Project | UC-010     | UC-011     | UC-012     | —                   | No archive UC |
 
+## MoSCoW Classification
+
+| FR ID    | Title              | Current Priority | MoSCoW | Rationale                                          | Confidence        |
+|----------|--------------------|------------------|--------|----------------------------------------------------|--------------------|
+| FR-010   | Create Project     | High             | M      | CRUD: only Create path for Project entity          | HIGH CONFIDENCE    |
+| FR-011   | View Project List  | High             | M      | Actor-goal: Manager's primary read operation       | HIGH CONFIDENCE    |
+| FR-012   | Edit Project       | Medium           | S      | Workaround exists (delete + recreate)              | HIGH CONFIDENCE    |
+| FR-013   | Project Analytics  | Low              | C      | Secondary actor convenience; no dependency on it   | HIGH CONFIDENCE    |
+| FR-014   | Bulk Project Import| Low              | W      | Depends on unbuilt integration infrastructure      | CRITICAL AMBIGUITY |
+
+**Distribution:** M: 2 (40%) · S: 1 (20%) · C: 1 (20%) · W: 1 (20%)
+
 ## Proposed Changes
 
 ### Requirements Changes
 
-| Action  | ID/Target  | Detail                                          | Confidence      | PO Verdict |
+| Action  | ID/Target  | Detail                                          | Confidence      | Nexa PO Verdict |
 |---------|------------|-------------------------------------------------|-----------------|------------|
-| Add     | FR-NEW-01  | "As a Manager, I want to archive projects..."   | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Add     | FR-NEW-01  | "As a Manager, I want to archive projects..."   | HIGH CONFIDENCE | _(filled after Nexa PO review)_ |
 | Refine  | FR-045     | Clarify scope — currently too vague              | HIGH CONFIDENCE | |
 | Add     | FR-NEW-02  | "As a Member, I want to see task dependencies..." | CRITICAL AMBIGUITY — see Q3 | |
 
 ### Entity Model Changes
 
-| Action         | Target              | Detail                              | Confidence      | PO Verdict |
+| Action         | Target              | Detail                              | Confidence      | Nexa PO Verdict |
 |----------------|---------------------|-------------------------------------|-----------------|------------|
-| Add attribute  | Project.archivedAt  | DateTime?, for archive flow         | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Add attribute  | Project.archivedAt  | DateTime?, for archive flow         | HIGH CONFIDENCE | _(filled after Nexa PO review)_ |
 | Add entity     | TaskDependency      | Many-to-many between Task and Task  | CRITICAL AMBIGUITY — see Q2 | |
 
 ### Use Case Diagram Changes
 
-| Action   | Target | Detail                                    | Confidence      | PO Verdict |
+| Action   | Target | Detail                                    | Confidence      | Nexa PO Verdict |
 |----------|--------|-------------------------------------------|-----------------|------------|
-| Add UC   | UC-NEW | Archive Project (Manager)                 | HIGH CONFIDENCE | _(filled after PO review)_ |
+| Add UC   | UC-NEW | Archive Project (Manager)                 | HIGH CONFIDENCE | _(filled after Nexa PO review)_ |
 | Add rel  | UC-014 | includes new UC for dependency check      | CRITICAL AMBIGUITY — see Q2 | |
 
 ## Critical Questions (max 5)
 
-> **Q1:** [Question about a genuine ambiguity — what the skill cannot decide alone]
-> **Context:** [Why this matters, what depends on the answer]
-> **Options:** a) [option] b) [option] c) [option]
->
-> **PO Answer:** _(filled after PO review)_ [Option chosen] — [one-sentence rationale] `CONFIDENT` / `NEEDS_HUMAN`
-
-> **Q2:** UC-014 allows deleting tasks. Should tasks with active dependencies be blocked
-> from deletion, or should deletion cascade and remove the dependencies too?
-> **Context:** This affects whether we need a TaskDependency entity and a pre-delete check flow.
-> **Options:** a) Block deletion b) Cascade c) Soft-delete only (archive)
->
-> **PO Answer:** _(filled after PO review)_ [Option chosen] — [one-sentence rationale] `CONFIDENT` / `NEEDS_HUMAN`
-
-> [... up to Q5]
+| #  | Question | Context | Options | Nexa PO Answer |
+|----|----------|---------|---------|-----------|
+| Q1 | [Question about a genuine ambiguity — what the skill cannot decide alone] | [Why this matters, what depends on the answer] | a) [option] · b) [option] · c) [option] | _(filled after Nexa PO review)_ [Option chosen] — [rationale] `CONFIDENT` / `NEEDS_HUMAN` |
+| Q2 | UC-014 allows deleting tasks. Should tasks with active dependencies be blocked from deletion, or should deletion cascade and remove the dependencies too? | This affects whether we need a TaskDependency entity and a pre-delete check flow. | a) Block deletion · b) Cascade · c) Soft-delete only (archive) | _(filled after Nexa PO review)_ [Option chosen] — [rationale] `CONFIDENT` / `NEEDS_HUMAN` |
+| ... | up to Q5 | | | |
 
 ## High-Confidence Decisions (pre-approved)
 
 These decisions are based on explicit requirements or strong patterns. They will be applied
 unless you override any of them.
 
-| # | Decision                                      | Rationale                                  | PO Verdict |
+| # | Decision                                      | Rationale                                  | Nexa PO Verdict |
 |---|-----------------------------------------------|--------------------------------------------|------------|
-| 1 | Add "Archive Project" use case (UC-NEW)       | CRUD gap: no way to remove/archive projects | _(filled after PO review)_ AGREE / CHALLENGE — [rationale] |
+| 1 | Add "Archive Project" use case (UC-NEW)       | CRUD gap: no way to remove/archive projects | _(filled after Nexa PO review)_ AGREE / CHALLENGE — [rationale] |
 | 2 | Add Project.archivedAt attribute              | Required by the archive use case           | |
 | 3 | Add alternative flow to UC-010 for invalid members | Exception path: member not in system  | |
 | 4 | Map FR-045 to UC-011                          | Traceability gap: FR-045 describes project viewing | |
 ```
 
-#### Step 2c: Product Owner Review (Sub-Agent)
+#### Step 2c: Nexa Product Owner Agent Review
 
-Launch an **isolated agent** (using the Agent tool) with the Product Owner persona to review
-the cluster analysis and answer the RE's critical questions. The PO agent works from the analysis
+Launch an **isolated agent** (using the Agent tool) with the Nexa Product Owner agent persona to review
+the cluster analysis and answer the RE's critical questions. The Nexa PO agent works from the analysis
 file and the project context — it has no knowledge of the RE's reasoning process.
 
 Agent prompt:
 
-> You are a **Product Owner** reviewing a requirements engineering analysis.
+> You are a **Nexa Product Owner agent** reviewing a requirements engineering analysis.
 >
 > **Your persona:**
 > - Optimize for MVP scope — when in doubt, choose the simpler option and defer the rest
@@ -426,35 +460,32 @@ Agent prompt:
 >    - Include the decision's full description (not just a number reference)
 >    - Mark as `AGREE` or `CHALLENGE` with a one-sentence rationale
 >    - Only challenge if the decision contradicts explicit requirements or adds unnecessary scope
-> 4. For each **Proposed Change** (requirements, entity model, use case diagram):
+> 4. For each **MoSCoW Classification** in the analysis:
+>    - Review the assigned category and rationale
+>    - Mark as `AGREE` or `RECLASSIFY` with the suggested category and a one-sentence rationale
+>    - Apply your MVP-optimization lens: when in doubt, push non-blocking requirements toward
+>      Should/Could rather than Must; push gold-plating toward Won't
+>    - Flag any classification as `NEEDS_HUMAN` if it involves business strategy or stakeholder priority
+> 5. For each **Proposed Change** (requirements, entity model, use case diagram):
 >    - Include the change's full detail (not just an ID reference)
 >    - Mark as `APPROVE` or `DEFER` with rationale
 >    - Defer changes that are not essential for the current cluster's use cases to function
 >
 > **Output format:**
 >
-> The PO review document must be **self-contained** — a reader must be able to understand every
+> The Nexa PO review document must be **self-contained** — a reader must be able to understand every
 > question and answer without opening the analysis file. Each critical question is duplicated
-> in full (question text, context, and options) with the PO answer immediately below it.
+> in full (question text, context, and options) as a table row with the Nexa PO answer in the last column.
 >
 > ```markdown
-> # PO Review: Cluster N — [Cluster Name]
+> # Nexa PO Review: Cluster N — [Cluster Name]
 >
 > ## Critical Question Answers
 >
-> > **Q1:** [Full question text — copied verbatim from the analysis]
-> > **Context:** [Full context — copied verbatim from the analysis]
-> > **Options:** a) [option] b) [option] c) [option]
-> >
-> > **PO Answer:** Option b — [one-sentence rationale referencing specific requirement] `CONFIDENT`
->
-> > **Q2:** [Full question text — copied verbatim from the analysis]
-> > **Context:** [Full context — copied verbatim from the analysis]
-> > **Options:** a) [option] b) [option] c) [option]
-> >
-> > **PO Answer:** Option c — [one-sentence rationale explaining why this needs human input] `NEEDS_HUMAN`
->
-> [Repeat for each critical question]
+> | #  | Question | Context | Options | Nexa PO Answer |
+> |----|----------|---------|---------|-----------|
+> | Q1 | [Full question text — copied verbatim from the analysis] | [Full context — copied verbatim] | a) [option] · b) [option] · c) [option] | Option b — [one-sentence rationale referencing specific requirement] `CONFIDENT` |
+> | Q2 | [Full question text — copied verbatim from the analysis] | [Full context — copied verbatim] | a) [option] · b) [option] · c) [option] | Option c — [one-sentence rationale explaining why this needs human input] `NEEDS_HUMAN` |
 >
 > ## High-Confidence Decision Review
 >
@@ -464,6 +495,14 @@ Agent prompt:
 > |---|----------|---------|-----------|
 > | 1 | Add "Archive Project" use case (UC-NEW) — CRUD gap: no way to remove/archive projects | AGREE | [rationale] |
 > | 2 | Add Project.archivedAt attribute — Required by the archive use case | CHALLENGE | [rationale — what's wrong and what to do instead] |
+>
+> ## MoSCoW Review
+>
+> | FR ID  | Title             | RE Category | Nexa PO Verdict | Rationale |
+> |--------|-------------------|-------------|-----------------|-----------|
+> | FR-010 | Create Project    | M           | AGREE           | Core entity creation — non-negotiable |
+> | FR-012 | Edit Project      | S           | RECLASSIFY → C  | Delete+recreate is acceptable for MVP; upgrade post-launch |
+> | FR-014 | Bulk Project Import | W         | AGREE `NEEDS_HUMAN` | Business may want this for launch data migration |
 >
 > ## Proposed Changes Review
 >
@@ -478,49 +517,56 @@ Agent prompt:
 > - **Needs human input:** [count]
 > - **Challenges:** [count]
 > - **Deferred changes:** [count]
+> - **MoSCoW reclassifications:** [count]
 > ```
 
-Write the PO agent's output to `docs/engineering/cluster-N-po-review.md`.
+Write the Nexa PO agent's output to `docs/engineering/cluster-N-po-review.md`.
 
-#### Step 2c-bis: Merge PO Answers into Analysis Document
+#### Step 2c-bis: Merge Nexa PO Answers into Analysis Document
 
-After the PO agent completes its review, update `docs/engineering/cluster-N-analysis.md` so that
-every question and decision includes the PO's answer **inline**:
+After the Nexa PO agent completes its review, update `docs/engineering/cluster-N-analysis.md` so that
+every question and decision includes the Nexa PO's answer **inline**:
 
-1. **Critical Questions:** Under each question block, fill in the `**PO Answer:**` line with the
-   PO's chosen option, rationale, and `CONFIDENT` / `NEEDS_HUMAN` tag.
-2. **High-Confidence Decisions:** Fill in the `PO Verdict` column for each decision with `AGREE`
-   or `CHALLENGE` and the PO's rationale.
-3. **Proposed Changes tables:** Add a `PO Verdict` column and fill it with `APPROVE` or `DEFER`
-   and the PO's rationale.
+1. **Critical Questions:** Fill in the `Nexa PO Answer` column for each question in the Critical Questions
+   table with the Nexa PO's chosen option, rationale, and `CONFIDENT` / `NEEDS_HUMAN` tag.
+2. **High-Confidence Decisions:** Fill in the `Nexa PO Verdict` column for each decision with `AGREE`
+   or `CHALLENGE` and the Nexa PO's rationale.
+3. **MoSCoW Classification:** Update the `Confidence` column with the Nexa PO's verdict (`AGREE` or
+   `RECLASSIFY → [new category]`). If reclassified, update the `MoSCoW` column to reflect the Nexa PO's
+   suggested category and add the rationale. Recalculate the distribution percentages.
+4. **Proposed Changes tables:** Add a `Nexa PO Verdict` column and fill it with `APPROVE` or `DEFER`
+   and the Nexa PO's rationale.
 
 After this step, the analysis document is the **single source of truth** — a reader can see every
 question, every answer, every decision, and every verdict in one place without cross-referencing
-the PO review file. The separate `cluster-N-po-review.md` is kept as an audit trail but is not
+the Nexa PO review file. The separate `cluster-N-po-review.md` is kept as an audit trail but is not
 the primary document for human review.
 
 #### Step 2d: Human Review (Reduced Scope)
 
 The analysis document (`docs/engineering/cluster-N-analysis.md`) now contains all questions and
-PO answers inline. Present to the user **only** the items that need human input, quoting the
+Nexa PO answers inline. Present to the user **only** the items that need human input, quoting the
 relevant Q&A pairs directly from the analysis document so the user sees question and answer together:
 
-1. **NEEDS_HUMAN questions** — Show the full question block including the PO's answer and rationale.
-   The PO could not confidently decide. The user must answer.
-2. **CHALLENGE items** — Show the RE's high-confidence decision and the PO's challenge rationale
+1. **NEEDS_HUMAN questions** — Show the full question row including the Nexa PO's answer and rationale.
+   The Nexa PO could not confidently decide. The user must answer.
+2. **CHALLENGE items** — Show the RE's high-confidence decision and the Nexa PO's challenge rationale
    side by side. The user breaks the tie.
-3. **Summary of CONFIDENT + AGREE items** — Presented as a compact table for optional override.
-   The user does not need to act on these unless they disagree.
+3. **MoSCoW reclassifications and NEEDS_HUMAN** — Show requirements where the Nexa PO reclassified
+   the MoSCoW category or tagged it as `NEEDS_HUMAN`. Present the RE's original classification, the
+   Nexa PO's suggestion, and both rationales. The user confirms or overrides.
+4. **Summary of CONFIDENT + AGREE items** — Presented as a compact table for optional override.
+   The user does not need to act on these unless they disagree. Include agreed MoSCoW classifications.
 
-**If the PO agent tagged zero items as NEEDS_HUMAN and raised zero challenges:**
-Print a summary of the PO's decisions and ask the user for a quick confirmation before applying.
+**If the Nexa PO agent tagged zero items as NEEDS_HUMAN and raised zero challenges:**
+Print a summary of the Nexa PO's decisions and ask the user for a quick confirmation before applying.
 
 **Step gate:** User resolves NEEDS_HUMAN items, breaks ties on challenges, and optionally
 overrides any CONFIDENT decisions.
 
 #### Step 2e: Revise if Needed
 
-If the user's answers invalidate any decisions (from the RE, the PO agent, or proposed changes):
+If the user's answers invalidate any decisions (from the RE, the Nexa PO agent, or proposed changes):
 
 1. Identify which parts of the analysis are affected by the user's answers.
 2. Revise **only the affected parts** — do not redo the entire analysis.
@@ -534,6 +580,10 @@ Apply the user-approved changes to the living documents:
 1. **Update `docs/requirements.md`:**
    - Add new functional requirements with proper IDs following the existing numbering scheme
    - Refine existing requirements in place
+   - **Add a `MoSCoW` column** to the functional requirements table (after Priority) if it does
+     not already exist. Set MoSCoW values for all requirements processed in this cluster.
+     Requirements from unprocessed clusters keep their MoSCoW cell empty until their cluster
+     is processed.
    - Do NOT add inline provenance tags — the cluster analysis file is the audit trail
 
 2. **Update `docs/entity_model.md`:**
@@ -556,6 +606,7 @@ Apply the user-approved changes to the living documents:
 ## Cluster N Complete
 
 - Requirements: +2 added, 1 refined
+- MoSCoW classified: [count] (M: [n] · S: [n] · C: [n] · W: [n])
 - Entity model: +1 attribute, +1 entity
 - Use case diagram: +1 UC, +1 relationship
 - Next: Cluster N+1 ([name]) — [UC count] use cases
@@ -582,6 +633,7 @@ After all clusters are complete, run a final analysis across the entire project:
 | Business rule conflicts        | Rules from different clusters that contradict each other           |
 | Duplicate or overlapping UCs   | Use cases from different clusters that cover the same ground       |
 | Cross-cluster granularity      | Use cases from different clusters that are actually steps in the same user journey — merge candidates missed during Phase 1 pre-check |
+| MoSCoW consistency             | Requirements classified differently across clusters for the same entity or actor — harmonize. Verify global distribution is healthy (not all Must-haves or all Won't-haves). Flag Must-have requirements that depend on Could/Won't-have requirements (priority inversion). |
 | Reference/seed data            | Data that use cases assume exists but no UC or migration creates   |
 
 3. Write the cross-cutting report to `docs/engineering/cross-cutting-analysis.md`:
@@ -606,7 +658,7 @@ After all clusters are complete, run a final analysis across the entire project:
 ### FINDING-001: [Short title]
 
 - **Type:** Entity Conflict | Dependency Gap | Traceability Gap | Business Rule Conflict |
-           Duplicate UC | Missing Seed Data | Actor Overload
+           Duplicate UC | Missing Seed Data | Actor Overload | MoSCoW Inversion
 - **Severity:** High | Medium | Low
 - **Affected:** [UC IDs, entity names, FR IDs]
 - **Description:** [What is wrong or missing]
@@ -618,6 +670,18 @@ After all clusters are complete, run a final analysis across the entire project:
 ## Critical Questions
 
 [Questions that emerged from cross-cutting analysis, max 5]
+
+## Global MoSCoW Distribution
+
+| Category              | Count | % of Total | FRs |
+|-----------------------|-------|------------|-----|
+| Must have (M)         |       |            | FR-001, FR-002, ... |
+| Should have (S)       |       |            | FR-003, ... |
+| Could have (C)        |       |            | FR-010, ... |
+| Won't have (W)        |       |            | FR-014, ... |
+| Unclassified          |       |            | [if any remain] |
+
+**Priority inversions:** [list any Must-have FRs that depend on Could/Won't-have FRs, or "None"]
 
 ## Summary
 
@@ -633,18 +697,19 @@ After all clusters are complete, run a final analysis across the entire project:
 | Mapped UCs              |       |
 | Orphan UCs              |       |
 | Cross-cutting findings  |       |
+| MoSCoW inversions       |       |
 ```
 
-4. Launch a **PO sub-agent** (same persona as Step 2c) to review the cross-cutting findings.
+4. Launch a **Nexa PO agent** (same persona as Step 2c) to review the cross-cutting findings.
 
    Agent prompt: Same as Step 2c, but replace the cluster analysis input with
-   `docs/engineering/cross-cutting-analysis.md`. The PO agent reviews each finding's
+   `docs/engineering/cross-cutting-analysis.md`. The Nexa PO agent reviews each finding's
    recommendation and each critical question using the same `CONFIDENT`/`NEEDS_HUMAN`
    and `AGREE`/`CHALLENGE`/`APPROVE`/`DEFER` tagging. Write the output to
    `docs/engineering/cross-cutting-po-review.md`.
 
-5. **Merge PO answers into the cross-cutting analysis document** (same approach as Step 2c-bis):
-   update `docs/engineering/cross-cutting-analysis.md` to include PO verdicts inline next to each
+5. **Merge Nexa PO answers into the cross-cutting analysis document** (same approach as Step 2c-bis):
+   update `docs/engineering/cross-cutting-analysis.md` to include Nexa PO verdicts inline next to each
    finding's recommendation and each critical question, so the document is self-contained.
 
 6. Present to the user only `NEEDS_HUMAN` items, challenges, and a summary of confident
@@ -672,6 +737,7 @@ After all clusters are complete, run a final analysis across the entire project:
 - **Use cases analyzed:** [count]
 - **Requirements added:** [count]
 - **Requirements refined:** [count]
+- **Requirements MoSCoW-classified:** [count] (M: [n] · S: [n] · C: [n] · W: [n])
 - **Entities added:** [count]
 - **Attributes added:** [count]
 - **Use cases added:** [count]
@@ -702,14 +768,18 @@ The project is ready for `/sprint-prepare`.
 
 **[X] clusters processed, [Y] use cases analyzed**
 
-| Change Type          | Count |
-|----------------------|-------|
-| Requirements added   |       |
-| Requirements refined |       |
-| Entities added       |       |
-| Attributes added     |       |
-| Use cases added      |       |
-| Relationships added  |       |
+| Change Type              | Count |
+|--------------------------|-------|
+| Requirements added       |       |
+| Requirements refined     |       |
+| MoSCoW: Must have        |       |
+| MoSCoW: Should have      |       |
+| MoSCoW: Could have       |       |
+| MoSCoW: Won't have       |       |
+| Entities added           |       |
+| Attributes added         |       |
+| Use cases added          |       |
+| Relationships added      |       |
 
 **Living documents updated:**
 - `docs/requirements.md`

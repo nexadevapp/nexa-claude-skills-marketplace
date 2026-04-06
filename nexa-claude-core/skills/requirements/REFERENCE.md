@@ -10,11 +10,25 @@
 
 ## Priority
 
+Used during initial requirements gathering (`/requirements`):
+
 | Priority | Description                                         |
 |----------|-----------------------------------------------------|
 | High     | Must have. Core functionality or critical quality.  |
 | Medium   | Should have. Important but system works without it. |
 | Low      | Nice to have. Can be deferred to future releases.   |
+
+## MoSCoW
+
+Added during requirements engineering (`/engineer-requirements`). Provides a more rigorous
+classification informed by CRUD analysis, traceability, and dependency evidence:
+
+| Category              | Code | Description                                                                 |
+|-----------------------|------|-----------------------------------------------------------------------------|
+| Must have             | M    | Without this the system has no value; the release cannot ship               |
+| Should have           | S    | Important and painful to omit, but the system is still usable without it    |
+| Could have            | C    | Desirable; included only if time and budget allow                           |
+| Won't have (this time)| W    | Explicitly out of scope for the current release but acknowledged for future |
 
 ## Status
 

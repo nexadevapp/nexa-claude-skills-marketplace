@@ -1,12 +1,12 @@
 # Use Case: [Use Case Name]
 
-## Overview
-
-**Use Case ID:** UC-XXX   
-**Use Case Name:** [Descriptive Name]   
-**Primary Actor:** [Role]   
-**Goal:** [What the actor wants to achieve]   
-**Status:** Draft | Reviewed | Approved | Implemented | Tested | Done | Obsolete
+|                |                                                                      |
+|----------------|----------------------------------------------------------------------|
+| Use Case ID    | UC-XXX                                                               |
+| Use Case Name  | [Descriptive Name]                                                   |
+| Primary Actor  | [Role]                                                               |
+| Goal           | [What the actor wants to achieve]                                    |
+| Status         | Draft · Reviewed · Approved · Implemented · Tested · Done · Obsolete |
 
 ## Preconditions
 

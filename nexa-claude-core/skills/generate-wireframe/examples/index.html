@@ -4,688 +4,689 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VolunteerHub — Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50: '#f6f7f4', 100: '#e8ebe3', 200: '#d2d8c8', 300: '#b3bea3',
+              400: '#94a67e', 500: '#778d62', 600: '#5d724c', 700: '#48583c',
+              800: '#3b4833', 900: '#333e2d', 950: '#1a2016',
+            },
+            terracotta: {
+              50: '#fef6f2', 100: '#fdeae1', 200: '#fcd5c3', 300: '#f9b698',
+              400: '#f48c64', 500: '#ef6b3a', 600: '#e1511f', 700: '#bb3f18',
+              800: '#96351a', 900: '#7c2f1a', 950: '#43150a',
+            },
+            sand: {
+              50: '#fdfcfa', 100: '#f9f5ef', 200: '#f2eadb', 300: '#e8d9c0',
+              400: '#dbc3a0', 500: '#cdab7f', 600: '#be9463', 700: '#a47a4e',
+              800: '#876443', 900: '#6f533a', 950: '#3b2b1d',
+            },
+            ink: {
+              50: '#f6f6f7', 100: '#e1e2e5', 200: '#c3c5cb', 300: '#9ea1aa',
+              400: '#797d88', 500: '#5f636e', 600: '#4b4e58', 700: '#3e4049',
+              800: '#35363d', 900: '#2b2c31', 950: '#1c1d20',
+            },
+          },
+          fontFamily: {
+            display: ['Sora', 'sans-serif'],
+            body: ['Source Serif 4', 'Georgia', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
   <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.5;
+    /* ── CSS Custom Properties ── */
+    :root {
+      --sage-600: #5d724c;
+      --sage-700: #48583c;
+      --terracotta-500: #ef6b3a;
+      --terracotta-600: #e1511f;
+      --sand-100: #f9f5ef;
+      --sand-200: #f2eadb;
+      --ink-800: #35363d;
+      --ink-900: #2b2c31;
     }
 
-    /* ── Wireframe Chrome ── */
-    .wf-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .wf-header { text-align: center; padding: 2rem 0; border-bottom: 2px solid #333; margin-bottom: 2rem; }
-    .wf-header h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a1a; }
-    .wf-header p { color: #616161; margin-top: 0.5rem; }
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 9999;
+    }
 
-    /* ── Table of Contents ── */
-    .wf-toc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
-    .wf-toc h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a1a; }
-    .wf-toc ul { list-style: none; columns: 2; }
-    .wf-toc li { padding: 0.25rem 0; }
-    .wf-toc a { color: #1a1a1a; text-decoration: none; border-bottom: 1px dashed #9e9e9e; }
-    .wf-toc a:hover { border-bottom-style: solid; }
-    .wf-toc .wf-toc-actor { color: #9e9e9e; font-size: 0.85rem; }
+    /* ── Smooth scroll ── */
+    html { scroll-behavior: smooth; }
 
-    /* ── Screen Section ── */
-    .wf-screen-section {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-      padding: 2rem; margin-bottom: 2rem;
-    }
-    .wf-screen-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      border-bottom: 1px solid #e0e0e0; padding-bottom: 1rem; margin-bottom: 1.5rem;
-      flex-wrap: wrap; gap: 0.5rem;
-    }
-    .wf-screen-header h2 { font-size: 1.3rem; color: #1a1a1a; }
-    .wf-screen-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: #9e9e9e; flex-wrap: wrap; }
-    .wf-screen-meta span { background: #f5f5f5; padding: 0.2rem 0.6rem; border-radius: 4px; }
-
-    /* ── Wireframe Components ── */
-    .wf-viewport {
-      background: #fafafa; border: 2px dashed #e0e0e0; border-radius: 8px;
-      padding: 1.5rem; min-height: 300px;
-    }
-    .wf-navbar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #1a1a1a; color: #fff; padding: 0.75rem 1.5rem; border-radius: 6px;
-      margin-bottom: 1rem;
-    }
-    .wf-navbar-logo { font-weight: 700; font-size: 1.1rem; }
-    .wf-navbar-links { display: flex; gap: 1rem; }
-    .wf-navbar-links a { color: #e0e0e0; text-decoration: none; font-size: 0.9rem; }
-    .wf-navbar-links a.active { color: #fff; font-weight: 600; }
-    .wf-sidebar {
-      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 1rem; min-width: 200px;
-    }
-    .wf-sidebar-item {
-      padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.9rem;
-      cursor: default; margin-bottom: 0.25rem;
-    }
-    .wf-sidebar-item.active { background: #e0e0e0; font-weight: 600; }
-    .wf-card {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 1rem; margin-bottom: 0.75rem;
-    }
-    .wf-card-title { font-weight: 600; margin-bottom: 0.5rem; }
-    .wf-btn {
-      display: inline-block; padding: 0.5rem 1.25rem; border-radius: 6px;
-      font-size: 0.9rem; font-weight: 500; cursor: default; text-decoration: none;
-      border: none;
-    }
-    .wf-btn-primary { background: #333; color: #fff; }
-    .wf-btn-secondary { background: #fff; border: 1px solid #9e9e9e; color: #333; }
-    .wf-input {
-      display: block; width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0;
-      border-radius: 6px; background: #fff; font-size: 0.9rem; color: #9e9e9e;
-      margin-bottom: 0.75rem;
-    }
-    .wf-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; color: #616161; }
-    .wf-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .wf-table th { text-align: left; padding: 0.5rem; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; font-weight: 600; }
-    .wf-table td { padding: 0.5rem; border-bottom: 1px solid #e0e0e0; }
-    .wf-placeholder {
-      background: #f5f5f5; border: 2px dashed #e0e0e0; border-radius: 6px;
-      padding: 2rem; text-align: center; color: #9e9e9e; font-size: 0.9rem;
-    }
-    .wf-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .wf-stat-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; text-align: center; }
-    .wf-stat-value { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
-    .wf-stat-label { font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem; }
-    .wf-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 500; }
-    .wf-badge-dark { background: #333; color: #fff; }
-    .wf-badge-light { background: #e0e0e0; color: #616161; }
-    .wf-divider { border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; }
-
-    /* ── Screen Annotations ── */
+    /* ── Annotations ── */
     .wf-annotation {
-      background: #fffde7; border-left: 3px solid #fbc02d; padding: 0.75rem 1rem;
-      font-size: 0.85rem; color: #616161; margin-bottom: 1rem; border-radius: 0 4px 4px 0;
+      background: linear-gradient(135deg, #f9f5ef, #f2eadb);
+      border-left: 3px solid var(--terracotta-500);
+      padding: 0.75rem 1rem;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.85rem;
+      color: #4b4e58;
+      margin-bottom: 1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
     }
-    .wf-annotation strong { color: #333; }
+    .wf-annotation strong { color: var(--ink-800); }
+    .wf-annotation a { color: var(--sage-700); text-decoration: underline; text-underline-offset: 2px; }
 
-    /* ── Navigation Map ── */
-    .wf-nav-map {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-      padding: 2rem; margin-bottom: 2rem;
+    /* ── Card hover ── */
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .wf-nav-map h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #1a1a1a; }
-    .wf-nav-flow {
-      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-      margin-bottom: 0.75rem;
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
-    .wf-nav-node {
-      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 0.4rem 0.8rem; font-size: 0.85rem;
+
+    /* ── Fade-in animation ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .wf-nav-node a { color: #1a1a1a; text-decoration: none; }
-    .wf-nav-arrow { color: #9e9e9e; font-size: 0.85rem; }
-    .wf-flow-label { font-size: 0.75rem; color: #9e9e9e; font-style: italic; }
+    .animate-fade-up {
+      animation: fadeUp 0.5s ease-out forwards;
+    }
   </style>
 </head>
-<body>
+<body class="bg-sand-50 text-ink-800 antialiased">
 
-<div class="wf-container">
+<div class="max-w-[1400px] mx-auto px-6 py-8">
 
   <!-- ============================================================ -->
   <!-- HEADER -->
   <!-- ============================================================ -->
-  <div class="wf-header">
-    <h1>VolunteerHub — Wireframe</h1>
-    <p>Volunteer management platform | 5 screens | Actors: Visitor, Volunteer, Admin</p>
+  <div class="text-center py-10 mb-10 border-b-2 border-sage-200">
+    <h1 class="font-display text-4xl font-bold text-sage-900 tracking-tight">VolunteerHub — Wireframe</h1>
+    <p class="mt-3 font-body text-lg text-ink-400">Volunteer management platform | 5 screens | Actors: Visitor, Volunteer, Admin</p>
   </div>
 
   <!-- ============================================================ -->
   <!-- TABLE OF CONTENTS -->
   <!-- ============================================================ -->
-  <div class="wf-toc">
-    <h2>Screens</h2>
-    <ul>
-      <li><a href="#UC-000">UC-000: Landing Page</a> <span class="wf-toc-actor">Visitor</span></li>
-      <li><a href="#UC-001">UC-001: Register</a> <span class="wf-toc-actor">Visitor</span></li>
-      <li><a href="#UC-002">UC-002: Browse Opportunities</a> <span class="wf-toc-actor">Volunteer</span></li>
-      <li><a href="#UC-003">UC-003: Opportunity Detail</a> <span class="wf-toc-actor">Volunteer</span></li>
-      <li><a href="#UC-010">UC-010: Admin Dashboard</a> <span class="wf-toc-actor">Admin</span></li>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-6 mb-10 shadow-sm">
+    <h2 class="font-display text-lg font-semibold text-sage-800 mb-4">Screens</h2>
+    <ul class="columns-2 list-none space-y-1">
+      <li class="py-1"><a href="#UC-000" class="font-display text-sm font-medium text-sage-700 hover:text-terracotta-600 transition-colors border-b border-dashed border-sage-300 hover:border-terracotta-400">UC-000: Landing Page</a> <span class="text-xs text-ink-300 ml-1">Visitor</span></li>
+      <li class="py-1"><a href="#UC-001" class="font-display text-sm font-medium text-sage-700 hover:text-terracotta-600 transition-colors border-b border-dashed border-sage-300 hover:border-terracotta-400">UC-001: Register</a> <span class="text-xs text-ink-300 ml-1">Visitor</span></li>
+      <li class="py-1"><a href="#UC-002" class="font-display text-sm font-medium text-sage-700 hover:text-terracotta-600 transition-colors border-b border-dashed border-sage-300 hover:border-terracotta-400">UC-002: Browse Opportunities</a> <span class="text-xs text-ink-300 ml-1">Volunteer</span></li>
+      <li class="py-1"><a href="#UC-003" class="font-display text-sm font-medium text-sage-700 hover:text-terracotta-600 transition-colors border-b border-dashed border-sage-300 hover:border-terracotta-400">UC-003: Opportunity Detail</a> <span class="text-xs text-ink-300 ml-1">Volunteer</span></li>
+      <li class="py-1"><a href="#UC-010" class="font-display text-sm font-medium text-sage-700 hover:text-terracotta-600 transition-colors border-b border-dashed border-sage-300 hover:border-terracotta-400">UC-010: Admin Dashboard</a> <span class="text-xs text-ink-300 ml-1">Admin</span></li>
     </ul>
   </div>
 
   <!-- ============================================================ -->
   <!-- SCREEN: UC-000 — Landing Page -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-000">
-    <div class="wf-screen-header">
-      <h2>UC-000: Landing Page</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: Visitor</span>
-        <span>Type: Landing page</span>
-        <span>Route: /</span>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm" id="UC-000">
+    <div class="flex justify-between items-baseline border-b border-sand-200 pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold text-sage-900">UC-000: Landing Page</h2>
+      <div class="flex gap-3 text-xs">
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Actor: Visitor</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Type: Landing page</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Route: /</span>
       </div>
     </div>
 
     <div class="wf-annotation">
-      <strong>Purpose:</strong> Entry point for visitors. Introduces the platform and
-      directs users to register or log in.
+      <strong>Purpose:</strong> Entry point for visitors. Introduces the platform and directs users to register or log in.
     </div>
 
-    <div class="wf-viewport">
+    <div class="bg-sand-50 rounded-2xl p-6 min-h-[400px] border border-sand-200">
       <!-- Navbar -->
-      <div class="wf-navbar">
-        <span class="wf-navbar-logo">VolunteerHub</span>
-        <div class="wf-navbar-links">
-          <a href="#UC-002">Opportunities</a>
-          <a href="#UC-001">Register</a>
-          <a href="#">Log In</a>
+      <nav class="bg-sage-800 text-white rounded-xl px-6 py-3 flex items-center justify-between mb-6">
+        <span class="font-display font-bold text-lg tracking-tight">Volunteer<span class="text-terracotta-400">Hub</span></span>
+        <div class="flex items-center gap-6">
+          <a href="#UC-002" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Opportunities</a>
+          <a href="#UC-001" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Register</a>
+          <a href="#" class="font-display text-sm bg-terracotta-500 hover:bg-terracotta-600 text-white px-4 py-1.5 rounded-lg transition-colors">Log In</a>
         </div>
-      </div>
+      </nav>
 
       <!-- Hero Section -->
-      <div style="text-align: center; padding: 3rem 2rem; background: #e0e0e0; border-radius: 6px; margin-bottom: 1.5rem;">
-        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #1a1a1a;">Make a difference in your community</h2>
-        <p style="color: #616161; margin-bottom: 1.5rem;">Find volunteer opportunities that match your skills and interests.</p>
-        <a href="#UC-001" class="wf-btn wf-btn-primary" style="margin-right: 0.5rem;">Get Started</a>
-        <a href="#UC-002" class="wf-btn wf-btn-secondary">Browse Opportunities</a>
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sage-700 via-sage-800 to-sage-950 text-white px-10 py-16 mb-8">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 30% 50%, rgba(239,107,58,0.4), transparent 60%), radial-gradient(circle at 80% 20%, rgba(119,141,98,0.3), transparent 50%);"></div>
+        <div class="relative text-center max-w-2xl mx-auto">
+          <h2 class="font-display text-3xl font-bold mb-3 tracking-tight">Make a difference in your community</h2>
+          <p class="font-body text-sage-200 text-lg mb-8">Find volunteer opportunities that match your skills and interests.</p>
+          <div class="flex justify-center gap-4">
+            <a href="#UC-001" class="font-display text-sm font-semibold bg-terracotta-500 hover:bg-terracotta-600 text-white px-6 py-3 rounded-xl transition-colors shadow-lg shadow-terracotta-500/25">Get Started</a>
+            <a href="#UC-002" class="font-display text-sm font-medium bg-white/10 hover:bg-white/20 backdrop-blur text-white px-6 py-3 rounded-xl border border-white/20 transition-colors">Browse Opportunities</a>
+          </div>
+        </div>
       </div>
 
       <!-- Stats Row -->
-      <div class="wf-stats-grid" style="margin-bottom: 1.5rem;">
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">2,450</div>
-          <div class="wf-stat-label">Active Volunteers</div>
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-5 text-center shadow-sm border border-sand-100 card-hover">
+          <div class="font-display text-2xl font-bold text-sage-800">2,450</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Active Volunteers</div>
         </div>
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">186</div>
-          <div class="wf-stat-label">Open Opportunities</div>
+        <div class="bg-white rounded-xl p-5 text-center shadow-sm border border-sand-100 card-hover">
+          <div class="font-display text-2xl font-bold text-sage-800">186</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Open Opportunities</div>
         </div>
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">12,800</div>
-          <div class="wf-stat-label">Hours Contributed</div>
+        <div class="bg-white rounded-xl p-5 text-center shadow-sm border border-sand-100 card-hover">
+          <div class="font-display text-2xl font-bold text-sage-800">12,800</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Hours Contributed</div>
         </div>
       </div>
 
       <!-- Featured Opportunities -->
-      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a1a;">Featured Opportunities</h3>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-        <div class="wf-card">
-          <div class="wf-card-title">Beach Cleanup</div>
-          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">Ocean Conservation Society</p>
-          <span class="wf-badge wf-badge-dark">Environment</span>
+      <h3 class="font-display text-lg font-semibold text-sage-800 mb-4">Featured Opportunities</h3>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100 card-hover">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-display text-xs font-semibold bg-sage-100 text-sage-700 px-2.5 py-1 rounded-full">Environment</span>
+          </div>
+          <h4 class="font-display font-semibold text-ink-800 mb-1">Beach Cleanup</h4>
+          <p class="font-body text-sm text-ink-400">Ocean Conservation Society</p>
         </div>
-        <div class="wf-card">
-          <div class="wf-card-title">Math Tutoring</div>
-          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">City Youth Center</p>
-          <span class="wf-badge wf-badge-dark">Education</span>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100 card-hover">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-display text-xs font-semibold bg-terracotta-100 text-terracotta-700 px-2.5 py-1 rounded-full">Education</span>
+          </div>
+          <h4 class="font-display font-semibold text-ink-800 mb-1">Math Tutoring</h4>
+          <p class="font-body text-sm text-ink-400">City Youth Center</p>
         </div>
-        <div class="wf-card">
-          <div class="wf-card-title">Food Drive</div>
-          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">Community Food Bank</p>
-          <span class="wf-badge wf-badge-dark">Social</span>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100 card-hover">
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-display text-xs font-semibold bg-sand-200 text-sand-800 px-2.5 py-1 rounded-full">Social</span>
+          </div>
+          <h4 class="font-display font-semibold text-ink-800 mb-1">Food Drive</h4>
+          <p class="font-body text-sm text-ink-400">Community Food Bank</p>
         </div>
       </div>
     </div>
 
-    <div class="wf-annotation">
-      <strong>Navigation:</strong> "Get Started" and "Register" navigate to
-      <a href="#UC-001">UC-001: Register</a>. "Browse Opportunities" navigates to
-      <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" navigates to the
-      login screen (not wireframed — separate use case).
+    <div class="wf-annotation mt-4">
+      <strong>Navigation:</strong> "Get Started" and "Register" navigate to <a href="#UC-001">UC-001: Register</a>. "Browse Opportunities" navigates to <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" navigates to the login screen (not wireframed — separate use case).
     </div>
   </div>
 
   <!-- ============================================================ -->
   <!-- SCREEN: UC-001 — Register -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-001">
-    <div class="wf-screen-header">
-      <h2>UC-001: Register</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: Visitor</span>
-        <span>Type: Form</span>
-        <span>Route: /register</span>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm" id="UC-001">
+    <div class="flex justify-between items-baseline border-b border-sand-200 pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold text-sage-900">UC-001: Register</h2>
+      <div class="flex gap-3 text-xs">
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Actor: Visitor</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Type: Form</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Route: /register</span>
       </div>
     </div>
 
     <div class="wf-annotation">
-      <strong>Purpose:</strong> New users create an account by providing their personal
-      information, selecting skills, and agreeing to terms.
+      <strong>Purpose:</strong> New users create an account by providing their personal information, selecting skills, and agreeing to terms.
     </div>
 
-    <div class="wf-viewport">
+    <div class="bg-sand-50 rounded-2xl p-6 min-h-[400px] border border-sand-200">
       <!-- Navbar (same as landing) -->
-      <div class="wf-navbar">
-        <span class="wf-navbar-logo">VolunteerHub</span>
-        <div class="wf-navbar-links">
-          <a href="#UC-002">Opportunities</a>
-          <a href="#UC-001" class="active">Register</a>
-          <a href="#">Log In</a>
+      <nav class="bg-sage-800 text-white rounded-xl px-6 py-3 flex items-center justify-between mb-6">
+        <span class="font-display font-bold text-lg tracking-tight">Volunteer<span class="text-terracotta-400">Hub</span></span>
+        <div class="flex items-center gap-6">
+          <a href="#UC-002" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Opportunities</a>
+          <a href="#UC-001" class="font-display text-sm text-white font-semibold">Register</a>
+          <a href="#" class="font-display text-sm bg-terracotta-500 hover:bg-terracotta-600 text-white px-4 py-1.5 rounded-lg transition-colors">Log In</a>
         </div>
-      </div>
+      </nav>
 
       <!-- Registration Form -->
-      <div style="max-width: 480px; margin: 2rem auto;">
-        <h2 style="font-size: 1.3rem; text-align: center; margin-bottom: 1.5rem; color: #1a1a1a;">Create your account</h2>
+      <div class="max-w-lg mx-auto py-8">
+        <div class="text-center mb-8">
+          <h2 class="font-display text-2xl font-bold text-sage-900 mb-2">Create your account</h2>
+          <p class="font-body text-ink-400">Join thousands of volunteers making a difference</p>
+        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-          <div>
-            <label class="wf-label">First Name</label>
-            <input class="wf-input" placeholder="Emma">
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-sand-100">
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">First Name</label>
+              <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="Emma">
+            </div>
+            <div>
+              <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Last Name</label>
+              <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="Johnson">
+            </div>
           </div>
-          <div>
-            <label class="wf-label">Last Name</label>
-            <input class="wf-input" placeholder="Johnson">
+
+          <div class="mb-4">
+            <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Email</label>
+            <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="emma.johnson@example.com">
           </div>
+
+          <div class="mb-4">
+            <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Password</label>
+            <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="********" type="password">
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Phone <span class="text-ink-300">(optional)</span></label>
+            <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="+1 555 123 4567">
+          </div>
+
+          <div class="mb-4">
+            <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">City</label>
+            <input class="w-full px-3.5 py-2.5 bg-sand-50 border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="San Francisco">
+          </div>
+
+          <div class="mb-5">
+            <label class="block font-display text-xs font-medium text-ink-500 mb-2">Skills</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="font-display text-xs font-medium bg-sand-100 text-ink-500 px-3 py-1.5 rounded-full border border-sand-200 cursor-pointer hover:bg-sage-100 hover:text-sage-700 hover:border-sage-300 transition-colors">Teaching</span>
+              <span class="font-display text-xs font-medium bg-sage-100 text-sage-700 px-3 py-1.5 rounded-full border border-sage-300">First Aid</span>
+              <span class="font-display text-xs font-medium bg-sand-100 text-ink-500 px-3 py-1.5 rounded-full border border-sand-200 cursor-pointer hover:bg-sage-100 hover:text-sage-700 hover:border-sage-300 transition-colors">Driving</span>
+              <span class="font-display text-xs font-medium bg-sand-100 text-ink-500 px-3 py-1.5 rounded-full border border-sand-200 cursor-pointer hover:bg-sage-100 hover:text-sage-700 hover:border-sage-300 transition-colors">Cooking</span>
+              <span class="font-display text-xs font-medium bg-sand-100 text-ink-500 px-3 py-1.5 rounded-full border border-sand-200 cursor-pointer hover:bg-sage-100 hover:text-sage-700 hover:border-sage-300 transition-colors">Photography</span>
+              <span class="font-display text-xs font-medium text-terracotta-600 px-3 py-1.5 rounded-full border border-dashed border-terracotta-300 cursor-pointer hover:bg-terracotta-50 transition-colors">+ More</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 mb-6">
+            <input type="checkbox" class="mt-1 accent-sage-600 w-4 h-4">
+            <span class="font-body text-sm text-ink-400">I agree to the <a href="#" class="text-sage-600 underline underline-offset-2">Terms of Service</a> and <a href="#" class="text-sage-600 underline underline-offset-2">Privacy Policy</a></span>
+          </div>
+
+          <button class="w-full font-display text-sm font-semibold bg-sage-700 hover:bg-sage-800 text-white py-3 rounded-xl transition-colors shadow-sm">Create Account</button>
+
+          <p class="text-center mt-5 font-body text-sm text-ink-400">
+            Already have an account? <a href="#" class="text-sage-600 font-medium underline underline-offset-2">Log In</a>
+          </p>
         </div>
-
-        <label class="wf-label">Email</label>
-        <input class="wf-input" placeholder="emma.johnson@example.com">
-
-        <label class="wf-label">Password</label>
-        <input class="wf-input" placeholder="********">
-
-        <label class="wf-label">Phone (optional)</label>
-        <input class="wf-input" placeholder="+1 555 123 4567">
-
-        <label class="wf-label">City</label>
-        <input class="wf-input" placeholder="San Francisco">
-
-        <label class="wf-label">Skills</label>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
-          <span class="wf-badge wf-badge-light">Teaching</span>
-          <span class="wf-badge wf-badge-dark">First Aid</span>
-          <span class="wf-badge wf-badge-light">Driving</span>
-          <span class="wf-badge wf-badge-light">Cooking</span>
-          <span class="wf-badge wf-badge-light">Photography</span>
-          <span class="wf-badge wf-badge-light">+ More</span>
-        </div>
-
-        <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 1.5rem;">
-          <input type="checkbox" style="margin-top: 0.25rem;">
-          <span style="font-size: 0.85rem; color: #616161;">I agree to the Terms of Service and Privacy Policy</span>
-        </div>
-
-        <button class="wf-btn wf-btn-primary" style="width: 100%;">Create Account</button>
-
-        <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: #616161;">
-          Already have an account? <a href="#" style="color: #333;">Log In</a>
-        </p>
       </div>
     </div>
 
-    <div class="wf-annotation">
-      <strong>Fields:</strong> First Name (User.firstName), Last Name (User.lastName),
-      Email (User.email), Password (User.passwordHash), Phone (User.phone),
-      City (User.city), Skills (User.skills — multi-select from Skill entity).
+    <div class="wf-annotation mt-4">
+      <strong>Fields:</strong> First Name (User.firstName), Last Name (User.lastName), Email (User.email), Password (User.passwordHash), Phone (User.phone), City (User.city), Skills (User.skills — multi-select from Skill entity).
     </div>
     <div class="wf-annotation">
-      <strong>Navigation:</strong> On successful registration, redirects to
-      <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" link navigates to login screen.
+      <strong>Navigation:</strong> On successful registration, redirects to <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" link navigates to login screen.
     </div>
   </div>
 
   <!-- ============================================================ -->
   <!-- SCREEN: UC-002 — Browse Opportunities -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-002">
-    <div class="wf-screen-header">
-      <h2>UC-002: Browse Opportunities</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: Volunteer</span>
-        <span>Type: List</span>
-        <span>Route: /opportunities</span>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm" id="UC-002">
+    <div class="flex justify-between items-baseline border-b border-sand-200 pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold text-sage-900">UC-002: Browse Opportunities</h2>
+      <div class="flex gap-3 text-xs">
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Actor: Volunteer</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Type: List</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Route: /opportunities</span>
       </div>
     </div>
 
     <div class="wf-annotation">
-      <strong>Purpose:</strong> Volunteers search and filter available volunteer opportunities,
-      then select one to view its details.
+      <strong>Purpose:</strong> Volunteers search and filter available volunteer opportunities, then select one to view its details.
     </div>
 
-    <div class="wf-viewport">
+    <div class="bg-sand-50 rounded-2xl p-6 min-h-[400px] border border-sand-200">
       <!-- Navbar (authenticated) -->
-      <div class="wf-navbar">
-        <span class="wf-navbar-logo">VolunteerHub</span>
-        <div class="wf-navbar-links">
-          <a href="#UC-002" class="active">Opportunities</a>
-          <a href="#">My Applications</a>
-          <a href="#">Profile</a>
-          <a href="#">Log Out</a>
+      <nav class="bg-sage-800 text-white rounded-xl px-6 py-3 flex items-center justify-between mb-6">
+        <span class="font-display font-bold text-lg tracking-tight">Volunteer<span class="text-terracotta-400">Hub</span></span>
+        <div class="flex items-center gap-6">
+          <a href="#UC-002" class="font-display text-sm text-white font-semibold">Opportunities</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">My Applications</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Profile</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Log Out</a>
         </div>
-      </div>
+      </nav>
 
       <!-- Search & Filters -->
-      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end;">
-        <div style="flex: 1;">
-          <label class="wf-label">Search</label>
-          <input class="wf-input" placeholder="Search opportunities..." style="margin-bottom: 0;">
+      <div class="flex gap-3 items-end mb-6">
+        <div class="flex-1">
+          <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Search</label>
+          <input class="w-full px-3.5 py-2.5 bg-white border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300 focus:outline-none focus:ring-2 focus:ring-sage-300 focus:border-sage-400 transition-colors" placeholder="Search opportunities...">
         </div>
-        <div style="width: 180px;">
-          <label class="wf-label">Category</label>
-          <input class="wf-input" placeholder="All Categories" style="margin-bottom: 0;">
+        <div class="w-44">
+          <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Category</label>
+          <input class="w-full px-3.5 py-2.5 bg-white border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300" placeholder="All Categories">
         </div>
-        <div style="width: 180px;">
-          <label class="wf-label">Location</label>
-          <input class="wf-input" placeholder="Any Location" style="margin-bottom: 0;">
+        <div class="w-44">
+          <label class="block font-display text-xs font-medium text-ink-500 mb-1.5">Location</label>
+          <input class="w-full px-3.5 py-2.5 bg-white border border-sand-200 rounded-xl font-body text-sm text-ink-800 placeholder-ink-300" placeholder="Any Location">
         </div>
-        <button class="wf-btn wf-btn-primary">Search</button>
+        <button class="font-display text-sm font-semibold bg-sage-700 hover:bg-sage-800 text-white px-5 py-2.5 rounded-xl transition-colors">Search</button>
       </div>
 
-      <!-- Results count -->
-      <p style="font-size: 0.85rem; color: #9e9e9e; margin-bottom: 1rem;">Showing 42 opportunities</p>
+      <p class="font-body text-sm text-ink-300 mb-4">Showing 42 opportunities</p>
 
       <!-- Opportunity List -->
-      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">Beach Cleanup — Saturday Crew</a></div>
-          <p style="font-size: 0.85rem; color: #616161;">Ocean Conservation Society &middot; Santa Cruz &middot; Dec 14, 2025</p>
-        </div>
-        <div style="text-align: right;">
-          <span class="wf-badge wf-badge-dark">Environment</span>
-          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">8 / 20 spots filled</p>
-        </div>
-      </div>
+      <div class="space-y-3">
+        <a href="#UC-003" class="block bg-white rounded-xl p-5 border border-sand-100 shadow-sm card-hover no-underline">
+          <div class="flex justify-between items-center">
+            <div>
+              <h4 class="font-display font-semibold text-ink-800 mb-1">Beach Cleanup — Saturday Crew</h4>
+              <p class="font-body text-sm text-ink-400">Ocean Conservation Society &middot; Santa Cruz &middot; Dec 14, 2025</p>
+            </div>
+            <div class="text-right">
+              <span class="font-display text-xs font-semibold bg-sage-100 text-sage-700 px-2.5 py-1 rounded-full">Environment</span>
+              <p class="font-body text-xs text-ink-300 mt-1.5">8 / 20 spots filled</p>
+            </div>
+          </div>
+        </a>
 
-      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">After-School Math Tutoring</a></div>
-          <p style="font-size: 0.85rem; color: #616161;">City Youth Center &middot; Downtown &middot; Ongoing</p>
-        </div>
-        <div style="text-align: right;">
-          <span class="wf-badge wf-badge-dark">Education</span>
-          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">3 / 10 spots filled</p>
-        </div>
-      </div>
+        <a href="#UC-003" class="block bg-white rounded-xl p-5 border border-sand-100 shadow-sm card-hover no-underline">
+          <div class="flex justify-between items-center">
+            <div>
+              <h4 class="font-display font-semibold text-ink-800 mb-1">After-School Math Tutoring</h4>
+              <p class="font-body text-sm text-ink-400">City Youth Center &middot; Downtown &middot; Ongoing</p>
+            </div>
+            <div class="text-right">
+              <span class="font-display text-xs font-semibold bg-terracotta-100 text-terracotta-700 px-2.5 py-1 rounded-full">Education</span>
+              <p class="font-body text-xs text-ink-300 mt-1.5">3 / 10 spots filled</p>
+            </div>
+          </div>
+        </a>
 
-      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">Holiday Food Drive Coordinator</a></div>
-          <p style="font-size: 0.85rem; color: #616161;">Community Food Bank &middot; Bay Area &middot; Dec 20-25, 2025</p>
-        </div>
-        <div style="text-align: right;">
-          <span class="wf-badge wf-badge-dark">Social</span>
-          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">12 / 15 spots filled</p>
-        </div>
+        <a href="#UC-003" class="block bg-white rounded-xl p-5 border border-sand-100 shadow-sm card-hover no-underline">
+          <div class="flex justify-between items-center">
+            <div>
+              <h4 class="font-display font-semibold text-ink-800 mb-1">Holiday Food Drive Coordinator</h4>
+              <p class="font-body text-sm text-ink-400">Community Food Bank &middot; Bay Area &middot; Dec 20-25, 2025</p>
+            </div>
+            <div class="text-right">
+              <span class="font-display text-xs font-semibold bg-sand-200 text-sand-800 px-2.5 py-1 rounded-full">Social</span>
+              <p class="font-body text-xs text-ink-300 mt-1.5">12 / 15 spots filled</p>
+            </div>
+          </div>
+        </a>
       </div>
 
       <!-- Pagination -->
-      <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;">
-        <span class="wf-btn wf-btn-primary" style="padding: 0.4rem 0.8rem;">1</span>
-        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">2</span>
-        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">3</span>
-        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">&rarr;</span>
+      <div class="flex justify-center gap-2 mt-6">
+        <span class="font-display text-sm font-medium bg-sage-700 text-white px-3.5 py-1.5 rounded-lg">1</span>
+        <span class="font-display text-sm font-medium bg-white text-ink-500 border border-sand-200 px-3.5 py-1.5 rounded-lg hover:bg-sand-50 cursor-pointer transition-colors">2</span>
+        <span class="font-display text-sm font-medium bg-white text-ink-500 border border-sand-200 px-3.5 py-1.5 rounded-lg hover:bg-sand-50 cursor-pointer transition-colors">3</span>
+        <span class="font-display text-sm font-medium bg-white text-ink-500 border border-sand-200 px-3.5 py-1.5 rounded-lg hover:bg-sand-50 cursor-pointer transition-colors">&rarr;</span>
       </div>
     </div>
 
-    <div class="wf-annotation">
-      <strong>Data:</strong> Each row displays Opportunity.title, Organization.name,
-      Opportunity.location, Opportunity.date, Opportunity.category,
-      Opportunity.spotsAvailable / Opportunity.spotsTotal.
+    <div class="wf-annotation mt-4">
+      <strong>Data:</strong> Each row displays Opportunity.title, Organization.name, Opportunity.location, Opportunity.date, Opportunity.category, Opportunity.spotsAvailable / Opportunity.spotsTotal.
     </div>
     <div class="wf-annotation">
-      <strong>Navigation:</strong> Clicking an opportunity title navigates to
-      <a href="#UC-003">UC-003: Opportunity Detail</a>.
+      <strong>Navigation:</strong> Clicking an opportunity title navigates to <a href="#UC-003">UC-003: Opportunity Detail</a>.
     </div>
   </div>
 
   <!-- ============================================================ -->
   <!-- SCREEN: UC-003 — Opportunity Detail -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-003">
-    <div class="wf-screen-header">
-      <h2>UC-003: Opportunity Detail</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: Volunteer</span>
-        <span>Type: Detail view</span>
-        <span>Route: /opportunities/:id</span>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm" id="UC-003">
+    <div class="flex justify-between items-baseline border-b border-sand-200 pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold text-sage-900">UC-003: Opportunity Detail</h2>
+      <div class="flex gap-3 text-xs">
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Actor: Volunteer</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Type: Detail view</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Route: /opportunities/:id</span>
       </div>
     </div>
 
     <div class="wf-annotation">
-      <strong>Purpose:</strong> Volunteer views full details of an opportunity and applies
-      to participate.
+      <strong>Purpose:</strong> Volunteer views full details of an opportunity and applies to participate.
     </div>
 
-    <div class="wf-viewport">
+    <div class="bg-sand-50 rounded-2xl p-6 min-h-[400px] border border-sand-200">
       <!-- Navbar (authenticated) -->
-      <div class="wf-navbar">
-        <span class="wf-navbar-logo">VolunteerHub</span>
-        <div class="wf-navbar-links">
-          <a href="#UC-002" class="active">Opportunities</a>
-          <a href="#">My Applications</a>
-          <a href="#">Profile</a>
-          <a href="#">Log Out</a>
+      <nav class="bg-sage-800 text-white rounded-xl px-6 py-3 flex items-center justify-between mb-6">
+        <span class="font-display font-bold text-lg tracking-tight">Volunteer<span class="text-terracotta-400">Hub</span></span>
+        <div class="flex items-center gap-6">
+          <a href="#UC-002" class="font-display text-sm text-white font-semibold">Opportunities</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">My Applications</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Profile</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Log Out</a>
         </div>
-      </div>
+      </nav>
 
       <!-- Breadcrumb -->
-      <p style="font-size: 0.85rem; color: #9e9e9e; margin-bottom: 1rem;">
-        <a href="#UC-002" style="color: #616161;">Opportunities</a> &rsaquo; Beach Cleanup — Saturday Crew
+      <p class="font-body text-sm text-ink-300 mb-4">
+        <a href="#UC-002" class="text-sage-600 hover:text-sage-800 transition-colors">Opportunities</a>
+        <span class="mx-2">&rsaquo;</span>
+        <span class="text-ink-500">Beach Cleanup — Saturday Crew</span>
       </p>
 
       <!-- Detail Content -->
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-        <!-- Main Content -->
-        <div>
-          <h2 style="font-size: 1.4rem; color: #1a1a1a; margin-bottom: 0.5rem;">Beach Cleanup — Saturday Crew</h2>
-          <p style="color: #616161; margin-bottom: 1rem;">Ocean Conservation Society</p>
+      <div class="grid grid-cols-3 gap-6">
+        <!-- Main Content (2 cols) -->
+        <div class="col-span-2">
+          <h2 class="font-display text-2xl font-bold text-sage-900 mb-1">Beach Cleanup — Saturday Crew</h2>
+          <p class="font-body text-ink-400 mb-5">Ocean Conservation Society</p>
 
-          <div class="wf-placeholder" style="margin-bottom: 1.5rem;">Image: Opportunity cover photo (800 x 300)</div>
+          <div class="bg-sage-100 rounded-xl flex items-center justify-center h-48 mb-6 border border-sage-200">
+            <span class="font-display text-sm text-sage-500">Image: Opportunity cover photo (800 &times; 300)</span>
+          </div>
 
-          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Description</h3>
-          <p style="font-size: 0.9rem; color: #616161; margin-bottom: 1.5rem;">
+          <h3 class="font-display text-sm font-semibold text-sage-800 mb-2">Description</h3>
+          <p class="font-body text-sm text-ink-500 mb-6 leading-relaxed">
             Join us for our weekly beach cleanup at Santa Cruz Main Beach. We provide all equipment
             including gloves, bags, and grabbers. Great for families and groups. No experience needed.
           </p>
 
-          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Requirements</h3>
-          <ul style="font-size: 0.9rem; color: #616161; padding-left: 1.5rem; margin-bottom: 1.5rem;">
+          <h3 class="font-display text-sm font-semibold text-sage-800 mb-2">Requirements</h3>
+          <ul class="font-body text-sm text-ink-500 pl-5 mb-6 space-y-1 list-disc">
             <li>Must be at least 16 years old</li>
             <li>Able to walk on sand for 2-3 hours</li>
             <li>Bring water and sunscreen</li>
           </ul>
 
-          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Location</h3>
-          <div class="wf-placeholder">Map: Santa Cruz Main Beach (embedded map placeholder)</div>
+          <h3 class="font-display text-sm font-semibold text-sage-800 mb-2">Location</h3>
+          <div class="bg-sand-200 rounded-xl flex items-center justify-center h-40 border border-sand-300">
+            <span class="font-display text-sm text-sand-600">Map: Santa Cruz Main Beach</span>
+          </div>
         </div>
 
         <!-- Sidebar -->
         <div>
-          <div class="wf-card">
-            <div class="wf-card-title">Details</div>
-            <hr class="wf-divider">
-            <table style="width: 100%; font-size: 0.85rem;">
-              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Date</td><td style="text-align: right;">Dec 14, 2025</td></tr>
-              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Time</td><td style="text-align: right;">9:00 AM – 12:00 PM</td></tr>
-              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Duration</td><td style="text-align: right;">3 hours</td></tr>
-              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Category</td><td style="text-align: right;"><span class="wf-badge wf-badge-dark">Environment</span></td></tr>
-              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Spots</td><td style="text-align: right;">8 / 20 filled</td></tr>
-            </table>
-            <hr class="wf-divider">
-            <button class="wf-btn wf-btn-primary" style="width: 100%;">Apply Now</button>
+          <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100 mb-4">
+            <h4 class="font-display font-semibold text-ink-800 mb-3">Details</h4>
+            <div class="border-t border-sand-100 pt-3 space-y-2.5">
+              <div class="flex justify-between font-body text-sm">
+                <span class="text-ink-400">Date</span><span class="text-ink-800 font-medium">Dec 14, 2025</span>
+              </div>
+              <div class="flex justify-between font-body text-sm">
+                <span class="text-ink-400">Time</span><span class="text-ink-800 font-medium">9:00 AM – 12:00 PM</span>
+              </div>
+              <div class="flex justify-between font-body text-sm">
+                <span class="text-ink-400">Duration</span><span class="text-ink-800 font-medium">3 hours</span>
+              </div>
+              <div class="flex justify-between font-body text-sm items-center">
+                <span class="text-ink-400">Category</span>
+                <span class="font-display text-xs font-semibold bg-sage-100 text-sage-700 px-2.5 py-0.5 rounded-full">Environment</span>
+              </div>
+              <div class="flex justify-between font-body text-sm">
+                <span class="text-ink-400">Spots</span><span class="text-ink-800 font-medium">8 / 20 filled</span>
+              </div>
+            </div>
+            <div class="border-t border-sand-100 mt-4 pt-4">
+              <button class="w-full font-display text-sm font-semibold bg-terracotta-500 hover:bg-terracotta-600 text-white py-3 rounded-xl transition-colors shadow-sm shadow-terracotta-500/20">Apply Now</button>
+            </div>
           </div>
 
-          <div class="wf-card" style="margin-top: 0.75rem;">
-            <div class="wf-card-title">Organization</div>
-            <p style="font-size: 0.85rem; color: #616161;">Ocean Conservation Society</p>
-            <p style="font-size: 0.8rem; color: #9e9e9e;">12 active opportunities &middot; 340 volunteers</p>
+          <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+            <h4 class="font-display font-semibold text-ink-800 mb-1">Organization</h4>
+            <p class="font-body text-sm text-ink-500">Ocean Conservation Society</p>
+            <p class="font-body text-xs text-ink-300 mt-1">12 active opportunities &middot; 340 volunteers</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="wf-annotation">
-      <strong>Data:</strong> Opportunity.title, Opportunity.description, Opportunity.requirements,
-      Opportunity.date, Opportunity.time, Opportunity.duration, Opportunity.category,
-      Opportunity.spotsAvailable, Opportunity.spotsTotal, Opportunity.coverImage,
-      Organization.name, Organization.activeOpportunities, Organization.totalVolunteers.
+    <div class="wf-annotation mt-4">
+      <strong>Data:</strong> Opportunity.title, Opportunity.description, Opportunity.requirements, Opportunity.date, Opportunity.time, Opportunity.duration, Opportunity.category, Opportunity.spotsAvailable, Opportunity.spotsTotal, Opportunity.coverImage, Organization.name, Organization.activeOpportunities, Organization.totalVolunteers.
     </div>
     <div class="wf-annotation">
-      <strong>Navigation:</strong> "Apply Now" submits the application (triggers confirmation
-      state on this screen). Breadcrumb navigates back to
-      <a href="#UC-002">UC-002: Browse Opportunities</a>.
+      <strong>Navigation:</strong> "Apply Now" submits the application (triggers confirmation state on this screen). Breadcrumb navigates back to <a href="#UC-002">UC-002: Browse Opportunities</a>.
     </div>
   </div>
 
   <!-- ============================================================ -->
   <!-- SCREEN: UC-010 — Admin Dashboard -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-010">
-    <div class="wf-screen-header">
-      <h2>UC-010: Admin Dashboard</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: Admin</span>
-        <span>Type: Dashboard</span>
-        <span>Route: /admin</span>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm" id="UC-010">
+    <div class="flex justify-between items-baseline border-b border-sand-200 pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold text-sage-900">UC-010: Admin Dashboard</h2>
+      <div class="flex gap-3 text-xs">
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Actor: Admin</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Type: Dashboard</span>
+        <span class="bg-sage-50 text-sage-600 font-display font-medium px-3 py-1 rounded-lg">Route: /admin</span>
       </div>
     </div>
 
     <div class="wf-annotation">
-      <strong>Purpose:</strong> Admin views platform-wide statistics, manages pending
-      verifications, and monitors recent activity.
+      <strong>Purpose:</strong> Admin views platform-wide statistics, manages pending verifications, and monitors recent activity.
     </div>
 
-    <div class="wf-viewport">
+    <div class="bg-sand-50 rounded-2xl p-6 min-h-[400px] border border-sand-200">
       <!-- Navbar (admin) -->
-      <div class="wf-navbar">
-        <span class="wf-navbar-logo">VolunteerHub Admin</span>
-        <div class="wf-navbar-links">
-          <a href="#UC-010" class="active">Dashboard</a>
-          <a href="#">Organizations</a>
-          <a href="#">Users</a>
-          <a href="#">Reports</a>
-          <a href="#">Log Out</a>
+      <nav class="bg-sage-800 text-white rounded-xl px-6 py-3 flex items-center justify-between mb-6">
+        <span class="font-display font-bold text-lg tracking-tight">Volunteer<span class="text-terracotta-400">Hub</span> <span class="text-sage-300 font-normal text-sm">Admin</span></span>
+        <div class="flex items-center gap-6">
+          <a href="#UC-010" class="font-display text-sm text-white font-semibold">Dashboard</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Organizations</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Users</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Reports</a>
+          <a href="#" class="font-display text-sm text-sage-200 hover:text-white transition-colors">Log Out</a>
         </div>
-      </div>
+      </nav>
 
       <!-- Stats Row -->
-      <div class="wf-stats-grid" style="margin-bottom: 1.5rem;">
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">2,450</div>
-          <div class="wf-stat-label">Total Volunteers</div>
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+          <div class="font-display text-2xl font-bold text-sage-800">2,450</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Total Volunteers</div>
         </div>
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">186</div>
-          <div class="wf-stat-label">Active Opportunities</div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+          <div class="font-display text-2xl font-bold text-sage-800">186</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Active Opportunities</div>
         </div>
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">47</div>
-          <div class="wf-stat-label">Organizations</div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+          <div class="font-display text-2xl font-bold text-sage-800">47</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Organizations</div>
         </div>
-        <div class="wf-stat-card">
-          <div class="wf-stat-value">5</div>
-          <div class="wf-stat-label">Pending Verifications</div>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-terracotta-200">
+          <div class="font-display text-2xl font-bold text-terracotta-600">5</div>
+          <div class="font-body text-sm text-ink-400 mt-1">Pending Verifications</div>
         </div>
       </div>
 
       <!-- Two-column layout -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div class="grid grid-cols-2 gap-6 mb-6">
         <!-- Pending Verifications -->
-        <div class="wf-card">
-          <div class="wf-card-title">Pending Organization Verifications</div>
-          <hr class="wf-divider">
-          <table class="wf-table">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+          <h4 class="font-display font-semibold text-ink-800 mb-4">Pending Organization Verifications</h4>
+          <table class="w-full">
             <thead>
-              <tr>
-                <th>Organization</th>
-                <th>Submitted</th>
-                <th>Action</th>
+              <tr class="border-b-2 border-sand-200">
+                <th class="font-display text-xs font-semibold text-ink-500 text-left pb-2">Organization</th>
+                <th class="font-display text-xs font-semibold text-ink-500 text-left pb-2">Submitted</th>
+                <th class="font-display text-xs font-semibold text-ink-500 text-right pb-2">Action</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Green Earth Foundation</td>
-                <td>Dec 10, 2025</td>
-                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
+            <tbody class="font-body text-sm">
+              <tr class="border-b border-sand-100">
+                <td class="py-2.5 text-ink-700">Green Earth Foundation</td>
+                <td class="py-2.5 text-ink-400">Dec 10, 2025</td>
+                <td class="py-2.5 text-right"><a href="#" class="font-display text-xs font-semibold text-terracotta-600 hover:text-terracotta-700">Review</a></td>
+              </tr>
+              <tr class="border-b border-sand-100">
+                <td class="py-2.5 text-ink-700">City Helpers Inc.</td>
+                <td class="py-2.5 text-ink-400">Dec 9, 2025</td>
+                <td class="py-2.5 text-right"><a href="#" class="font-display text-xs font-semibold text-terracotta-600 hover:text-terracotta-700">Review</a></td>
               </tr>
               <tr>
-                <td>City Helpers Inc.</td>
-                <td>Dec 9, 2025</td>
-                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
-              </tr>
-              <tr>
-                <td>Sunrise Shelter</td>
-                <td>Dec 8, 2025</td>
-                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
+                <td class="py-2.5 text-ink-700">Sunrise Shelter</td>
+                <td class="py-2.5 text-ink-400">Dec 8, 2025</td>
+                <td class="py-2.5 text-right"><a href="#" class="font-display text-xs font-semibold text-terracotta-600 hover:text-terracotta-700">Review</a></td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <!-- Recent Activity -->
-        <div class="wf-card">
-          <div class="wf-card-title">Recent Activity</div>
-          <hr class="wf-divider">
-          <div style="font-size: 0.85rem;">
-            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
-              <strong>Emma Johnson</strong> applied to Beach Cleanup
-              <span style="color: #9e9e9e; float: right;">2 min ago</span>
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-sand-100">
+          <h4 class="font-display font-semibold text-ink-800 mb-4">Recent Activity</h4>
+          <div class="space-y-0">
+            <div class="flex justify-between items-center py-2.5 border-b border-sand-50">
+              <p class="font-body text-sm text-ink-600"><strong class="text-ink-800">Emma Johnson</strong> applied to Beach Cleanup</p>
+              <span class="font-body text-xs text-ink-300 whitespace-nowrap ml-4">2 min ago</span>
             </div>
-            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
-              <strong>Green Earth Foundation</strong> submitted verification
-              <span style="color: #9e9e9e; float: right;">1 hour ago</span>
+            <div class="flex justify-between items-center py-2.5 border-b border-sand-50">
+              <p class="font-body text-sm text-ink-600"><strong class="text-ink-800">Green Earth Foundation</strong> submitted verification</p>
+              <span class="font-body text-xs text-ink-300 whitespace-nowrap ml-4">1 hour ago</span>
             </div>
-            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
-              <strong>Ocean Conservation</strong> created new opportunity
-              <span style="color: #9e9e9e; float: right;">3 hours ago</span>
+            <div class="flex justify-between items-center py-2.5 border-b border-sand-50">
+              <p class="font-body text-sm text-ink-600"><strong class="text-ink-800">Ocean Conservation</strong> created new opportunity</p>
+              <span class="font-body text-xs text-ink-300 whitespace-nowrap ml-4">3 hours ago</span>
             </div>
-            <div style="padding: 0.5rem 0;">
-              <strong>David Chen</strong> registered as volunteer
-              <span style="color: #9e9e9e; float: right;">5 hours ago</span>
+            <div class="flex justify-between items-center py-2.5">
+              <p class="font-body text-sm text-ink-600"><strong class="text-ink-800">David Chen</strong> registered as volunteer</p>
+              <span class="font-body text-xs text-ink-300 whitespace-nowrap ml-4">5 hours ago</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Chart Placeholder -->
-      <div class="wf-placeholder" style="margin-top: 1.5rem;">
-        Chart: Monthly Volunteer Registrations (bar chart — last 12 months)
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-sand-100 flex items-center justify-center h-48">
+        <span class="font-display text-sm text-ink-300">Chart: Monthly Volunteer Registrations (bar chart — last 12 months)</span>
       </div>
     </div>
 
-    <div class="wf-annotation">
-      <strong>Data:</strong> Platform-wide aggregates (User.count, Opportunity.count,
-      Organization.count, Organization.pendingVerifications), Activity log entries,
-      monthly registration chart data.
+    <div class="wf-annotation mt-4">
+      <strong>Data:</strong> Platform-wide aggregates (User.count, Opportunity.count, Organization.count, Organization.pendingVerifications), Activity log entries, monthly registration chart data.
     </div>
     <div class="wf-annotation">
-      <strong>Navigation:</strong> "Review" links navigate to Organization verification
-      detail screen. Navbar links navigate to list management screens.
+      <strong>Navigation:</strong> "Review" links navigate to Organization verification detail screen. Navbar links navigate to list management screens.
     </div>
   </div>
 
   <!-- ============================================================ -->
   <!-- NAVIGATION MAP -->
   <!-- ============================================================ -->
-  <div class="wf-nav-map">
-    <h2>Navigation Map</h2>
+  <div class="bg-white/80 backdrop-blur-sm border border-sand-200 rounded-2xl p-8 mb-10 shadow-sm">
+    <h2 class="font-display text-xl font-bold text-sage-900 mb-6">Navigation Map</h2>
 
     <!-- Visitor Flow -->
-    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem;">Visitor Flow</p>
-    <div class="wf-nav-flow">
-      <div class="wf-nav-node"><a href="#UC-000">UC-000: Landing Page</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node"><a href="#UC-001">UC-001: Register</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node"><a href="#UC-002">UC-002: Browse Opportunities</a></div>
+    <p class="font-display text-sm font-semibold text-ink-500 mb-2">Visitor Flow</p>
+    <div class="flex flex-wrap gap-2 items-center mb-5">
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-000" class="font-display text-sm text-sage-700 no-underline">UC-000: Landing Page</a></div>
+      <span class="text-ink-300 text-sm">&rarr;</span>
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-001" class="font-display text-sm text-sage-700 no-underline">UC-001: Register</a></div>
+      <span class="text-ink-300 text-sm">&rarr;</span>
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-002" class="font-display text-sm text-sage-700 no-underline">UC-002: Browse Opportunities</a></div>
     </div>
 
     <!-- Volunteer Flow -->
-    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem; margin-top: 1rem;">Volunteer Flow</p>
-    <div class="wf-nav-flow">
-      <div class="wf-nav-node"><a href="#UC-002">UC-002: Browse Opportunities</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node"><a href="#UC-003">UC-003: Opportunity Detail</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node" style="border-style: dashed;">Apply (in-page)</div>
+    <p class="font-display text-sm font-semibold text-ink-500 mb-2">Volunteer Flow</p>
+    <div class="flex flex-wrap gap-2 items-center mb-5">
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-002" class="font-display text-sm text-sage-700 no-underline">UC-002: Browse Opportunities</a></div>
+      <span class="text-ink-300 text-sm">&rarr;</span>
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-003" class="font-display text-sm text-sage-700 no-underline">UC-003: Opportunity Detail</a></div>
+      <span class="text-ink-300 text-sm">&rarr;</span>
+      <div class="bg-sand-100 border border-dashed border-sand-300 px-3 py-1.5 rounded-lg font-display text-sm text-ink-400">Apply (in-page)</div>
     </div>
 
     <!-- Admin Flow -->
-    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem; margin-top: 1rem;">Admin Flow</p>
-    <div class="wf-nav-flow">
-      <div class="wf-nav-node"><a href="#UC-010">UC-010: Admin Dashboard</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node" style="border-style: dashed;">Organization Review (not yet wireframed)</div>
+    <p class="font-display text-sm font-semibold text-ink-500 mb-2">Admin Flow</p>
+    <div class="flex flex-wrap gap-2 items-center">
+      <div class="bg-sage-50 border border-sage-200 px-3 py-1.5 rounded-lg"><a href="#UC-010" class="font-display text-sm text-sage-700 no-underline">UC-010: Admin Dashboard</a></div>
+      <span class="text-ink-300 text-sm">&rarr;</span>
+      <div class="bg-sand-100 border border-dashed border-sand-300 px-3 py-1.5 rounded-lg font-display text-sm text-ink-400">Organization Review (not yet wireframed)</div>
     </div>
   </div>
 

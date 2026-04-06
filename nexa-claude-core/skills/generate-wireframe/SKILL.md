@@ -1,10 +1,10 @@
 ---
 name: generate-wireframe
 description: >
-  Generates a low-fidelity wireframe as a single-page HTML file showing all screens,
+  Generates a high-quality wireframe as a single-page HTML file showing all screens,
   their spatial layout, and navigation flow. The wireframe establishes screen structure,
-  component placement, and information hierarchy without visual identity — colors, fonts,
-  and theming are added later by /design-screens. Supports incremental updates: new screens
+  component placement, and information hierarchy with production-grade visual design
+  powered by the frontend-design skill. Supports incremental updates: new screens
   can be added without destroying existing sections. Use when the user asks to "create a
   wireframe", "generate a wireframe", "sketch the screens", "layout the UI", or mentions
   wireframe, screen layout, UI skeleton, or low-fidelity mockup.
@@ -15,9 +15,14 @@ description: >
 ## Instructions
 
 Create or update the project wireframe at `docs/wireframes/index.html`. The wireframe is a
-single-page HTML document that shows every user-facing screen as a low-fidelity layout —
-boxes, labels, placeholder content, and navigation links. It bridges the use case diagram
-(what the system does) and the screen designs (how it looks).
+single-page HTML document that shows every user-facing screen with production-grade visual
+design — distinctive typography, cohesive color palette, polished components, and navigation
+links. It bridges the use case diagram (what the system does) and stakeholder review (does
+this look right?).
+
+**This skill uses the `frontend-design` skill for all visual output.** The `frontend-design`
+skill provides the aesthetic direction, typography, color, spatial composition, and motion
+guidelines. Read and apply them when generating the HTML.
 
 $ARGUMENTS is optional. If provided, it is a space-separated list of use case IDs
 (e.g., `UC-001 UC-002 UC-003`) to add to an existing wireframe. If omitted, generate
@@ -32,28 +37,38 @@ The wireframe serves four downstream consumers:
    analysis, and CRUD coverage checks. Without the wireframe, requirements engineering operates
    on abstractions disconnected from how users will actually interact with the system.
 2. **`/design-screens`** — Opens the wireframe in Playwright, extracts the visual language
-   (layout patterns, spacing, component types), and produces high-fidelity themed HTML per
-   use case. The wireframe's structure directly shapes the design output.
+   (layout patterns, colors, typography, component styles), and produces themed HTML per
+   use case with full state coverage. The wireframe's visual identity directly shapes the
+   design output.
 3. **Human review** — Stakeholders review the wireframe to validate screen flow, information
-   hierarchy, and navigation before visual design begins. This is the cheapest place to catch
-   UX problems.
+   hierarchy, visual direction, and navigation. A polished wireframe builds confidence early.
 4. **`/sprint-prepare`** — Can trigger wireframe generation for new use cases added during
    sprint refinement, ensuring the wireframe stays current as the project evolves.
 
 ## Design Philosophy
 
-**Low-fidelity intentionally.** The wireframe communicates *structure*, not *style*:
+**Production-grade visual design.** The wireframe communicates both *structure* and *style*:
 
-- **Grayscale only** — No brand colors. Use shades of gray (`#f5f5f5`, `#e0e0e0`, `#9e9e9e`,
-  `#616161`, `#333333`, `#1a1a1a`) to distinguish hierarchy levels.
-- **System fonts only** — Use `system-ui, -apple-system, sans-serif`. No Google Fonts, no
-  custom typography. Visual identity comes later in `/design-screens`.
-- **Boxes and labels** — Show where components go, not what they look like. A card is a
-  bordered rectangle with a label. A chart is a placeholder box that says "Chart: Monthly Revenue".
+- **Distinctive typography** — Use Google Fonts with characterful, unexpected choices. Pair a
+  distinctive display font with a refined body font. Never use generic fonts (Inter, Roboto,
+  Arial, system fonts).
+- **Cohesive color palette** — Commit to a bold aesthetic direction with dominant colors and
+  sharp accents. Use CSS variables for consistency. Avoid timid, evenly-distributed palettes.
+- **Polished components** — Cards, buttons, inputs, tables, and navigation should look like
+  they belong in a finished product. Use shadows, rounded corners, hover states, and
+  micro-interactions where appropriate.
+- **Spatial composition** — Use generous whitespace, asymmetry where it adds interest, and
+  grid-based layouts. Avoid cramped or generic layouts.
+- **Atmosphere and depth** — Add background textures, gradients, or subtle effects that match
+  the aesthetic direction. Avoid flat solid-color backgrounds.
 - **Real content, not lorem ipsum** — Use realistic placeholder data that matches entity model
   attributes (e.g., "Maria Popescu", "maria@example.com", not "Lorem ipsum dolor").
 - **Navigation is explicit** — Every clickable element that navigates to another screen uses
   an anchor link (`#UC-XXX`) so the wireframe is internally navigable.
+
+**Apply the `frontend-design` skill guidelines** for typography, color, motion, spatial
+composition, and backgrounds. The wireframe should be visually striking and memorable —
+not a gray sketch.
 
 ## Inputs
 
@@ -99,8 +114,7 @@ Set the `lang` attribute on `<html>` to match the detected locale.
 
 ## DO NOT
 
-- Add colors, brand identity, or visual styling beyond grayscale structure
-- Use Google Fonts or custom typography — system fonts only
+- Use generic AI aesthetics (Inter/Roboto fonts, purple gradients on white, cookie-cutter layouts)
 - Use lorem ipsum — use realistic placeholder content from the entity model
 - Use any JavaScript framework (no React, no Vue, no Angular)
 - Create separate files per screen — everything goes in one `index.html`
@@ -108,7 +122,6 @@ Set the `lang` attribute on `<html>` to match the detected locale.
   triggers with no UI)
 - Invent screens that have no basis in the use case diagram or requirements
 - Destroy existing wireframe sections when adding new ones (incremental updates)
-- Over-design — this is a structural sketch, not a finished design
 - Add responsive breakpoints or mobile layouts — that is `/design-screens`' responsibility
 - Strip or approximate diacritics/accents — all UI text must use correct Unicode characters
 
@@ -175,8 +188,32 @@ When adding screens to an existing wireframe:
 
 ## HTML Structure
 
-The wireframe must follow this structure. Study the example in `examples/` for a complete
-reference implementation.
+The wireframe uses Tailwind CSS and Google Fonts for production-grade visual quality. Study the
+example in `examples/` for a complete reference implementation.
+
+**Technology stack:**
+- **Tailwind CSS** via CDN (`https://cdn.tailwindcss.com`) — for all utility-based styling
+- **Google Fonts** — distinctive, characterful font choices (never Inter, Roboto, or system fonts)
+- **Inline `<style>`** — only for custom CSS animations, effects, and component styles that
+  Tailwind cannot express. Define CSS custom properties here for the color palette.
+- **Inline `<script>` for Tailwind config** — extend Tailwind with the wireframe's custom
+  color palette and font families
+
+### Design direction
+
+Before writing HTML, commit to a **bold aesthetic direction** following the `frontend-design`
+skill guidelines:
+
+1. **Choose a tone** — e.g., brutally minimal, luxury/refined, organic/natural, editorial/magazine,
+   retro-futuristic, playful, art deco, industrial. Pick one and execute with precision.
+2. **Choose distinctive fonts** — pair a display font with a body font from Google Fonts. The
+   pairing should be unexpected and memorable.
+3. **Choose a color palette** — 3–4 colors with clear hierarchy. Define as CSS custom properties
+   and in the Tailwind config. Dominant color with sharp accents, not evenly distributed.
+4. **Choose atmospheric elements** — gradients, textures, grain overlays, shadows, or other
+   effects that create depth and character.
+
+### Template structure
 
 ```html
 <!DOCTYPE html>
@@ -185,143 +222,64 @@ reference implementation.
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>[Project Name] — Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=[Display+Font]:wght@[weights]&family=[Body+Font]:wght@[weights][&subset=latin-ext if needed]&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Define 3-4 palette colors with evocative names and shade scales
+            // e.g., ocean: { 50: '...', 100: '...', ..., 900: '...' }
+          },
+          fontFamily: {
+            display: ['[Display Font]', 'sans-serif'],
+            body: ['[Body Font]', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
-      color: #333;
-      line-height: 1.5;
+    /* ── CSS Custom Properties ── */
+    :root {
+      /* Define palette tokens matching the Tailwind config */
+      /* Define semantic aliases: --bg-page, --bg-card, --text-primary, --accent, etc. */
     }
 
-    /* ── Wireframe Chrome ── */
-    .wf-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-    .wf-header { text-align: center; padding: 2rem 0; border-bottom: 2px solid #333; margin-bottom: 2rem; }
-    .wf-header h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a1a; }
-    .wf-header p { color: #616161; margin-top: 0.5rem; }
+    /* ── Custom animations, effects, and component styles ── */
+    /* Grain overlays, gradient meshes, hover effects, transitions, etc. */
+    /* Annotation styles for wireframe metadata */
 
-    /* ── Table of Contents ── */
-    .wf-toc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
-    .wf-toc h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a1a; }
-    .wf-toc ul { list-style: none; columns: 2; }
-    .wf-toc li { padding: 0.25rem 0; }
-    .wf-toc a { color: #1a1a1a; text-decoration: none; border-bottom: 1px dashed #9e9e9e; }
-    .wf-toc a:hover { border-bottom-style: solid; }
-    .wf-toc .wf-toc-actor { color: #9e9e9e; font-size: 0.85rem; }
-
-    /* ── Screen Section ── */
-    .wf-screen-section {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-      padding: 2rem; margin-bottom: 2rem;
-    }
-    .wf-screen-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      border-bottom: 1px solid #e0e0e0; padding-bottom: 1rem; margin-bottom: 1.5rem;
-    }
-    .wf-screen-header h2 { font-size: 1.3rem; color: #1a1a1a; }
-    .wf-screen-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: #9e9e9e; }
-    .wf-screen-meta span { background: #f5f5f5; padding: 0.2rem 0.6rem; border-radius: 4px; }
-
-    /* ── Wireframe Components ── */
-    .wf-viewport {
-      background: #fafafa; border: 2px dashed #e0e0e0; border-radius: 8px;
-      padding: 1.5rem; min-height: 400px;
-    }
-    .wf-navbar {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #1a1a1a; color: #fff; padding: 0.75rem 1.5rem; border-radius: 6px;
-      margin-bottom: 1rem;
-    }
-    .wf-navbar-logo { font-weight: 700; font-size: 1.1rem; }
-    .wf-navbar-links { display: flex; gap: 1rem; }
-    .wf-navbar-links a { color: #e0e0e0; text-decoration: none; font-size: 0.9rem; }
-    .wf-sidebar {
-      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 1rem; min-width: 200px;
-    }
-    .wf-sidebar-item {
-      padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.9rem;
-      cursor: default; margin-bottom: 0.25rem;
-    }
-    .wf-sidebar-item.active { background: #e0e0e0; font-weight: 600; }
-    .wf-card {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 1rem; margin-bottom: 0.75rem;
-    }
-    .wf-card-title { font-weight: 600; margin-bottom: 0.5rem; }
-    .wf-btn {
-      display: inline-block; padding: 0.5rem 1.25rem; border-radius: 6px;
-      font-size: 0.9rem; font-weight: 500; cursor: default; text-decoration: none;
-    }
-    .wf-btn-primary { background: #333; color: #fff; }
-    .wf-btn-secondary { background: #fff; border: 1px solid #9e9e9e; color: #333; }
-    .wf-input {
-      display: block; width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0;
-      border-radius: 6px; background: #fff; font-size: 0.9rem; color: #9e9e9e;
-      margin-bottom: 0.75rem;
-    }
-    .wf-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; color: #616161; }
-    .wf-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .wf-table th { text-align: left; padding: 0.5rem; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; font-weight: 600; }
-    .wf-table td { padding: 0.5rem; border-bottom: 1px solid #e0e0e0; }
-    .wf-placeholder {
-      background: #f5f5f5; border: 2px dashed #e0e0e0; border-radius: 6px;
-      padding: 2rem; text-align: center; color: #9e9e9e; font-size: 0.9rem;
-    }
-    .wf-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .wf-stat-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; text-align: center; }
-    .wf-stat-value { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
-    .wf-stat-label { font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem; }
-    .wf-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 500; }
-    .wf-badge-dark { background: #333; color: #fff; }
-    .wf-badge-light { background: #e0e0e0; color: #616161; }
-    .wf-divider { border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; }
-
-    /* ── Screen Annotations ── */
     .wf-annotation {
-      background: #fffde7; border-left: 3px solid #fbc02d; padding: 0.75rem 1rem;
-      font-size: 0.85rem; color: #616161; margin-bottom: 1rem; border-radius: 0 4px 4px 0;
+      /* Style annotations to be visually distinct but harmonious with the palette */
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      border-radius: 0.5rem;
     }
-    .wf-annotation strong { color: #333; }
-
-    /* ── Navigation Map ── */
-    .wf-nav-map {
-      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-      padding: 2rem; margin-bottom: 2rem;
-    }
-    .wf-nav-map h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #1a1a1a; }
-    .wf-nav-flow {
-      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
-      margin-bottom: 0.75rem;
-    }
-    .wf-nav-node {
-      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
-      padding: 0.4rem 0.8rem; font-size: 0.85rem;
-    }
-    .wf-nav-node a { color: #1a1a1a; text-decoration: none; }
-    .wf-nav-arrow { color: #9e9e9e; font-size: 0.85rem; }
   </style>
 </head>
-<body>
+<body class="[bg and text classes using palette] antialiased">
 
-<div class="wf-container">
+<div class="max-w-[1400px] mx-auto px-6 py-8">
 
   <!-- ============================================================ -->
   <!-- HEADER -->
   <!-- ============================================================ -->
-  <div class="wf-header">
-    <h1>[Project Name] — Wireframe</h1>
-    <p>[Brief project description] | [N] screens | Actors: [actor list]</p>
+  <div class="text-center py-8 mb-8 border-b-2 [border-color]">
+    <h1 class="font-display text-3xl font-bold">[Project Name] — Wireframe</h1>
+    <p class="mt-2 [muted-text-color]">[Brief project description] | [N] screens | Actors: [actor list]</p>
   </div>
 
   <!-- ============================================================ -->
   <!-- TABLE OF CONTENTS -->
   <!-- ============================================================ -->
-  <div class="wf-toc">
-    <h2>Screens</h2>
-    <ul>
-      <li><a href="#UC-XXX">UC-XXX: [Screen Name]</a> <span class="wf-toc-actor">[Actor]</span></li>
+  <div class="[card-styling] rounded-xl p-6 mb-8">
+    <h2 class="font-display text-lg font-semibold mb-4">Screens</h2>
+    <ul class="columns-2 list-none">
+      <li class="py-1"><a href="#UC-XXX" class="[link-styling]">UC-XXX: [Screen Name]</a> <span class="text-sm [muted-color]">[Actor]</span></li>
       <!-- Repeat for each screen -->
     </ul>
   </div>
@@ -329,13 +287,13 @@ reference implementation.
   <!-- ============================================================ -->
   <!-- SCREEN: UC-XXX — [Screen Name] -->
   <!-- ============================================================ -->
-  <div class="wf-screen-section" id="UC-XXX">
-    <div class="wf-screen-header">
-      <h2>UC-XXX: [Screen Name]</h2>
-      <div class="wf-screen-meta">
-        <span>Actor: [Primary Actor]</span>
-        <span>Type: [Form | List | Dashboard | Detail | Wizard | Settings]</span>
-        <span>Route: /[suggested-route]</span>
+  <div class="[card-styling] rounded-xl p-8 mb-8" id="UC-XXX">
+    <div class="flex justify-between items-baseline border-b [border-color] pb-4 mb-6 flex-wrap gap-2">
+      <h2 class="font-display text-xl font-bold">UC-XXX: [Screen Name]</h2>
+      <div class="flex gap-3 text-sm [muted-color]">
+        <span class="[badge-styling] px-3 py-1 rounded-lg">Actor: [Primary Actor]</span>
+        <span class="[badge-styling] px-3 py-1 rounded-lg">Type: [Form | List | Dashboard | ...]</span>
+        <span class="[badge-styling] px-3 py-1 rounded-lg">Route: /[suggested-route]</span>
       </div>
     </div>
 
@@ -343,12 +301,13 @@ reference implementation.
       <strong>Purpose:</strong> [What this screen accomplishes — derived from use case goal]
     </div>
 
-    <div class="wf-viewport">
-      <!-- Screen layout using wireframe components -->
-      <!-- Use .wf-navbar, .wf-sidebar, .wf-card, .wf-btn, .wf-input, .wf-table, etc. -->
+    <div class="[viewport-styling] rounded-xl p-6 min-h-[400px]">
+      <!-- Screen layout using Tailwind utility classes -->
+      <!-- Build navbars, sidebars, cards, forms, tables, stats grids, etc. -->
+      <!-- Use the chosen font families, colors, and spatial composition -->
     </div>
 
-    <div class="wf-annotation">
+    <div class="wf-annotation mt-4">
       <strong>Navigation:</strong> Navigates to <a href="#UC-YYY">UC-YYY: [Screen Name]</a>
       on [action]. Returns to <a href="#UC-ZZZ">UC-ZZZ: [Screen Name]</a> on cancel.
     </div>
@@ -358,16 +317,16 @@ reference implementation.
   <!-- ============================================================ -->
   <!-- NAVIGATION MAP -->
   <!-- ============================================================ -->
-  <div class="wf-nav-map">
-    <h2>Navigation Map</h2>
+  <div class="[card-styling] rounded-xl p-8 mb-8">
+    <h2 class="font-display text-xl font-bold mb-6">Navigation Map</h2>
 
     <!-- Show primary navigation flows as sequences -->
-    <div class="wf-nav-flow">
-      <div class="wf-nav-node"><a href="#UC-XXX">UC-XXX: [Name]</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node"><a href="#UC-YYY">UC-YYY: [Name]</a></div>
-      <span class="wf-nav-arrow">&rarr;</span>
-      <div class="wf-nav-node"><a href="#UC-ZZZ">UC-ZZZ: [Name]</a></div>
+    <div class="flex flex-wrap gap-2 items-center mb-3">
+      <div class="[node-styling] px-3 py-1.5 rounded-lg text-sm"><a href="#UC-XXX">UC-XXX: [Name]</a></div>
+      <span class="[muted-color] text-sm">&rarr;</span>
+      <div class="[node-styling] px-3 py-1.5 rounded-lg text-sm"><a href="#UC-YYY">UC-YYY: [Name]</a></div>
+      <span class="[muted-color] text-sm">&rarr;</span>
+      <div class="[node-styling] px-3 py-1.5 rounded-lg text-sm"><a href="#UC-ZZZ">UC-ZZZ: [Name]</a></div>
     </div>
     <!-- Repeat for each navigation flow -->
   </div>
@@ -378,57 +337,9 @@ reference implementation.
 </html>
 ```
 
-## Component Library Reference
-
-Use these CSS classes to build screen layouts. Each component represents a structural
-pattern — **not a styled element**. The grayscale appearance is intentional.
-
-| Component | Class | Use For |
-|-----------|-------|---------|
-| Top navigation bar | `.wf-navbar` | App-level navigation with logo and links |
-| Sidebar navigation | `.wf-sidebar` + `.wf-sidebar-item` | Section navigation, menu panels |
-| Content card | `.wf-card` + `.wf-card-title` | Grouping related content |
-| Primary button | `.wf-btn.wf-btn-primary` | Main actions (submit, save, create) |
-| Secondary button | `.wf-btn.wf-btn-secondary` | Cancel, back, secondary actions |
-| Text input | `.wf-input` | Form fields — use `placeholder` for hint text |
-| Field label | `.wf-label` | Labels above inputs |
-| Data table | `.wf-table` | Tabular data with headers |
-| Placeholder box | `.wf-placeholder` | Charts, images, maps, or content not yet defined |
-| Stats grid | `.wf-stats-grid` + `.wf-stat-card` | Dashboard KPI cards |
-| Badge | `.wf-badge` (`.wf-badge-dark` / `.wf-badge-light`) | Status indicators, tags |
-| Divider | `.wf-divider` | Horizontal section separator |
-| Annotation | `.wf-annotation` | Design notes visible in the wireframe |
-| Screen viewport | `.wf-viewport` | Container for the actual screen layout |
-
-### Layout Patterns
-
-Use standard CSS for layout within `.wf-viewport`:
-
-```html
-<!-- Two-column layout (sidebar + content) -->
-<div style="display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem;">
-  <div class="wf-sidebar">...</div>
-  <div><!-- Main content --></div>
-</div>
-
-<!-- Form layout -->
-<div style="max-width: 480px; margin: 0 auto;">
-  <label class="wf-label">Email</label>
-  <input class="wf-input" placeholder="maria@example.com">
-  <label class="wf-label">Password</label>
-  <input class="wf-input" placeholder="********">
-  <button class="wf-btn wf-btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
-</div>
-
-<!-- Dashboard grid -->
-<div class="wf-stats-grid">
-  <div class="wf-stat-card">
-    <div class="wf-stat-value">128</div>
-    <div class="wf-stat-label">Total Users</div>
-  </div>
-  <!-- More stat cards -->
-</div>
-```
+**Note:** The `[bracketed-styling]` placeholders above are not literal — replace them with
+actual Tailwind classes using your chosen palette. The template shows the structural skeleton;
+the visual execution must follow the `frontend-design` skill's aesthetic guidelines.
 
 ## Screen Derivation Rules
 
@@ -467,12 +378,15 @@ Infer the minimum screen set from the use case type:
 
 All screens that share the same actor and context should have a consistent layout frame:
 
-- **Same navbar** — If multiple screens share a navigation bar, use the same `.wf-navbar`
+- **Same navbar** — If multiple screens share a navigation bar, use the same navbar
   structure with the same links across those screens. Highlight the active link.
 - **Same sidebar** — If the app has sidebar navigation, show it consistently with the
   active item highlighted.
 - **Consistent placement** — Buttons in the same position, tables with the same column
   patterns, forms with the same field layout conventions.
+- **Same visual identity** — Typography, color palette, spacing, and component styles must
+  be identical across all screens. This is enforced naturally by the shared Tailwind config
+  and CSS custom properties.
 
 This consistency is essential because `/design-screens` will derive the shared layout
 from the wireframe. Inconsistent wireframes produce inconsistent designs.

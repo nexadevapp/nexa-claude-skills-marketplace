@@ -600,9 +600,27 @@ this document.
 ## Completion
 
 When the pipeline finishes successfully (E2E tests pass and the QA evaluation verdict is
-PASS), present a summary to the user and post it to the GitHub issue.
+PASS), perform the following actions:
 
-### Terminal Summary
+### 1. Generate Traceability Report
+
+Generate a traceability report at `docs/delivery/$ARGUMENTS-traceability.md` that maps
+functional requirements to their verified E2E tests.
+
+Use this format:
+
+```markdown
+# Traceability Report: $ARGUMENTS
+
+| Requirement | Spec Flow | Test File | Verdict |
+|-------------|-----------|-----------|---------|
+| FR-XXX      | MSS Step N| `e2e/UC-XXX.spec.ts:L24` | VERIFIED |
+| BR-XXX      | AF-YYY    | `e2e/UC-XXX.spec.ts:L45` | VERIFIED |
+```
+
+To find line numbers, grep the test file for the BR/FR annotations introduced in the tests.
+
+### 2. Terminal Summary
 
 Display the pipeline report to the user:
 
@@ -622,9 +640,10 @@ Display the pipeline report to the user:
 Include a **What was built** section listing the key artifacts: pages, API routes, services,
 tests, and any notable implementation details.
 
-Include a **Delivery log** line pointing to `docs/delivery/$ARGUMENTS-iterations.md`.
+Include a **Delivery log** line pointing to `docs/delivery/$ARGUMENTS-iterations.md` and a
+**Traceability report** line pointing to `docs/delivery/$ARGUMENTS-traceability.md`.
 
-### GitHub Issue Report
+### 3. GitHub Issue Report
 
 Post the pipeline report as a comment on the GitHub issue for `$ARGUMENTS`:
 

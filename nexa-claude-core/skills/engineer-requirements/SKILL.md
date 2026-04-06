@@ -133,6 +133,38 @@ For each use case in the cluster, determine:
   covered: who creates it, who reads it, who updates it, who deletes/archives it?
 - Flag entities with unclear ownership or partial lifecycle coverage
 
+### 7. Use Case Granularity Check
+
+A use case must represent a **complete user goal** — an end-to-end journey that delivers value to the
+actor. Individual steps, validations, or UI interactions within that journey are **not** separate use
+cases; they belong as steps in the main success scenario or as alternative/exception flows.
+
+**Signs of over-granularity (merge candidates):**
+
+- Multiple UCs that are always performed together in sequence by the same actor (e.g., "Enter Data",
+  "Validate Data", "Submit Data" → single "Submit Data" UC)
+- UCs that describe validation or error handling for another UC (e.g., "Validate Input" is a step
+  inside the parent UC, not a standalone UC)
+- UCs that describe UI behavior rather than a user goal (e.g., "Clear Form", "Show Confirmation
+  Dialog" are interaction details, not use cases)
+- UCs where one cannot deliver user value without the others — they form a single atomic journey
+
+**Signs of correct granularity:**
+
+- The UC can be performed independently and delivers standalone value to the actor
+- The UC has a distinct trigger (the actor consciously decides to start it)
+- The UC has a meaningful postcondition that changes system state or delivers information
+- Different actors or different contexts may need the UC in isolation
+
+**Action when over-granularity is detected:**
+
+1. Propose merging the fine-grained UCs into a single use case named after the user goal
+2. The merged UC's main success scenario absorbs the individual UCs as steps
+3. Validation and error handling become alternative/exception flows
+4. Update the traceability: the merged UC covers all FRs that the individual UCs covered
+5. Flag the merge as a proposed change in the cluster analysis (HIGH CONFIDENCE unless
+   the boundary between UCs is genuinely ambiguous)
+
 ## Output Directory
 
 All engineering artifacts go in:
@@ -155,14 +187,19 @@ Execute these phases in order.
    - If it exists and has incomplete clusters: **resume** from the first incomplete cluster.
    - If it exists and all clusters are complete: skip to Phase 3 (cross-cutting analysis).
    - If it does not exist: proceed to clustering.
-4. Group all undelivered use cases into **thematic clusters** based on:
+4. **Granularity pre-check:** Before clustering, scan all undelivered use cases for over-granularity
+   using technique #7 (Use Case Granularity Check). If multiple use cases clearly represent steps
+   within the same user journey rather than independent user goals, propose merging them upfront.
+   Present any proposed merges to the user as part of the clustering approval in step 5. This
+   prevents wasted analysis effort on use cases that will be merged anyway.
+5. Group all undelivered use cases into **thematic clusters** based on:
    - **Primary grouping:** Shared domain concept or entity (e.g., all booking-related UCs together)
    - **Secondary grouping:** Shared actor (if domain overlap is weak)
    - **Constraint:** Each cluster should have 5-12 use cases. Split larger groups by subdomain;
      merge smaller groups if they share actors or entities.
    - **Constraint:** Dependency order — if Cluster B's use cases depend on entities or
      postconditions from Cluster A's use cases, Cluster A comes first.
-5. Present the proposed clustering to the user:
+6. Present the proposed clustering (and any granularity merges from step 4) to the user:
 
 ```markdown
 ## Proposed Clusters
@@ -177,8 +214,10 @@ Execute these phases in order.
 **Estimated clusters to process:** 3 + 1 cross-cutting = 4 rounds
 ```
 
-6. **Step gate:** User confirms or adjusts the clustering before proceeding.
-7. Create the progress manifest at `docs/engineering/progress.md`:
+7. **Step gate:** User confirms or adjusts the clustering (and merges) before proceeding.
+   If granularity merges were approved, apply them to `docs/requirements.md` and `docs/use_cases.puml`
+   before creating the progress manifest.
+8. Create the progress manifest at `docs/engineering/progress.md`:
 
 ```markdown
 # Requirements Engineering Progress
@@ -207,7 +246,7 @@ For each cluster, in the order defined in Phase 1:
 
 #### Step 2a: Analyze
 
-Run all six analysis techniques against the cluster's use cases. Produce a structured analysis
+Run all seven analysis techniques against the cluster's use cases. Produce a structured analysis
 document. Classify every finding as:
 
 - **HIGH CONFIDENCE** — The skill is confident in the decision based on explicit requirements
@@ -472,6 +511,7 @@ After all clusters are complete, run a final analysis across the entire project:
 | Actor load balancing           | No actor has > 15 direct use cases (suggest role decomposition)    |
 | Business rule conflicts        | Rules from different clusters that contradict each other           |
 | Duplicate or overlapping UCs   | Use cases from different clusters that cover the same ground       |
+| Cross-cluster granularity      | Use cases from different clusters that are actually steps in the same user journey — merge candidates missed during Phase 1 pre-check |
 | Reference/seed data            | Data that use cases assume exists but no UC or migration creates   |
 
 3. Write the cross-cutting report to `docs/engineering/cross-cutting-analysis.md`:

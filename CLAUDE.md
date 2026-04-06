@@ -26,6 +26,7 @@ nexa-claude-marketplace/
 │       ├── use-case-spec/
 │       ├── technical-task/
 │       ├── sprint-prepare/
+│       ├── generate-wireframe/
 │       ├── design-screens/
 │       ├── refine-use-cases/
 │       ├── code-review/
@@ -85,6 +86,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Elaboration  | `/engineer-requirements` | Clustered elaboration of all use cases with interactive refinement |
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
 | Construction | `/technical-task`     | Create technical task specifications   |
+| Construction | `/generate-wireframe` | Generate low-fidelity wireframe from use cases |
 | Construction | `/sprint-prepare`     | Select, refine, and validate use cases for sprint delivery |
 | Construction | `/design-screens`     | Create screen design specifications    |
 | Elaboration  | `/refine-use-cases`   | Generate all specs & designs, then GAP analysis |

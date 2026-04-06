@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VolunteerHub — Wireframe</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    /* ── Wireframe Chrome ── */
+    .wf-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .wf-header { text-align: center; padding: 2rem 0; border-bottom: 2px solid #333; margin-bottom: 2rem; }
+    .wf-header h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a1a; }
+    .wf-header p { color: #616161; margin-top: 0.5rem; }
+
+    /* ── Table of Contents ── */
+    .wf-toc { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+    .wf-toc h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a1a; }
+    .wf-toc ul { list-style: none; columns: 2; }
+    .wf-toc li { padding: 0.25rem 0; }
+    .wf-toc a { color: #1a1a1a; text-decoration: none; border-bottom: 1px dashed #9e9e9e; }
+    .wf-toc a:hover { border-bottom-style: solid; }
+    .wf-toc .wf-toc-actor { color: #9e9e9e; font-size: 0.85rem; }
+
+    /* ── Screen Section ── */
+    .wf-screen-section {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 2rem; margin-bottom: 2rem;
+    }
+    .wf-screen-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px solid #e0e0e0; padding-bottom: 1rem; margin-bottom: 1.5rem;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .wf-screen-header h2 { font-size: 1.3rem; color: #1a1a1a; }
+    .wf-screen-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: #9e9e9e; flex-wrap: wrap; }
+    .wf-screen-meta span { background: #f5f5f5; padding: 0.2rem 0.6rem; border-radius: 4px; }
+
+    /* ── Wireframe Components ── */
+    .wf-viewport {
+      background: #fafafa; border: 2px dashed #e0e0e0; border-radius: 8px;
+      padding: 1.5rem; min-height: 300px;
+    }
+    .wf-navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #1a1a1a; color: #fff; padding: 0.75rem 1.5rem; border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .wf-navbar-logo { font-weight: 700; font-size: 1.1rem; }
+    .wf-navbar-links { display: flex; gap: 1rem; }
+    .wf-navbar-links a { color: #e0e0e0; text-decoration: none; font-size: 0.9rem; }
+    .wf-navbar-links a.active { color: #fff; font-weight: 600; }
+    .wf-sidebar {
+      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
+      padding: 1rem; min-width: 200px;
+    }
+    .wf-sidebar-item {
+      padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.9rem;
+      cursor: default; margin-bottom: 0.25rem;
+    }
+    .wf-sidebar-item.active { background: #e0e0e0; font-weight: 600; }
+    .wf-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;
+      padding: 1rem; margin-bottom: 0.75rem;
+    }
+    .wf-card-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .wf-btn {
+      display: inline-block; padding: 0.5rem 1.25rem; border-radius: 6px;
+      font-size: 0.9rem; font-weight: 500; cursor: default; text-decoration: none;
+      border: none;
+    }
+    .wf-btn-primary { background: #333; color: #fff; }
+    .wf-btn-secondary { background: #fff; border: 1px solid #9e9e9e; color: #333; }
+    .wf-input {
+      display: block; width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0;
+      border-radius: 6px; background: #fff; font-size: 0.9rem; color: #9e9e9e;
+      margin-bottom: 0.75rem;
+    }
+    .wf-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; color: #616161; }
+    .wf-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .wf-table th { text-align: left; padding: 0.5rem; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; font-weight: 600; }
+    .wf-table td { padding: 0.5rem; border-bottom: 1px solid #e0e0e0; }
+    .wf-placeholder {
+      background: #f5f5f5; border: 2px dashed #e0e0e0; border-radius: 6px;
+      padding: 2rem; text-align: center; color: #9e9e9e; font-size: 0.9rem;
+    }
+    .wf-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .wf-stat-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 1rem; text-align: center; }
+    .wf-stat-value { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; }
+    .wf-stat-label { font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem; }
+    .wf-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 99px; font-size: 0.75rem; font-weight: 500; }
+    .wf-badge-dark { background: #333; color: #fff; }
+    .wf-badge-light { background: #e0e0e0; color: #616161; }
+    .wf-divider { border: none; border-top: 1px solid #e0e0e0; margin: 1.5rem 0; }
+
+    /* ── Screen Annotations ── */
+    .wf-annotation {
+      background: #fffde7; border-left: 3px solid #fbc02d; padding: 0.75rem 1rem;
+      font-size: 0.85rem; color: #616161; margin-bottom: 1rem; border-radius: 0 4px 4px 0;
+    }
+    .wf-annotation strong { color: #333; }
+
+    /* ── Navigation Map ── */
+    .wf-nav-map {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+      padding: 2rem; margin-bottom: 2rem;
+    }
+    .wf-nav-map h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #1a1a1a; }
+    .wf-nav-flow {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .wf-nav-node {
+      background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 6px;
+      padding: 0.4rem 0.8rem; font-size: 0.85rem;
+    }
+    .wf-nav-node a { color: #1a1a1a; text-decoration: none; }
+    .wf-nav-arrow { color: #9e9e9e; font-size: 0.85rem; }
+    .wf-flow-label { font-size: 0.75rem; color: #9e9e9e; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="wf-container">
+
+  <!-- ============================================================ -->
+  <!-- HEADER -->
+  <!-- ============================================================ -->
+  <div class="wf-header">
+    <h1>VolunteerHub — Wireframe</h1>
+    <p>Volunteer management platform | 5 screens | Actors: Visitor, Volunteer, Admin</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TABLE OF CONTENTS -->
+  <!-- ============================================================ -->
+  <div class="wf-toc">
+    <h2>Screens</h2>
+    <ul>
+      <li><a href="#UC-000">UC-000: Landing Page</a> <span class="wf-toc-actor">Visitor</span></li>
+      <li><a href="#UC-001">UC-001: Register</a> <span class="wf-toc-actor">Visitor</span></li>
+      <li><a href="#UC-002">UC-002: Browse Opportunities</a> <span class="wf-toc-actor">Volunteer</span></li>
+      <li><a href="#UC-003">UC-003: Opportunity Detail</a> <span class="wf-toc-actor">Volunteer</span></li>
+      <li><a href="#UC-010">UC-010: Admin Dashboard</a> <span class="wf-toc-actor">Admin</span></li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-000 — Landing Page -->
+  <!-- ============================================================ -->
+  <div class="wf-screen-section" id="UC-000">
+    <div class="wf-screen-header">
+      <h2>UC-000: Landing Page</h2>
+      <div class="wf-screen-meta">
+        <span>Actor: Visitor</span>
+        <span>Type: Landing page</span>
+        <span>Route: /</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Entry point for visitors. Introduces the platform and
+      directs users to register or log in.
+    </div>
+
+    <div class="wf-viewport">
+      <!-- Navbar -->
+      <div class="wf-navbar">
+        <span class="wf-navbar-logo">VolunteerHub</span>
+        <div class="wf-navbar-links">
+          <a href="#UC-002">Opportunities</a>
+          <a href="#UC-001">Register</a>
+          <a href="#">Log In</a>
+        </div>
+      </div>
+
+      <!-- Hero Section -->
+      <div style="text-align: center; padding: 3rem 2rem; background: #e0e0e0; border-radius: 6px; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #1a1a1a;">Make a difference in your community</h2>
+        <p style="color: #616161; margin-bottom: 1.5rem;">Find volunteer opportunities that match your skills and interests.</p>
+        <a href="#UC-001" class="wf-btn wf-btn-primary" style="margin-right: 0.5rem;">Get Started</a>
+        <a href="#UC-002" class="wf-btn wf-btn-secondary">Browse Opportunities</a>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="wf-stats-grid" style="margin-bottom: 1.5rem;">
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">2,450</div>
+          <div class="wf-stat-label">Active Volunteers</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">186</div>
+          <div class="wf-stat-label">Open Opportunities</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">12,800</div>
+          <div class="wf-stat-label">Hours Contributed</div>
+        </div>
+      </div>
+
+      <!-- Featured Opportunities -->
+      <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: #1a1a1a;">Featured Opportunities</h3>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+        <div class="wf-card">
+          <div class="wf-card-title">Beach Cleanup</div>
+          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">Ocean Conservation Society</p>
+          <span class="wf-badge wf-badge-dark">Environment</span>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-title">Math Tutoring</div>
+          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">City Youth Center</p>
+          <span class="wf-badge wf-badge-dark">Education</span>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-title">Food Drive</div>
+          <p style="font-size: 0.85rem; color: #616161; margin-bottom: 0.5rem;">Community Food Bank</p>
+          <span class="wf-badge wf-badge-dark">Social</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Navigation:</strong> "Get Started" and "Register" navigate to
+      <a href="#UC-001">UC-001: Register</a>. "Browse Opportunities" navigates to
+      <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" navigates to the
+      login screen (not wireframed — separate use case).
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-001 — Register -->
+  <!-- ============================================================ -->
+  <div class="wf-screen-section" id="UC-001">
+    <div class="wf-screen-header">
+      <h2>UC-001: Register</h2>
+      <div class="wf-screen-meta">
+        <span>Actor: Visitor</span>
+        <span>Type: Form</span>
+        <span>Route: /register</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> New users create an account by providing their personal
+      information, selecting skills, and agreeing to terms.
+    </div>
+
+    <div class="wf-viewport">
+      <!-- Navbar (same as landing) -->
+      <div class="wf-navbar">
+        <span class="wf-navbar-logo">VolunteerHub</span>
+        <div class="wf-navbar-links">
+          <a href="#UC-002">Opportunities</a>
+          <a href="#UC-001" class="active">Register</a>
+          <a href="#">Log In</a>
+        </div>
+      </div>
+
+      <!-- Registration Form -->
+      <div style="max-width: 480px; margin: 2rem auto;">
+        <h2 style="font-size: 1.3rem; text-align: center; margin-bottom: 1.5rem; color: #1a1a1a;">Create your account</h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label class="wf-label">First Name</label>
+            <input class="wf-input" placeholder="Emma">
+          </div>
+          <div>
+            <label class="wf-label">Last Name</label>
+            <input class="wf-input" placeholder="Johnson">
+          </div>
+        </div>
+
+        <label class="wf-label">Email</label>
+        <input class="wf-input" placeholder="emma.johnson@example.com">
+
+        <label class="wf-label">Password</label>
+        <input class="wf-input" placeholder="********">
+
+        <label class="wf-label">Phone (optional)</label>
+        <input class="wf-input" placeholder="+1 555 123 4567">
+
+        <label class="wf-label">City</label>
+        <input class="wf-input" placeholder="San Francisco">
+
+        <label class="wf-label">Skills</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <span class="wf-badge wf-badge-light">Teaching</span>
+          <span class="wf-badge wf-badge-dark">First Aid</span>
+          <span class="wf-badge wf-badge-light">Driving</span>
+          <span class="wf-badge wf-badge-light">Cooking</span>
+          <span class="wf-badge wf-badge-light">Photography</span>
+          <span class="wf-badge wf-badge-light">+ More</span>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <input type="checkbox" style="margin-top: 0.25rem;">
+          <span style="font-size: 0.85rem; color: #616161;">I agree to the Terms of Service and Privacy Policy</span>
+        </div>
+
+        <button class="wf-btn wf-btn-primary" style="width: 100%;">Create Account</button>
+
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: #616161;">
+          Already have an account? <a href="#" style="color: #333;">Log In</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Fields:</strong> First Name (User.firstName), Last Name (User.lastName),
+      Email (User.email), Password (User.passwordHash), Phone (User.phone),
+      City (User.city), Skills (User.skills — multi-select from Skill entity).
+    </div>
+    <div class="wf-annotation">
+      <strong>Navigation:</strong> On successful registration, redirects to
+      <a href="#UC-002">UC-002: Browse Opportunities</a>. "Log In" link navigates to login screen.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-002 — Browse Opportunities -->
+  <!-- ============================================================ -->
+  <div class="wf-screen-section" id="UC-002">
+    <div class="wf-screen-header">
+      <h2>UC-002: Browse Opportunities</h2>
+      <div class="wf-screen-meta">
+        <span>Actor: Volunteer</span>
+        <span>Type: List</span>
+        <span>Route: /opportunities</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Volunteers search and filter available volunteer opportunities,
+      then select one to view its details.
+    </div>
+
+    <div class="wf-viewport">
+      <!-- Navbar (authenticated) -->
+      <div class="wf-navbar">
+        <span class="wf-navbar-logo">VolunteerHub</span>
+        <div class="wf-navbar-links">
+          <a href="#UC-002" class="active">Opportunities</a>
+          <a href="#">My Applications</a>
+          <a href="#">Profile</a>
+          <a href="#">Log Out</a>
+        </div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end;">
+        <div style="flex: 1;">
+          <label class="wf-label">Search</label>
+          <input class="wf-input" placeholder="Search opportunities..." style="margin-bottom: 0;">
+        </div>
+        <div style="width: 180px;">
+          <label class="wf-label">Category</label>
+          <input class="wf-input" placeholder="All Categories" style="margin-bottom: 0;">
+        </div>
+        <div style="width: 180px;">
+          <label class="wf-label">Location</label>
+          <input class="wf-input" placeholder="Any Location" style="margin-bottom: 0;">
+        </div>
+        <button class="wf-btn wf-btn-primary">Search</button>
+      </div>
+
+      <!-- Results count -->
+      <p style="font-size: 0.85rem; color: #9e9e9e; margin-bottom: 1rem;">Showing 42 opportunities</p>
+
+      <!-- Opportunity List -->
+      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">Beach Cleanup — Saturday Crew</a></div>
+          <p style="font-size: 0.85rem; color: #616161;">Ocean Conservation Society &middot; Santa Cruz &middot; Dec 14, 2025</p>
+        </div>
+        <div style="text-align: right;">
+          <span class="wf-badge wf-badge-dark">Environment</span>
+          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">8 / 20 spots filled</p>
+        </div>
+      </div>
+
+      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">After-School Math Tutoring</a></div>
+          <p style="font-size: 0.85rem; color: #616161;">City Youth Center &middot; Downtown &middot; Ongoing</p>
+        </div>
+        <div style="text-align: right;">
+          <span class="wf-badge wf-badge-dark">Education</span>
+          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">3 / 10 spots filled</p>
+        </div>
+      </div>
+
+      <div class="wf-card" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="wf-card-title"><a href="#UC-003" style="color: #1a1a1a; text-decoration: none;">Holiday Food Drive Coordinator</a></div>
+          <p style="font-size: 0.85rem; color: #616161;">Community Food Bank &middot; Bay Area &middot; Dec 20-25, 2025</p>
+        </div>
+        <div style="text-align: right;">
+          <span class="wf-badge wf-badge-dark">Social</span>
+          <p style="font-size: 0.8rem; color: #9e9e9e; margin-top: 0.25rem;">12 / 15 spots filled</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;">
+        <span class="wf-btn wf-btn-primary" style="padding: 0.4rem 0.8rem;">1</span>
+        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">2</span>
+        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">3</span>
+        <span class="wf-btn wf-btn-secondary" style="padding: 0.4rem 0.8rem;">&rarr;</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Data:</strong> Each row displays Opportunity.title, Organization.name,
+      Opportunity.location, Opportunity.date, Opportunity.category,
+      Opportunity.spotsAvailable / Opportunity.spotsTotal.
+    </div>
+    <div class="wf-annotation">
+      <strong>Navigation:</strong> Clicking an opportunity title navigates to
+      <a href="#UC-003">UC-003: Opportunity Detail</a>.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-003 — Opportunity Detail -->
+  <!-- ============================================================ -->
+  <div class="wf-screen-section" id="UC-003">
+    <div class="wf-screen-header">
+      <h2>UC-003: Opportunity Detail</h2>
+      <div class="wf-screen-meta">
+        <span>Actor: Volunteer</span>
+        <span>Type: Detail view</span>
+        <span>Route: /opportunities/:id</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Volunteer views full details of an opportunity and applies
+      to participate.
+    </div>
+
+    <div class="wf-viewport">
+      <!-- Navbar (authenticated) -->
+      <div class="wf-navbar">
+        <span class="wf-navbar-logo">VolunteerHub</span>
+        <div class="wf-navbar-links">
+          <a href="#UC-002" class="active">Opportunities</a>
+          <a href="#">My Applications</a>
+          <a href="#">Profile</a>
+          <a href="#">Log Out</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <p style="font-size: 0.85rem; color: #9e9e9e; margin-bottom: 1rem;">
+        <a href="#UC-002" style="color: #616161;">Opportunities</a> &rsaquo; Beach Cleanup — Saturday Crew
+      </p>
+
+      <!-- Detail Content -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <!-- Main Content -->
+        <div>
+          <h2 style="font-size: 1.4rem; color: #1a1a1a; margin-bottom: 0.5rem;">Beach Cleanup — Saturday Crew</h2>
+          <p style="color: #616161; margin-bottom: 1rem;">Ocean Conservation Society</p>
+
+          <div class="wf-placeholder" style="margin-bottom: 1.5rem;">Image: Opportunity cover photo (800 x 300)</div>
+
+          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Description</h3>
+          <p style="font-size: 0.9rem; color: #616161; margin-bottom: 1.5rem;">
+            Join us for our weekly beach cleanup at Santa Cruz Main Beach. We provide all equipment
+            including gloves, bags, and grabbers. Great for families and groups. No experience needed.
+          </p>
+
+          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Requirements</h3>
+          <ul style="font-size: 0.9rem; color: #616161; padding-left: 1.5rem; margin-bottom: 1.5rem;">
+            <li>Must be at least 16 years old</li>
+            <li>Able to walk on sand for 2-3 hours</li>
+            <li>Bring water and sunscreen</li>
+          </ul>
+
+          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Location</h3>
+          <div class="wf-placeholder">Map: Santa Cruz Main Beach (embedded map placeholder)</div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <div class="wf-card">
+            <div class="wf-card-title">Details</div>
+            <hr class="wf-divider">
+            <table style="width: 100%; font-size: 0.85rem;">
+              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Date</td><td style="text-align: right;">Dec 14, 2025</td></tr>
+              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Time</td><td style="text-align: right;">9:00 AM – 12:00 PM</td></tr>
+              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Duration</td><td style="text-align: right;">3 hours</td></tr>
+              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Category</td><td style="text-align: right;"><span class="wf-badge wf-badge-dark">Environment</span></td></tr>
+              <tr><td style="color: #9e9e9e; padding: 0.3rem 0;">Spots</td><td style="text-align: right;">8 / 20 filled</td></tr>
+            </table>
+            <hr class="wf-divider">
+            <button class="wf-btn wf-btn-primary" style="width: 100%;">Apply Now</button>
+          </div>
+
+          <div class="wf-card" style="margin-top: 0.75rem;">
+            <div class="wf-card-title">Organization</div>
+            <p style="font-size: 0.85rem; color: #616161;">Ocean Conservation Society</p>
+            <p style="font-size: 0.8rem; color: #9e9e9e;">12 active opportunities &middot; 340 volunteers</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Data:</strong> Opportunity.title, Opportunity.description, Opportunity.requirements,
+      Opportunity.date, Opportunity.time, Opportunity.duration, Opportunity.category,
+      Opportunity.spotsAvailable, Opportunity.spotsTotal, Opportunity.coverImage,
+      Organization.name, Organization.activeOpportunities, Organization.totalVolunteers.
+    </div>
+    <div class="wf-annotation">
+      <strong>Navigation:</strong> "Apply Now" submits the application (triggers confirmation
+      state on this screen). Breadcrumb navigates back to
+      <a href="#UC-002">UC-002: Browse Opportunities</a>.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-010 — Admin Dashboard -->
+  <!-- ============================================================ -->
+  <div class="wf-screen-section" id="UC-010">
+    <div class="wf-screen-header">
+      <h2>UC-010: Admin Dashboard</h2>
+      <div class="wf-screen-meta">
+        <span>Actor: Admin</span>
+        <span>Type: Dashboard</span>
+        <span>Route: /admin</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Admin views platform-wide statistics, manages pending
+      verifications, and monitors recent activity.
+    </div>
+
+    <div class="wf-viewport">
+      <!-- Navbar (admin) -->
+      <div class="wf-navbar">
+        <span class="wf-navbar-logo">VolunteerHub Admin</span>
+        <div class="wf-navbar-links">
+          <a href="#UC-010" class="active">Dashboard</a>
+          <a href="#">Organizations</a>
+          <a href="#">Users</a>
+          <a href="#">Reports</a>
+          <a href="#">Log Out</a>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="wf-stats-grid" style="margin-bottom: 1.5rem;">
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">2,450</div>
+          <div class="wf-stat-label">Total Volunteers</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">186</div>
+          <div class="wf-stat-label">Active Opportunities</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">47</div>
+          <div class="wf-stat-label">Organizations</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="wf-stat-value">5</div>
+          <div class="wf-stat-label">Pending Verifications</div>
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Pending Verifications -->
+        <div class="wf-card">
+          <div class="wf-card-title">Pending Organization Verifications</div>
+          <hr class="wf-divider">
+          <table class="wf-table">
+            <thead>
+              <tr>
+                <th>Organization</th>
+                <th>Submitted</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Green Earth Foundation</td>
+                <td>Dec 10, 2025</td>
+                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
+              </tr>
+              <tr>
+                <td>City Helpers Inc.</td>
+                <td>Dec 9, 2025</td>
+                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
+              </tr>
+              <tr>
+                <td>Sunrise Shelter</td>
+                <td>Dec 8, 2025</td>
+                <td><a href="#" style="color: #333; font-weight: 500;">Review</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="wf-card">
+          <div class="wf-card-title">Recent Activity</div>
+          <hr class="wf-divider">
+          <div style="font-size: 0.85rem;">
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
+              <strong>Emma Johnson</strong> applied to Beach Cleanup
+              <span style="color: #9e9e9e; float: right;">2 min ago</span>
+            </div>
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
+              <strong>Green Earth Foundation</strong> submitted verification
+              <span style="color: #9e9e9e; float: right;">1 hour ago</span>
+            </div>
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #f5f5f5;">
+              <strong>Ocean Conservation</strong> created new opportunity
+              <span style="color: #9e9e9e; float: right;">3 hours ago</span>
+            </div>
+            <div style="padding: 0.5rem 0;">
+              <strong>David Chen</strong> registered as volunteer
+              <span style="color: #9e9e9e; float: right;">5 hours ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Placeholder -->
+      <div class="wf-placeholder" style="margin-top: 1.5rem;">
+        Chart: Monthly Volunteer Registrations (bar chart — last 12 months)
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Data:</strong> Platform-wide aggregates (User.count, Opportunity.count,
+      Organization.count, Organization.pendingVerifications), Activity log entries,
+      monthly registration chart data.
+    </div>
+    <div class="wf-annotation">
+      <strong>Navigation:</strong> "Review" links navigate to Organization verification
+      detail screen. Navbar links navigate to list management screens.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- NAVIGATION MAP -->
+  <!-- ============================================================ -->
+  <div class="wf-nav-map">
+    <h2>Navigation Map</h2>
+
+    <!-- Visitor Flow -->
+    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem;">Visitor Flow</p>
+    <div class="wf-nav-flow">
+      <div class="wf-nav-node"><a href="#UC-000">UC-000: Landing Page</a></div>
+      <span class="wf-nav-arrow">&rarr;</span>
+      <div class="wf-nav-node"><a href="#UC-001">UC-001: Register</a></div>
+      <span class="wf-nav-arrow">&rarr;</span>
+      <div class="wf-nav-node"><a href="#UC-002">UC-002: Browse Opportunities</a></div>
+    </div>
+
+    <!-- Volunteer Flow -->
+    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem; margin-top: 1rem;">Volunteer Flow</p>
+    <div class="wf-nav-flow">
+      <div class="wf-nav-node"><a href="#UC-002">UC-002: Browse Opportunities</a></div>
+      <span class="wf-nav-arrow">&rarr;</span>
+      <div class="wf-nav-node"><a href="#UC-003">UC-003: Opportunity Detail</a></div>
+      <span class="wf-nav-arrow">&rarr;</span>
+      <div class="wf-nav-node" style="border-style: dashed;">Apply (in-page)</div>
+    </div>
+
+    <!-- Admin Flow -->
+    <p style="font-size: 0.85rem; font-weight: 600; color: #616161; margin-bottom: 0.5rem; margin-top: 1rem;">Admin Flow</p>
+    <div class="wf-nav-flow">
+      <div class="wf-nav-node"><a href="#UC-010">UC-010: Admin Dashboard</a></div>
+      <span class="wf-nav-arrow">&rarr;</span>
+      <div class="wf-nav-node" style="border-style: dashed;">Organization Review (not yet wireframed)</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

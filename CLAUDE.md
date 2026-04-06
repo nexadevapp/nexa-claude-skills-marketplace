@@ -22,6 +22,7 @@ nexa-claude-marketplace/
 │       ├── requirements/
 │       ├── entity-model/
 │       ├── use-case-diagram/
+│       ├── engineer-requirements/
 │       ├── use-case-spec/
 │       ├── technical-task/
 │       ├── prioritize/
@@ -82,6 +83,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Inception    | `/requirements`       | Generate requirements from vision      |
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |
 | Elaboration  | `/use-case-diagram`   | Generate PlantUML use case diagrams    |
+| Elaboration  | `/engineer-requirements` | Clustered elaboration of all use cases with interactive refinement |
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
 | Construction | `/technical-task`     | Create technical task specifications   |
 | Construction | `/prioritize`         | Recommend implementation order         |

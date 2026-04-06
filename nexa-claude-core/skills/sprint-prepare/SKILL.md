@@ -123,8 +123,7 @@ use case diagram as input.
 2. Read `docs/requirements.md` — identify the functional requirements (FR-XXX), their priorities,
    and their mapped use cases. Cross-reference FRs to UC IDs from the diagram.
 3. Read `docs/entity_model.md` — note the current set of entities for later validation.
-4. Read `docs/priority.md` if it exists.
-5. Scan `docs/use_cases/` for existing specification files.
+4. Scan `docs/use_cases/` for existing specification files.
 6. Scan `docs/designs/` for existing design files.
 7. Check if `docs/designs/DESIGN_RULES.md` exists.
 8. Scan `docs/delivery/` for iteration logs (indicating a use case has been delivered).
@@ -153,7 +152,7 @@ Print a status table with delivered use cases clearly separated:
 - **UC IDs and names**: From `docs/use_cases.puml` (the canonical source)
 - **Spec**: "Yes" if `docs/use_cases/UC-XXX.md` exists, "No" otherwise
 - **Design**: "Yes" if `docs/designs/UC-XXX-design.html` exists, "No" otherwise
-- **Priority**: From `docs/priority.md` if available, "—" otherwise
+- **Priority**: From requirement priorities in `docs/requirements.md` if available, "—" otherwise
 - **Dependencies**: From `docs/use_cases.puml` relationships; annotate whether each is delivered
 - **Mapped FRs**: Functional requirements from `docs/requirements.md` that trace to this UC
 - **Status**: "Ready" if all dependencies are delivered or in scope, "Blocked" otherwise

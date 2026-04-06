@@ -16,7 +16,6 @@ Analysis of the skills in `nexa-claude-core` with a plan to create a unified **E
 | `/use-case-spec` | Elaboration | Use case ID | `docs/use_cases/UC-XXX.md` | Detailed use case specification |
 | `/design-screens` | Elaboration | UC spec + wireframe | `docs/designs/UC-XXX-design.html` | Screen designs with states |
 | `/technical-task` | Elaboration | Task description | `docs/technical_tasks/TT-XXX.md` | Non-UC engineering work |
-| `/prioritize` | Elaboration | All specs | `docs/priority.md` | Recommended implementation order |
 | `/refine-use-cases` | Elaboration | All above | `docs/gap_analysis_*.md` | Batch specs + designs + gap analysis |
 | `/report-bug` | Any | Bug description | `docs/bugs/BUG-XXX.md` | Structured bug reports |
 | `/code-review` | Construction | Code changes | Review report | Independent code review |
@@ -57,12 +56,6 @@ entity_model.md       use_cases.puml      wireframes/index.html
                └──────────┬──────────────────┘
                           │
                           ▼
-                    /prioritize
-                          │
-                          ▼
-                    priority.md
-                          │
-                          ▼
                /refine-use-cases (GAP analysis)
                           │
                           ▼
@@ -76,8 +69,7 @@ entity_model.md       use_cases.puml      wireframes/index.html
 Currently, there are multiple entry points and no single "run this to prepare for delivery" command. The `/refine-use-cases` skill comes closest but:
 
 1. **Assumes prerequisites exist** — If `requirements.md`, `entity_model.md`, or `use_cases.puml` don't exist, it stops and asks the user to run other commands
-2. **Doesn't include `/prioritize`** — Implementation order is a separate concern
-3. **Doesn't handle technical tasks** — Infrastructure setup (TT-XXX) often needs to happen before UC delivery
+2. **Doesn't handle technical tasks** — Infrastructure setup (TT-XXX) often needs to happen before UC delivery
 4. **No entity validation at spec creation** — Entity gaps discovered late
 
 ---
@@ -140,12 +132,7 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 │  • For each need: check if TT exists, create if missing                     │
 │  • Gate: foundational TTs must exist                                        │
 │                                                                             │
-│  Step 8: Prioritization                                                     │
-│  ──────────────────────                                                      │
-│  • Run /prioritize to generate implementation order                         │
-│  • Output: docs/priority.md                                                 │
-│                                                                             │
-│  Step 9: Cross-Reference GAP Analysis                                       │
+│  Step 8: Cross-Reference GAP Analysis                                       │
 │  ────────────────────────────────────                                        │
 │  • Entity coverage (all referenced entities exist)                          │
 │  • CRUD completeness                                                        │
@@ -155,7 +142,7 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 │  • Seed data identification                                                 │
 │  • Output: docs/gap_analysis_YYYY-MM-DD.md                                  │
 │                                                                             │
-│  Step 10: Elaboration Report                                                │
+│  Step 9: Elaboration Report                                                 │
 │  ──────────────────────────                                                  │
 │  • Summary of all artifacts generated                                       │
 │  • Gap analysis results                                                     │
@@ -172,7 +159,7 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 
 ### 1. Single Entry Point
 
-**Before:** User must know the sequence: `/requirements` → `/entity-model` → `/use-case-diagram` → `/use-case-spec` (for each) → `/design-screens` (for each) → `/prioritize` → `/refine-use-cases`
+**Before:** User must know the sequence: `/requirements` → `/entity-model` → `/use-case-diagram` → `/use-case-spec` (for each) → `/design-screens` (for each) → `/refine-use-cases`
 
 **After:** User runs `/elaborate` once. Pipeline handles dependencies automatically.
 
@@ -219,13 +206,12 @@ A single skill that orchestrates all Elaboration phase work, producing a complet
 - ✓ docs/use_cases/ (8 specifications)
 - ✓ docs/designs/ (6 HTML designs)
 - ✓ docs/technical_tasks/ (3 tasks)
-- ✓ docs/priority.md
 
 ### GAP Analysis
 No gaps identified.
 
 ### Ready for Delivery
-Run in this order (per priority.md):
+Run in this order (by dependency and business value):
 1. /deliver-use-case TT-001 (Environment Setup)
 2. /deliver-use-case TT-002 (Auth Setup)  
 3. /deliver-use-case UC-001
@@ -246,9 +232,8 @@ Run in this order (per priority.md):
 | Frontend designs | `docs/designs/UC-XXX-design.html` | Step 6 |
 | Wireframe snapshots | `docs/snapshots/UC-XXX-*.png` | Step 6 |
 | Technical tasks | `docs/technical_tasks/TT-XXX.md` | Step 7 |
-| Priority order | `docs/priority.md` | Step 8 |
-| Gap analysis | `docs/gap_analysis_YYYY-MM-DD.md` | Step 9 |
-| Elaboration report | `docs/elaboration_report.md` | Step 10 |
+| Gap analysis | `docs/gap_analysis_YYYY-MM-DD.md` | Step 8 |
+| Elaboration report | `docs/elaboration_report.md` | Step 9 |
 
 ---
 

@@ -11,7 +11,6 @@ graph TD
     subgraph "ELABORATION — One-time setup"
         EM["/entity-model<br/>→ docs/entity_model.md"]
         UCD["/use-case-diagram<br/>→ docs/use_cases.puml"]
-        PRI["/prioritize<br/>→ docs/priority.md"]
     end
 
     subgraph "SPRINT N — Repeat per sprint"
@@ -32,10 +31,8 @@ graph TD
 
     REQ --> EM
     REQ --> UCD
-    EM --> PRI
-    UCD --> PRI
-
-    PRI --> PS
+    EM --> PS
+    UCD --> PS
     PS -->|"entity model changed"| PM
     PS -->|"first sprint"| MW
     PM --> DUC
@@ -55,13 +52,12 @@ graph TD
 
 1. **`/entity-model`** — Produce entity model with Mermaid ER diagram and attribute tables
 2. **`/use-case-diagram`** — Produce PlantUML use case diagram with all actors and use cases
-3. **`/prioritize`** — Produce phased implementation order with dependency graph
 
 ### Phase B: Sprint Loop (repeat per sprint)
 
-4. **`/sprint-prepare UC-XXX UC-YYY ...`** — Select, refine, validate, generate specs and designs
-5. **`/prisma-migration`** — Generate DB migration if entity model changed
-6. **`/build-web-middleware`** — Set up auth/RBAC/security middleware (first sprint only)
-7. **`/deliver-use-case UC-XXX`** — For each UC in delivery order: implement, test, evaluate, iterate
-8. **Repeat** step 7 for each UC in the sprint
-9. **Go back** to step 4 for the next sprint
+3. **`/sprint-prepare UC-XXX UC-YYY ...`** — Select, refine, validate, generate specs and designs
+4. **`/prisma-migration`** — Generate DB migration if entity model changed
+5. **`/build-web-middleware`** — Set up auth/RBAC/security middleware (first sprint only)
+6. **`/deliver-use-case UC-XXX`** — For each UC in delivery order: implement, test, evaluate, iterate
+7. **Repeat** step 6 for each UC in the sprint
+8. **Go back** to step 3 for the next sprint

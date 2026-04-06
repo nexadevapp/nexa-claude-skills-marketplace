@@ -537,16 +537,6 @@ const DATA = {
       triggers: ["create a technical task", "set up the database", "bump a dependency"]
     },
     {
-      id: "prioritize", cmd: "/prioritize", name: "Prioritize",
-      plugin: "core", phase: "construction-spec",
-      desc: "Analyzes use cases and technical tasks to recommend an implementation order based on dependencies, business value, risk, and foundational necessity.",
-      output: "docs/priority.md",
-      produces: "Phased implementation order with dependency graph and parallelization analysis",
-      inputs: ["docs/requirements.md", "docs/entity_model.md", "docs/use_cases/", "docs/technical_tasks/"],
-      requires: ["use-case-spec"],
-      triggers: ["prioritize", "what should I work on next", "recommend next task", "rank tasks"]
-    },
-    {
       id: "design-screens", cmd: "/design-screens", name: "Design Screens",
       plugin: "core", phase: "construction-design",
       desc: "Creates screen design specifications as standalone HTML artifacts from the project wireframe. Uses Playwright to inspect wireframes and produces self-contained HTML with all screen states.",

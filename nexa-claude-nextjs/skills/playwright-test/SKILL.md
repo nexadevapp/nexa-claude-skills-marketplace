@@ -62,19 +62,26 @@ A typical use case produces **3–8 tests total**, not dozens.
 ## Traceability Convention
 
 **`test.describe`** — one describe block per use case:
-```
-test.describe('UC-XXX: [Use Case Name]', () => { ... })
-```
-
-**`test`** — one test per complete journey:
-```
-test('MSS: [end-to-end journey description]', ...)          // Main Success Scenario
-test('AF[n]: [end-to-end journey description]', ...)         // Alternative Flow
+```typescript
+test.describe('UC-XXX: [Use Case Name]', { tag: ['@UC-XXX'] }, () => { ... })
 ```
 
-Each test name describes the complete journey, not an individual step. For example:
-- Good: `'MSS: user registers, verifies email, and lands on dashboard'`
-- Bad: `'MSS Steps 1-2: displays registration form'`
+**`test`** — one test per complete journey, including Functional Requirement (FR) tags:
+```typescript
+test('MSS: [end-to-end journey description]', { tag: ['@MSS', '@FR-001', '@FR-002'] }, ...)
+test('AF[n]: [end-to-end journey description]', { tag: ['@AF[n]', '@FR-003'] }, ...)
+```
+
+Each test name describes the complete journey, not an individual step.
+
+**Inline Annotations** — explicitly mark where Business Rules (BR) and Postconditions are verified:
+```typescript
+// 1. Verifies BR-001: [Rule Name]
+await expect(page.getByText('Error')).toBeVisible();
+
+// 2. Verifies Success Postcondition: [Postcondition Name]
+await expect(page.locator('table')).toContainText(['New Item']);
+```
 
 ## DO NOT
 

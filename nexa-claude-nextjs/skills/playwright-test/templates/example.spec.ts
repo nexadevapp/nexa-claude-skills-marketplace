@@ -14,7 +14,7 @@ test.afterAll(async ({ request }) => {
 });
 
 // One describe per use case — tests are complete journeys, not per-screen fragments
-test.describe('UC-001: Manage Items', () => {
+test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
 
   // ── Helper: log in as a given user via the UI ───────────────────────
   async function loginViaUI(page: import('@playwright/test').Page, user: TestUser) {
@@ -33,7 +33,7 @@ test.describe('UC-001: Manage Items', () => {
   }
 
   // MSS: the full happy path as one test — entry point to final outcome
-  test('MSS: user logs in, navigates to items, creates item, and sees it in the list', async ({ page }) => {
+  test('MSS: user logs in, navigates to items, creates item, and sees it in the list', { tag: ['@MSS', '@FR-001', '@FR-002'] }, async ({ page }) => {
     // 1. Log in as the suite user
     await loginViaUI(page, suiteUser);
 
@@ -48,16 +48,18 @@ test.describe('UC-001: Manage Items', () => {
     // 4. Navigate to the create form through the UI
     await page.getByRole('button', { name: 'Add New' }).click();
 
-    // 5. Fill the form and submit (BR1: required field validation happens inline)
+    // 5. Fill the form and submit
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('Name is required')).toBeVisible(); // BR1 verified inline
+    // Verifies BR-001: Mandatory Field Validation
+    await expect(page.getByText('Name is required')).toBeVisible();
 
     await page.getByLabel('Name').fill('E2E Test Item');
     await page.getByLabel('Description').fill('Created by E2E test');
     await page.getByRole('button', { name: 'Save' }).click();
     await page.waitForLoadState('networkidle');
 
-    // 6. Verify the final outcome — new item appears in the list
+    // 6. Verify the final outcome
+    // Verifies Success Postcondition: Item Stored and Visible
     await expect(page.locator('table tbody tr')).toContainText(['E2E Test Item']);
 
     // 7. Log out

@@ -82,10 +82,10 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Inception    | `/requirements`       | Generate requirements from vision      |
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |
 | Elaboration  | `/use-case-diagram`   | Generate PlantUML use case diagrams    |
+| Elaboration  | `/generate-wireframe` | Generate low-fidelity wireframe from use cases |
 | Elaboration  | `/engineer-requirements` | Clustered elaboration of all use cases with interactive refinement |
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
 | Construction | `/technical-task`     | Create technical task specifications   |
-| Construction | `/generate-wireframe` | Generate low-fidelity wireframe from use cases |
 | Construction | `/sprint-prepare`     | Select, refine, and validate use cases for sprint delivery |
 | Construction | `/design-screens`     | Create screen design specifications    |
 | Verification | `/code-review`        | Independent code review (runs in isolation) |

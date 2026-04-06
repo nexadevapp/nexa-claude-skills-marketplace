@@ -25,15 +25,19 @@ screens for all user-facing use cases in the project.
 
 ## Purpose
 
-The wireframe serves three downstream consumers:
+The wireframe serves four downstream consumers:
 
-1. **`/design-screens`** — Opens the wireframe in Playwright, extracts the visual language
+1. **`/engineer-requirements`** — The wireframe is a required input. Screen layouts, navigation
+   flows, form fields, and data visibility inform the RE's probing questions, exception path
+   analysis, and CRUD coverage checks. Without the wireframe, requirements engineering operates
+   on abstractions disconnected from how users will actually interact with the system.
+2. **`/design-screens`** — Opens the wireframe in Playwright, extracts the visual language
    (layout patterns, spacing, component types), and produces high-fidelity themed HTML per
    use case. The wireframe's structure directly shapes the design output.
-2. **Human review** — Stakeholders review the wireframe to validate screen flow, information
+3. **Human review** — Stakeholders review the wireframe to validate screen flow, information
    hierarchy, and navigation before visual design begins. This is the cheapest place to catch
    UX problems.
-3. **`/sprint-prepare`** — Can trigger wireframe generation for new use cases added during
+4. **`/sprint-prepare`** — Can trigger wireframe generation for new use cases added during
    sprint refinement, ensuring the wireframe stays current as the project evolves.
 
 ## Design Philosophy

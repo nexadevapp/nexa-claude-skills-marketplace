@@ -36,8 +36,14 @@ The following must exist before running this skill:
 - `docs/requirements.md` (from `/requirements`)
 - `docs/entity_model.md` (from `/entity-model`)
 - `docs/use_cases.puml` (from `/use-case-diagram`)
+- `docs/wireframes/index.html` (from `/generate-wireframe`)
 
 If any prerequisite is missing, stop and tell the user which `/command` to run first.
+
+**Why the wireframe is required:** Screen layouts, navigation flows, form fields, and data
+visibility surface concerns that pure textual analysis misses. The wireframe grounds
+requirements engineering in the actual user experience — preventing abstract specs that
+later conflict with the UI.
 
 ## DO NOT
 
@@ -89,6 +95,25 @@ The Product Owner agent:
 - **Decides based on evidence** — References specific requirements and project context, not intuition
 - **Admits uncertainty** — Tags answers as `NEEDS_HUMAN` when the decision involves business strategy,
   legal/compliance, stakeholder politics, or when the requirements are genuinely silent on the topic
+
+## Wireframe-Informed Analysis
+
+The wireframe (`docs/wireframes/index.html`) is a primary input throughout all analysis
+techniques. For each use case in a cluster, cross-reference its wireframe screen(s) to:
+
+- **Identify missing fields** — Form inputs and table columns in the wireframe that are not
+  covered by any requirement or entity attribute indicate gaps.
+- **Validate navigation flows** — The wireframe's Navigation Map reveals user journeys that
+  may expose missing use cases or incorrect dependency relationships.
+- **Ground exception path probing** — Screen states (empty states, error states, loading
+  states) visible in the wireframe inform which failure scenarios need alternative flows.
+- **Verify CRUD coverage** — If a wireframe screen shows a "Delete" button or an "Edit" link
+  for an entity, the corresponding CRUD operation must be covered by a use case.
+- **Check data visibility** — Attributes displayed on wireframe screens must exist in the
+  entity model and be accessible through the use case's actor permissions.
+
+When documenting findings, reference specific wireframe screens by their anchor ID
+(e.g., "wireframe screen #UC-003 shows a 'Cancel' button, but no cancellation flow exists").
 
 ## Analysis Techniques
 
@@ -181,7 +206,8 @@ Execute these phases in order.
 
 ### Phase 1: Initialize and Cluster
 
-1. Read `docs/requirements.md`, `docs/entity_model.md`, and `docs/use_cases.puml`.
+1. Read `docs/requirements.md`, `docs/entity_model.md`, `docs/use_cases.puml`, and
+   `docs/wireframes/index.html`.
 2. Scan `docs/delivery/` — identify delivered use cases (immutable, excluded from processing).
 3. Check for existing progress manifest at `docs/engineering/progress.md`:
    - If it exists and has incomplete clusters: **resume** from the first incomplete cluster.
@@ -384,6 +410,7 @@ Agent prompt:
 > - Requirements: `docs/requirements.md`
 > - Entity model: `docs/entity_model.md`
 > - Use case diagram: `docs/use_cases.puml`
+> - Wireframe: `docs/wireframes/index.html`
 >
 > **Your task:**
 >

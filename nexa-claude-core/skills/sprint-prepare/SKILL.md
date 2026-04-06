@@ -29,6 +29,7 @@ The following must exist before running this skill:
 - `docs/requirements.md` — the broad requirements (from `/requirements` or human-authored)
 - `docs/use_cases.puml` — the use case diagram with UC IDs, actors, and relationships (from `/use-case-diagram`)
 - `docs/entity_model.md` — the entity model with Mermaid ER diagram (from `/entity-model`)
+- `docs/wireframes/index.html` — the project wireframe (from `/generate-wireframe`)
 
 If any prerequisite is missing, stop and tell the user which `/command` to run first.
 
@@ -581,6 +582,20 @@ before the pipeline can continue.
 
 For each selected use case, generate the specification and frontend design using the
 REFINED requirements from Phase 3.
+
+#### Step 6a-pre: Update Wireframe for New Use Cases
+
+If Phase 4 added new use cases or split existing ones, the wireframe must be updated before
+generating specs and designs:
+
+1. Check if any use case IDs in the sprint scope do NOT have a corresponding screen section
+   (anchor `#UC-XXX`) in `docs/wireframes/index.html`.
+2. If missing screens exist, read and follow:
+   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/generate-wireframe/SKILL.md`
+   with the missing UC IDs as arguments (e.g., `UC-015 UC-016`).
+3. **Verify:** Every user-facing use case in scope has a wireframe screen section.
+
+This ensures specs and designs are informed by the wireframe's screen structure.
 
 #### Step 6a: Generate Use Case Specifications
 

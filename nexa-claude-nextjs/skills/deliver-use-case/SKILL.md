@@ -469,16 +469,17 @@ Agent prompt:
 >   business rule) has ZERO tests exercising it. This is the only severity that requires a fix.
 > - **Partial:** A requirement or spec flow is tested but a significant behavioral branch within
 >   it is not (e.g., only one of three account types is tested when the spec defines
->   type-specific behavior). Flag it, but only recommend a fix if the untested branch has
->   meaningfully different behavior.
+>   type-specific behavior). **Treat Partial as a FAIL** if the item is a High-priority
+>   requirement (FR) or a critical use case step. For other items, flag it but only recommend
+>   a fix if the untested branch has meaningfully different behavior.
 > - **Observation:** Minor coverage improvements that would be nice but are not required.
 >   Examples: additional edge case variations within a covered flow, assertion enrichments,
 >   extra boundary values.
 >
 > **Definition of PASS:** If every functional requirement (FR), every MSS step, every
 > alternative flow, and every business rule has at least one test exercising its primary path,
-> the verdict is **PASS**. Missing edge case variations within a covered flow are
-> observations, not gaps.
+> AND there are no **Partial** verdicts for critical items, the verdict is **PASS**.
+> Missing edge case variations within a covered flow are observations, not gaps.
 >
 > **Do NOT flag as gaps:**
 >
@@ -503,10 +504,8 @@ Agent prompt:
 > |--------|---------------|---------------|---------|
 > | FR-XXX | [Requirement title] | [test name] | Covered / Partial / Missing |
 > | UC-XXX | MSS (steps 1-N) — [summary] | [test name] | Covered / Partial / Missing |
-> | UC-XXX | A1 — [trigger] | [test name] | Covered / Partial / Missing |
+> | UC-XXX | AF-XXX — [trigger] | [test name] | Covered / Partial / Missing |
 > | BR-XXX | [rule name] | [test name] | Covered / Partial / Missing |
-> | A1 — [trigger] | [test name] | Covered / Partial / Missing |
-> | BR-001 — [rule] | [test name] | Covered / Partial / Missing |
 >
 > Gap Analysis
 > [Only if Partial or Missing items exist]

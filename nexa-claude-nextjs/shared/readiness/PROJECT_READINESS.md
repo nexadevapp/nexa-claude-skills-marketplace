@@ -71,8 +71,8 @@ Report which checks failed and guide the user to the correct skill:
 
 | Missing Infrastructure                | Run This First         |
 |---------------------------------------|------------------------|
-| Request interception / auth / headers | `/build-web-middleware` |
-| Error handling / instrumentation      | `/build-web-middleware` |
+| Request interception / auth / headers | `/setup-web-middleware` |
+| Error handling / instrumentation      | `/setup-web-middleware` |
 | Environment files                     | `/setup-env-profiles`  |
 | Prisma schema or migrations           | `/prisma-migration`    |
 | Internationalization infrastructure   | `/setup-i18n`          |
@@ -89,7 +89,7 @@ Missing infrastructure:
 - ✗ Internationalization required by requirements but not configured
 
 Run these skills first:
-1. /build-web-middleware — sets up auth, security headers, structured error logging, and instrumentation
+1. /setup-web-middleware — sets up auth, security headers, structured error logging, and instrumentation
 2. /setup-env-profiles — creates environment configuration files
 3. /setup-i18n — sets up internationalization infrastructure (locales, translations, routing)
 

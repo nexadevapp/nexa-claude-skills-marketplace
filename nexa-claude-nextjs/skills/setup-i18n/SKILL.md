@@ -21,7 +21,7 @@ and type-safe translation utilities for both server and client components.
 
 Run this skill **after** environment profiles exist (`/setup-env-profiles`) and **before**
 implementing use cases. If the request interception layer already exists
-(`/build-web-middleware`), this skill extends it with locale detection rather than
+(`/setup-web-middleware`), this skill extends it with locale detection rather than
 replacing it.
 
 ## Step 0: Consult Next.js and next-intl Documentation
@@ -263,7 +263,7 @@ docs for the correct middleware setup. It should:
 - Rewrite URLs to include the locale prefix internally
 - Export the config matcher to exclude static assets and internal Next.js routes
 
-#### 7b. If existing middleware exists (from `/build-web-middleware`)
+#### 7b. If existing middleware exists (from `/setup-web-middleware`)
 
 Read the existing middleware file. Compose the i18n middleware with the auth middleware
 following the next-intl documentation for middleware composition.

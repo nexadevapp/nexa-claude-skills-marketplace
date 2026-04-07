@@ -39,13 +39,14 @@ nexa-claude-marketplace/
 │       ├── setup-env-profiles/
 │       ├── setup-i18n/
 │       ├── prisma-migration/
-│       ├── build-web-middleware/
+│       ├── setup-web-middleware/
 │       ├── implement/
 │       ├── vitest-test/
 │       ├── playwright-test/
 │       ├── code-quality/
 │       ├── deliver-use-case/
 │       ├── sprint-complete/
+│       ├── setup-playwright-ci/
 │       ├── aws-dockerize/
 │       └── aws-setup-apprunner/
 └── README.md
@@ -71,9 +72,14 @@ Each plugin contains:
 - `.mcp.json` - MCP server configurations for external tools
 - `skills/` - Skills with SKILL.md definitions; each skill is also a slash command
 
+## Skill Naming Conventions
+
+- **`setup-` prefix** — Skills that establish **foundational infrastructure, configuration, or tooling** for the repository must be prefixed with `setup-` (e.g., `setup-env-profiles`, `setup-i18n`, `setup-web-middleware`, `setup-playwright-ci`). These are typically run once but may be re-run when requirements change (new roles, new locales, new environments). When creating a new skill, check whether it sets up cross-cutting or foundational concerns; if so, name it `setup-<name>` and place it under the Setup phase accordingly.
+- All other skills (run repeatedly during development) use plain names without a prefix.
+
 ## Nexa Agentic Engineering Workflow
 
-Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Construction, Transition.
+Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Construction, Infrastructure.
 
 ### Core (stack-agnostic)
 
@@ -98,16 +104,17 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 |--------------|-------------------------|--------------------------------------------------------------------|
 | Setup        | `/setup-env-profiles`   | Set up local/dev/prod environment profiles with database URLs      |
 | Setup        | `/setup-i18n`           | Set up server-side internationalization with next-intl              |
+| Setup        | `/setup-web-middleware` | Build auth, RBAC, and security headers middleware                  |
+| Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
-| Construction | `/build-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run ESLint and Prettier checks                                     |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
-| Transition   | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
-| Transition   | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |
+| Infrastructure | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
+| Infrastructure | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |
 
 ## Git
 

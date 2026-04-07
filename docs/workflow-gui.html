@@ -483,7 +483,7 @@ const DATA = {
     { id: "construction-quality", label: "Construction — Quality", color: "#3b82f6" },
     { id: "verification", label: "Verification", color: "#10b981" },
     { id: "orchestration", label: "Orchestration", color: "#ec4899" },
-    { id: "transition", label: "Transition", color: "#ef4444" }
+    { id: "infrastructure", label: "Infrastructure", color: "#ef4444" }
   ],
   skills: [
     {
@@ -568,7 +568,7 @@ const DATA = {
       triggers: ["create a migration", "update the schema", "set up database tables"]
     },
     {
-      id: "build-web-middleware", cmd: "/build-web-middleware", name: "Build Web Middleware",
+      id: "setup-web-middleware", cmd: "/setup-web-middleware", name: "Build Web Middleware",
       plugin: "nextjs", phase: "setup",
       desc: "Builds the Next.js middleware layer with authentication, authorization, security headers, and request context enrichment. Run before implementing use cases.",
       output: "middleware.ts, lib/auth/**",
@@ -666,7 +666,7 @@ const DATA = {
     },
     {
       id: "aws-dockerize", cmd: "/aws-dockerize", name: "AWS Dockerize",
-      plugin: "nextjs", phase: "transition",
+      plugin: "nextjs", phase: "infrastructure",
       desc: "Creates a production-ready Dockerfile and .dockerignore for a Next.js project using multi-stage builds with standalone output.",
       output: "Dockerfile, .dockerignore",
       produces: "Three-stage Docker build (deps > builder > runner), non-root user, Alpine base",
@@ -676,7 +676,7 @@ const DATA = {
     },
     {
       id: "aws-setup-apprunner", cmd: "/aws-setup-apprunner", name: "AWS Setup App Runner",
-      plugin: "nextjs", phase: "transition",
+      plugin: "nextjs", phase: "infrastructure",
       desc: "Generates an interactive deployment script that provisions AWS App Runner with ECR, IAM roles, Secrets Manager integration, and a GitHub Actions CI/CD workflow.",
       output: "infra/aws.apprunner/deploy-apprunner.sh, .github/workflows/deploy-*.yml",
       produces: "Bash deployment script (with --teardown), GitHub Actions OIDC workflow for CI/CD",
@@ -812,7 +812,7 @@ function renderWorkflow() {
     { id: "construction-quality", label: "Construction — Quality", color: "#3b82f6" },
     { id: "verification", label: "Verification", color: "#10b981" },
     { id: "orchestration", label: "Orchestration", color: "#ec4899" },
-    { id: "transition", label: "Transition — Deployment", color: "#ef4444" }
+    { id: "infrastructure", label: "Infrastructure — Deployment", color: "#ef4444" }
   ];
 
   let stepNum = 0;
@@ -868,7 +868,7 @@ function renderPipeline() {
         { cmd: "/use-case-diagram", label: "Use case diagram", skill: "use-case-diagram" },
         { cmd: "/setup-env-profiles", label: "Environment profiles", skill: "setup-env-profiles" },
         { cmd: "/prisma-migration", label: "Prisma schema & migrations", skill: "prisma-migration" },
-        { cmd: "/build-web-middleware", label: "Auth middleware (if applicable)", skill: "build-web-middleware" }
+        { cmd: "/setup-web-middleware", label: "Auth middleware (if applicable)", skill: "setup-web-middleware" }
       ]
     },
     { num: 1, label: "Use Case Specification", cmd: "/use-case-spec", skill: "use-case-spec",

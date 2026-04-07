@@ -48,7 +48,7 @@ Configures local (Testcontainers), dev (Supabase), and test profiles with databa
 
 Claude generates Prisma schema models and migrations from your entity model.
 
-### 8. Build middleware → `/build-web-middleware`
+### 8. Build middleware → `/setup-web-middleware`
 
 Sets up authentication, authorization, security headers, and error tracking — the cross-cutting infrastructure your features depend on.
 

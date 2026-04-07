@@ -1,5 +1,5 @@
 ---
-name: build-web-middleware
+name: setup-web-middleware
 description: >
   Builds the Next.js request interception layer with authentication, authorization, security
   headers, error tracking, and request context enrichment. Run before implementing use cases

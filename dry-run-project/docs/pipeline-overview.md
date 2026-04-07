@@ -17,7 +17,7 @@ graph TD
         PS["/sprint-prepare UC-XXX UC-YYY<br/>→ requirements-refinement-proposal.md<br/>→ changelog.md<br/>→ readiness-report.md"]
 
         PM["/prisma-migration<br/>→ schema.prisma + migration SQL"]
-        MW["/build-web-middleware<br/>→ middleware.ts<br/><i>(first sprint only)</i>"]
+        MW["/setup-web-middleware<br/>→ middleware.ts<br/><i>(first sprint only)</i>"]
 
         subgraph "Per Use Case — in delivery order"
             DUC["/deliver-use-case UC-XXX<br/><i>spec → design → implement<br/>→ test → evaluate → iterate</i>"]
@@ -57,7 +57,7 @@ graph TD
 
 3. **`/sprint-prepare UC-XXX UC-YYY ...`** — Select, refine, validate, generate specs and designs
 4. **`/prisma-migration`** — Generate DB migration if entity model changed
-5. **`/build-web-middleware`** — Set up auth/RBAC/security middleware (first sprint only)
+5. **`/setup-web-middleware`** — Set up auth/RBAC/security middleware (first sprint only)
 6. **`/deliver-use-case UC-XXX`** — For each UC in delivery order: implement, test, evaluate, iterate
 7. **Repeat** step 6 for each UC in the sprint
 8. **Go back** to step 3 for the next sprint

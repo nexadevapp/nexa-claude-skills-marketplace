@@ -100,6 +100,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - Write tests that contradict the frontend design (e.g., asserting a table when the design specifies cards)
 - **Skip, exclude, or filter out tests** — never use `--grep-invert`, `--grep`, `test.skip()`, `test.fixme()`, or any other mechanism to avoid running tests. All tests must run and pass
 - **Claim tests pass without verifying output** — you must check the actual Playwright output for "X passed" and "0 failed" before declaring success
+- **Sleep or wait between test retries** — when tests fail, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate
 - **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
 - **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
 
@@ -200,9 +201,15 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1, // one worker — journeys are sequential
   reporter: 'html',
+  timeout: 30_000, // 30s max per single test (full journey: login → actions → assertions)
+  expect: {
+    timeout: 3_000, // 3s max per assertion
+  },
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    actionTimeout: 5_000, // 5s max per click/fill/select
+    navigationTimeout: 5_000, // 5s max per page navigation
   },
   projects: [
     {

@@ -47,6 +47,7 @@ Do not proceed with the pipeline until all items pass or the user explicitly wai
 - Modify the specification or design documents during fix iterations (only modify implementation code and tests)
 - Ask the user for input between steps — run autonomously until the pipeline completes or exhausts retries
 - Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/deliver-use-case` is invoked
+- **Sleep or wait between test retries** — when `npx playwright test` fails, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate — no pauses of any duration
 
 ## Iteration Artifacts
 

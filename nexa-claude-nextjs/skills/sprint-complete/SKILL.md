@@ -40,6 +40,7 @@ If any prerequisite fails, stop and report which prerequisite is not met.
 - Archive without generating the summary first
 - Force-push to `sprint-report` without confirming the dashboard renders correctly
 - Create a git commit on the current branch without user confirmation
+- **Sleep or wait between test retries** — when `npx playwright test` fails, present options to the user immediately. Never use `sleep`, `setTimeout`, or any delay before re-running. The fix-then-rerun cycle must be immediate — no pauses of any duration
 
 ## Pipeline
 

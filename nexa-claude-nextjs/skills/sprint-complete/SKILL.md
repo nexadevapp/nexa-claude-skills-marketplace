@@ -249,47 +249,43 @@ manifest entry with status `in-progress`.
 
 ### Phase 7: Publish to Sprint Report Branch
 
-Push the `docs/` directory to the `sprint-report` branch so AWS Amplify auto-deploys the
-updated dashboard.
+Rebase the `sprint-report` branch from the main branch and push so AWS Amplify auto-deploys
+the updated dashboard. The `sprint-report` branch is the long-lived branch from which the
+sprint demo is presented — it accumulates the state of all completed sprints.
 
 1. Verify the dashboard files are in place:
    - `docs/sprints/sprints-overview/index.html` exists
    - `docs/sprints/sprints-overview/manifest.json` exists and is valid JSON
    - `docs/sprints/sprints-overview/md-viewer.html` exists
 
-2. Create or update the `sprint-report` branch with the current `docs/` state:
-
+2. Determine the main branch name:
    ```bash
-   # Create a temporary orphan commit containing only docs/
-   git stash --include-untracked
-   git checkout --orphan sprint-report-temp
-   git rm -rf . 2>/dev/null || true
-   git checkout stash -- docs/
-   git add docs/
-   git commit -m "Sprint N report — [date]"
-   git push origin sprint-report-temp:sprint-report --force
+   git remote show origin | sed -n 's/.*HEAD branch: //p'
+   ```
+   Use the result (typically `main` or `master`) as `<main-branch>` below.
+
+3. Create or rebase the `sprint-report` branch:
+
+   **If `sprint-report` does not exist locally or on remote:**
+   ```bash
+   git branch sprint-report <main-branch>
+   ```
+
+   **If `sprint-report` already exists:**
+   ```bash
+   git checkout sprint-report
+   git rebase <main-branch>
+   ```
+
+   If the rebase has conflicts, abort and report to the user — do not force-resolve.
+
+4. Push to remote:
+   ```bash
+   git push origin sprint-report --force-with-lease
    git checkout -
-   git branch -D sprint-report-temp
-   git stash pop 2>/dev/null || true
    ```
 
-   If the above approach causes issues, use an alternative:
-
-   ```bash
-   # Alternative: use git subtree or worktree
-   git worktree add /tmp/sprint-report-publish sprint-report 2>/dev/null || \
-     git worktree add --detach /tmp/sprint-report-publish
-   rm -rf /tmp/sprint-report-publish/*
-   cp -r docs/ /tmp/sprint-report-publish/docs/
-   cd /tmp/sprint-report-publish
-   git add -A
-   git commit -m "Sprint N report — [date]"
-   git push origin HEAD:sprint-report --force
-   cd -
-   git worktree remove /tmp/sprint-report-publish
-   ```
-
-3. Confirm the push succeeded. If it fails (e.g., no remote, auth issue), warn the user
+5. Confirm the push succeeded. If it fails (e.g., no remote, auth issue), warn the user
    but do not fail the entire sprint-complete pipeline — the local artifacts are still valid.
 
 ---

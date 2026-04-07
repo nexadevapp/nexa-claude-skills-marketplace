@@ -33,12 +33,15 @@ Use [templates/bug-report.md](templates/bug-report.md) as the document structure
 
 ## Overview
 
-**Bug ID:** BUG-003
-**Title:** Order total ignores discount codes
-**Severity:** High
-**Status:** Open
-**Discovered In:** UC-012 (Place Order)
-**Reported By:** Evaluation of UC-012
+| | |
+|---|---|
+| **Bug ID** | BUG-003 |
+| **Title** | Order total ignores discount codes |
+| **Severity** | High |
+| **Status** | Open |
+| **Discovered In** | UC-012 (Place Order) |
+| **Reported By** | Evaluation of UC-012 |
+| **GitHub Issue** | https://github.com/acme/store/issues/47 |
 
 ## Description
 
@@ -90,3 +93,4 @@ and shipping. The discount is visually applied to line items but not reflected i
 6. Identify related artifacts (use cases, business rules, affected files)
 7. Set status to Open
 8. Create a GitHub tracking issue by following the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`
+9. Update the bug report's **GitHub Issue** field in the Overview section with the issue URL (e.g., `https://github.com/owner/repo/issues/42`)

@@ -2,12 +2,15 @@
 
 ## Overview
 
-**Bug ID:** BUG-XXX
-**Title:** [Short descriptive title]
-**Severity:** [Critical | High | Medium | Low]
-**Status:** Open
-**Discovered In:** [UC-XXX / TT-XXX / Testing / Production]
-**Reported By:** [Source: evaluation, testing, user report, etc.]
+| | |
+|---|---|
+| **Bug ID** | BUG-XXX |
+| **Title** | [Short descriptive title] |
+| **Severity** | [Critical \| High \| Medium \| Low] |
+| **Status** | Open |
+| **Discovered In** | [UC-XXX / TT-XXX / Testing / Production] |
+| **Reported By** | [Source: evaluation, testing, user report, etc.] |
+| **GitHub Issue** | [link to the tracking issue] |
 
 ## Description
 

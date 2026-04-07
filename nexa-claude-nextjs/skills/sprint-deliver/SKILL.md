@@ -14,8 +14,7 @@ arguments: none
 
 <!-- TODO: This skill currently delivers only the first-priority use case and stops.
      Future versions will iterate through the full delivery order autonomously,
-     handling cross-UC dependencies, running /sprint-audit after all UCs are
-     delivered, and generating a cumulative E2E report. -->
+     handling cross-UC dependencies and generating a cumulative E2E report. -->
 
 ## Instructions
 
@@ -104,8 +103,8 @@ SPRINT COMPLETE — all use cases in the delivery order have been delivered.
 Delivered:
 - <UC ID> — <Name> (each row)
 
-Next steps: run /sprint-audit for cross-cutting quality checks, then
-/sprint-demo to close the sprint.
+Next step: run /sprint-complete to close the sprint, update the dashboard,
+and publish the report.
 ```
 
 Otherwise, display the selected use case and the overall progress:

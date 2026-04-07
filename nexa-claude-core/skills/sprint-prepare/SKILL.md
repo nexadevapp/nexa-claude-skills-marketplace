@@ -101,9 +101,9 @@ All sprint-scoped artifacts go in:
 docs/sprints/next-sprint/
 ```
 
-This is always the upcoming or in-progress sprint. When a sprint is completed, the user
-renames it to `sprint-N/` (e.g., `sprint-1/`, `sprint-2/`). This skill always writes to
-`next-sprint/`.
+This is always the upcoming or in-progress sprint. When a sprint is completed,
+`/sprint-complete` archives it to `sprint-N/` (e.g., `sprint-1/`, `sprint-2/`).
+This skill always writes to `next-sprint/`.
 
 If `docs/sprints/next-sprint/` already exists and contains a `readiness-report.md`, warn
 the user that a previous sprint preparation exists and ask whether to overwrite or abort.
@@ -777,3 +777,121 @@ Recommended order for running `/deliver-use-case` on each selected use case:
   followed by `/deliver-use-case` for each use case in the recommended order.
 - **BLOCKERS REMAIN**: At least one blocker-severity gap exists. List what must be resolved before
   delivery can begin.
+
+---
+
+### Phase 8: Update Sprints Overview Dashboard
+
+After producing the readiness report, update the project dashboard so it reflects the
+sprint being prepared. The dashboard lives at `docs/sprints/sprints-overview/` and is
+cumulative — it shows all sprints (past and current).
+
+#### Step 8a: Bootstrap Dashboard (first sprint only)
+
+If `docs/sprints/sprints-overview/manifest.json` does NOT exist, create the dashboard
+infrastructure:
+
+1. Create `docs/sprints/sprints-overview/` directory.
+
+2. Create `docs/sprints/sprints-overview/manifest.json` with the project skeleton:
+
+   ```json
+   {
+     "project": "<project name from docs/requirements.md or repo name>",
+     "currentSprint": null,
+     "sprints": [],
+     "useCases": [],
+     "documents": [
+       { "id": "requirements", "name": "Requirements", "file": "../../requirements.md" },
+       { "id": "entity-model", "name": "Entity Model", "file": "../../entity_model.md" },
+       { "id": "use-case-diagram", "name": "Use Case Diagram", "file": "../../use_cases.puml" }
+     ],
+     "wireframe": "../../wireframes/index.html"
+   }
+   ```
+
+3. Create `docs/sprints/sprints-overview/index.html` — the dashboard SPA that reads
+   `manifest.json` and renders sprint overviews, use case details, and document viewers.
+   Use the reference implementation from the skill's project repository as the template.
+   The dashboard must:
+   - Have a sidebar with Sprints, Use Cases, and Documents sections
+   - Show sprint cards with use case grids
+   - Embed markdown files via an iframe using `md-viewer.html`
+   - Embed HTML design files directly in iframes
+   - Display PlantUML source inline for `.puml` files
+   - Be responsive (mobile sidebar toggle)
+   - Use a clean, professional design suitable for stakeholder presentations
+
+4. Create `docs/sprints/sprints-overview/md-viewer.html` — a markdown renderer page that:
+   - Accepts a `?file=path/to/doc.md` query parameter
+   - Fetches and renders the markdown using the `marked` library (CDN)
+   - Renders Mermaid diagrams using the `mermaid` library (CDN)
+   - Posts its height to the parent frame for auto-resize
+   - Has clean typography suitable for embedded viewing
+
+5. Create `docs/index.html` — a redirect page:
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+     <meta charset="UTF-8">
+     <meta http-equiv="refresh" content="0;url=sprints/sprints-overview/">
+     <title>Redirecting to Project Dashboard...</title>
+   </head>
+   <body>
+     <p>Redirecting to <a href="sprints/sprints-overview/">Project Dashboard</a>...</p>
+   </body>
+   </html>
+   ```
+
+#### Step 8b: Register the Sprint in the Manifest
+
+1. Read `docs/sprints/sprints-overview/manifest.json`.
+
+2. Determine the sprint name from the readiness report or the sprint scope summary.
+
+3. Determine the sprint ID:
+   - Count existing sprint entries in the `sprints` array
+   - New ID = `sprint-<count + 1>`
+
+4. Add a new sprint entry:
+   ```json
+   {
+     "id": "sprint-N",
+     "name": "Sprint N — <theme from scope summary>",
+     "date": "<today's date>",
+     "status": "in-progress",
+     "useCases": ["UC-XXX", "UC-YYY", "UC-ZZZ"],
+     "files": {
+       "readiness": "../next-sprint/readiness-report.md",
+       "changelog": "../next-sprint/changelog.md",
+       "refinement": "../next-sprint/refinement-proposal.md"
+     }
+   }
+   ```
+
+5. Set `currentSprint` to the new sprint ID.
+
+6. Add use case entries to the `useCases` array for any UCs not already present:
+   ```json
+   {
+     "id": "UC-XXX",
+     "name": "<use case name>",
+     "spec": "../../use_cases/UC-XXX.md",
+     "design": "../../designs/UC-XXX-design.html",
+     "delivery": "../../delivery/UC-XXX-iterations.md"
+   }
+   ```
+   Skip the `design` field for use cases with no user-facing UI.
+   Skip the `delivery` field — it will be populated once the UC is delivered.
+
+7. Write the updated `manifest.json`.
+
+#### Step 8c: Report
+
+After updating the dashboard, inform the user:
+
+> **Dashboard updated:** `docs/sprints/sprints-overview/index.html`
+>
+> Sprint N registered as in-progress with [N] use cases in scope.
+> Open the dashboard locally to verify it renders correctly before delivery.

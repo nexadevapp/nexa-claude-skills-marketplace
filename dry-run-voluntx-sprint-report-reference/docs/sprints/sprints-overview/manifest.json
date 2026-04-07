@@ -1,0 +1,44 @@
+{
+  "project": "VoluntX",
+  "currentSprint": "sprint-2",
+  "sprints": [
+    {
+      "id": "sprint-1",
+      "name": "Sprint 1 — Auth Foundation",
+      "date": "2026-04-01",
+      "status": "delivered",
+      "useCases": ["UC-042", "UC-001", "UC-043", "UC-044", "UC-004"],
+      "files": {
+        "readiness": "../sprint-1/readiness-report.md",
+        "changelog": "../sprint-1/changelog.md",
+        "refinement": "../sprint-1/refinement-proposal.md"
+      }
+    },
+    {
+      "id": "sprint-2",
+      "name": "Sprint 2 — Onboarding",
+      "date": "2026-04-02",
+      "status": "delivered",
+      "useCases": ["UC-003"],
+      "files": {
+        "readiness": "../sprint-2/readiness-report.md",
+        "changelog": "../sprint-2/changelog.md",
+        "refinement": "../sprint-2/refinement-proposal.md"
+      }
+    }
+  ],
+  "useCases": [
+    { "id": "UC-042", "name": "View Landing Page", "spec": "../../use_cases/UC-042.md", "design": "../../designs/UC-042-design.html", "delivery": "../../delivery/UC-042-iterations.md" },
+    { "id": "UC-001", "name": "Register with Email", "spec": "../../use_cases/UC-001.md", "design": "../../designs/UC-001-design.html", "delivery": "../../delivery/UC-001-iterations.md" },
+    { "id": "UC-043", "name": "Login", "spec": "../../use_cases/UC-043.md", "design": "../../designs/UC-043-design.html", "delivery": "../../delivery/UC-043-iterations.md" },
+    { "id": "UC-044", "name": "Logout", "spec": "../../use_cases/UC-044.md", "design": "../../designs/UC-044-design.html", "delivery": "../../delivery/UC-044-iterations.md" },
+    { "id": "UC-004", "name": "Recover Password", "spec": "../../use_cases/UC-004.md", "design": "../../designs/UC-004-design.html", "delivery": "../../delivery/UC-004-iterations.md" },
+    { "id": "UC-003", "name": "Complete Volunteer Onboarding Wizard", "spec": "../../use_cases/UC-003.md", "design": "../../designs/UC-003-design.html", "delivery": "../../delivery/UC-003-iterations.md" }
+  ],
+  "documents": [
+    { "id": "requirements", "name": "Requirements", "file": "../../requirements.md" },
+    { "id": "entity-model", "name": "Entity Model", "file": "../../entity_model.md" },
+    { "id": "use-case-diagram", "name": "Use Case Diagram", "file": "../../use_cases.puml" }
+  ],
+  "wireframe": "../../wireframe/index.html"
+}

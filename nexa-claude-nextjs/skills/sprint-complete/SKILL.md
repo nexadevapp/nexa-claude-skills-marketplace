@@ -1,12 +1,12 @@
 ---
 name: sprint-complete
 description: >
-  Completes the current sprint by validating all use cases are delivered, closing GitHub
-  issues, generating a sprint summary, updating the sprints overview dashboard, archiving
-  the sprint folder, and publishing the report to the sprint-report branch for Amplify
-  deployment. Use when the user asks to "complete the sprint", "close the sprint",
-  "finish the sprint", "wrap up the sprint", or mentions sprint completion, sprint close,
-  or sprint demo preparation.
+  Completes the current sprint by validating all use cases are delivered, running an E2E
+  regression gate, closing GitHub issues, generating a sprint summary, updating the sprints
+  overview dashboard, archiving the sprint folder, and publishing the report to the
+  sprint-report branch for Amplify deployment. Use when the user asks to "complete the
+  sprint", "close the sprint", "finish the sprint", "wrap up the sprint", or mentions
+  sprint completion, sprint close, or sprint demo preparation.
 user_invocable: true
 arguments: none
 ---
@@ -15,9 +15,9 @@ arguments: none
 
 ## Instructions
 
-Complete the current sprint by validating delivery, closing GitHub issues, generating a
-summary report, updating the project dashboard, archiving sprint artifacts, and publishing
-the updated report for stakeholder review.
+Complete the current sprint by validating delivery, running the E2E regression gate,
+closing GitHub issues, generating a summary report, updating the project dashboard,
+archiving sprint artifacts, and publishing the updated report for stakeholder review.
 
 The sprints overview dashboard (`docs/sprints/sprints-overview/index.html`) is the
 stakeholder-facing artifact — it is what gets presented in the sprint demo. This skill
@@ -34,6 +34,7 @@ If any prerequisite fails, stop and report which prerequisite is not met.
 ## DO NOT
 
 - Modify specification or design documents
+- Skip the E2E regression gate when E2E tests exist
 - Fix bugs or implementation issues — the sprint is done, this is closing time
 - Skip the GitHub issue closure step
 - Archive without generating the summary first
@@ -78,7 +79,66 @@ Execute these phases in order.
 
 ---
 
-### Phase 2: Close GitHub Issues
+### Phase 2: E2E Regression Gate
+
+Run the full Playwright E2E suite as a regression check before closing the sprint. This
+ensures that bug fixes, technical tasks, and any other changes introduced during the sprint
+have not broken existing functionality — even in sprints that only contain bug fixes and
+have no new use case deliveries.
+
+1. Check whether E2E tests exist:
+   - Look for files matching `e2e/**/*.spec.ts`
+   - If no test files exist, skip this phase entirely and note "No E2E tests found — regression
+     gate skipped" (this will be included in the sprint summary)
+
+2. Verify Docker is running (required for Testcontainers database):
+   ```bash
+   docker info > /dev/null 2>&1
+   ```
+   If Docker is not running, ask the user to start Docker or Colima before continuing.
+   Wait for confirmation, then re-check before proceeding.
+
+3. Run the full E2E suite:
+   ```bash
+   npx playwright test
+   ```
+   **Critical rules** (same as `/deliver-use-case`):
+   - NO filters: no `--grep`, `--grep-invert`, `--project` subset
+   - Must show `0 failed`, `0 skipped`, **exit code 0** to pass
+
+4. If all tests pass:
+   - Record the result: total tests, passed count, duration
+   - Proceed to Phase 3
+
+5. If any tests fail:
+   - Display the failure summary to the user
+   - Classify each failure:
+     - **Regression from bug fix** — a fix introduced in this sprint broke an existing test
+     - **Flaky test** — test passes on re-run without code changes
+     - **Pre-existing failure** — test was already failing before this sprint
+   - Present options:
+
+     > **E2E Regression Gate — FAILED**
+     >
+     > | Test | Classification | Details |
+     > |------|---------------|---------|
+     > | [test name] | [type] | [brief reason] |
+     >
+     > **Options:**
+     > 1. Fix and re-run — address the failures, then re-run the suite
+     > 2. Complete anyway — proceed with failures noted in the sprint summary
+     > 3. Cancel — stop sprint completion
+     >
+     > What would you like to do?
+
+   - **Option 1**: The user fixes the issue (or asks you to), then re-run from step 3.
+     Allow up to 3 re-runs. After 3 failures, only options 2 and 3 remain.
+   - **Option 2**: Record failures in the sprint summary as known regressions and proceed.
+   - **Option 3**: Stop the pipeline.
+
+---
+
+### Phase 3: Close GitHub Issues
 
 For each **delivered** use case, find and close its GitHub issue:
 
@@ -103,7 +163,7 @@ Report the results to the user before proceeding.
 
 ---
 
-### Phase 3: Determine Sprint Number
+### Phase 4: Determine Sprint Number
 
 1. List existing sprint folders in `docs/sprints/`:
    - Pattern: `sprint-1/`, `sprint-2/`, etc.
@@ -113,16 +173,17 @@ Report the results to the user before proceeding.
 
 ---
 
-### Phase 4: Generate Sprint Summary
+### Phase 5: Generate Sprint Summary
 
 Gather information and generate the summary:
 
 1. **Delivered UCs**: List from iteration logs with iteration counts
 2. **Traceability**: Read `docs/delivery/<UC-ID>-traceability.md` for each delivered UC
    to count verified requirements
-3. **Issues encountered**: Extract from iteration logs (retries, blockers, failures)
-4. **Sprint duration**: From git log — first and last commit touching sprint artifacts
-5. **Audit results**: Read `docs/delivery/sprint-audit-report.md` if it exists (optional —
+3. **E2E regression**: Record result from Phase 2 (passed/failed/skipped, test counts, failures)
+4. **Issues encountered**: Extract from iteration logs (retries, blockers, failures)
+5. **Sprint duration**: From git log — first and last commit touching sprint artifacts
+6. **Audit results**: Read `docs/delivery/sprint-audit-report.md` if it exists (optional —
    may not be present since sprint-audit is no longer part of the pipeline)
 
 Write `docs/sprints/next-sprint/SUMMARY.md`:
@@ -151,6 +212,19 @@ Write `docs/sprints/next-sprint/SUMMARY.md`:
 | Total delivery iterations | N |
 | Avg iterations per UC | N.N |
 | Total verified FRs | N |
+
+## E2E Regression Gate
+
+| Metric | Value |
+|--------|-------|
+| Result | PASSED / FAILED (with known regressions) / SKIPPED (no tests) |
+| Total tests | N |
+| Passed | N |
+| Failed | N |
+| Duration | Ns |
+
+*(If failed with known regressions, list them here:)*
+- [test name] — [classification and brief reason]
 
 ## GitHub Issues
 
@@ -185,7 +259,7 @@ Write `docs/sprints/next-sprint/SUMMARY.md`:
 
 ---
 
-### Phase 5: Update Sprints Overview Dashboard
+### Phase 6: Update Sprints Overview Dashboard
 
 The sprints overview lives at `docs/sprints/sprints-overview/` and is driven by
 `manifest.json`. `/sprint-prepare` bootstraps this directory and creates the initial
@@ -200,7 +274,7 @@ manifest entry with status `in-progress`.
    - Set `status` to `"delivered"`
    - Set `date` to today's date
    - Update the `files` object to point to the **archived** sprint folder paths
-     (since the folder will be renamed in Phase 6):
+     (since the folder will be renamed in Phase 7):
      ```json
      "files": {
        "readiness": "../sprint-N/readiness-report.md",
@@ -220,7 +294,7 @@ manifest entry with status `in-progress`.
 
 ---
 
-### Phase 6: Archive the Sprint
+### Phase 7: Archive the Sprint
 
 1. Rename the sprint folder:
    ```bash
@@ -247,7 +321,7 @@ manifest entry with status `in-progress`.
 
 ---
 
-### Phase 7: Publish to Sprint Report Branch
+### Phase 8: Publish to Sprint Report Branch
 
 Rebase the `sprint-report` branch from the main branch and push so AWS Amplify auto-deploys
 the updated dashboard. The `sprint-report` branch is the long-lived branch from which the
@@ -290,7 +364,7 @@ sprint demo is presented — it accumulates the state of all completed sprints.
 
 ---
 
-### Phase 8: Commit and Report
+### Phase 9: Commit and Report
 
 1. Stage all changes on the current branch:
    ```bash

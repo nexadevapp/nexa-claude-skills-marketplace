@@ -9,6 +9,11 @@ test.beforeAll(async ({ request }) => {
   suiteUser = await createTestUser(request, { accountType: 'BUYER' });
 });
 
+test.afterEach(async ({ context }) => {
+  // Clear cookies and storage between tests to prevent session leakage
+  await context.clearCookies();
+});
+
 test.afterAll(async ({ request }) => {
   await deleteTestUser(request, suiteUser.id);
 });
@@ -19,17 +24,16 @@ test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
   // ── Helper: log in as a given user via the UI ───────────────────────
   async function loginViaUI(page: import('@playwright/test').Page, user: TestUser) {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByLabel('Email')).toBeVisible();
     await page.getByLabel('Email').fill(user.email);
     await page.getByLabel('Password').fill(user.plainPassword);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await page.waitForLoadState('networkidle');
   }
 
   // ── Helper: log out via the UI ──────────────────────────────────────
   async function logoutViaUI(page: import('@playwright/test').Page) {
     await page.getByRole('button', { name: 'Sign out' }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByLabel('Email')).toBeVisible(); // back to login screen
   }
 
   // MSS: the full happy path as one test — entry point to final outcome
@@ -39,7 +43,7 @@ test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
 
     // 2. Navigate to the Items page through the UI (not via page.goto('/items'))
     await page.getByRole('link', { name: 'Items' }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
 
     // 3. Verify the list screen loaded
     const rows = page.locator('table tbody tr');
@@ -56,7 +60,6 @@ test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
     await page.getByLabel('Name').fill('E2E Test Item');
     await page.getByLabel('Description').fill('Created by E2E test');
     await page.getByRole('button', { name: 'Save' }).click();
-    await page.waitForLoadState('networkidle');
 
     // 6. Verify the final outcome
     // Verifies Success Postcondition: Item Stored and Visible
@@ -86,7 +89,7 @@ test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
 
     // Navigate to Items through the UI
     await page.getByRole('link', { name: 'Items' }).click();
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
 
     // Verify the empty state
     await expect(page.getByText('No items found')).toBeVisible();
@@ -104,11 +107,10 @@ test.describe('UC-001: Manage Items', { tag: ['@UC-001'] }, () => {
 
     try {
       await page.goto('/login');
-      await page.waitForLoadState('networkidle');
+      await expect(page.getByLabel('Email')).toBeVisible();
       await page.getByLabel('Email').fill(suspendedUser.email);
       await page.getByLabel('Password').fill(suspendedUser.plainPassword);
       await page.getByRole('button', { name: 'Sign in' }).click();
-      await page.waitForLoadState('networkidle');
 
       // Verify suspended user sees the locked screen
       await expect(page.getByText('Account suspended')).toBeVisible();

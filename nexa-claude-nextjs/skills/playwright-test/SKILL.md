@@ -93,6 +93,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - **Create separate tests for business rules** — verify business rules inline within the journey where they apply
 - **Run tests on multiple browsers** — use Chromium only. The `playwright.config.ts` must have exactly one project
 - Access the database directly in tests — use the test API endpoints (`/api/e2e/users`) instead
+- **Use `waitForLoadState('networkidle')`** — it waits for zero network activity for 500ms, but Next.js dev-server HMR websockets, analytics pings, and prefetch requests can delay or prevent it from settling, causing flaky timeouts in CI. Instead, wait for the specific UI element that signals the page is ready (a heading, a table row, a form field)
 - Skip waiting for page loads or network requests to complete
 - Use hard-coded delays (`page.waitForTimeout`) instead of proper waits
 - Delete all data in cleanup (only remove data created during the test)
@@ -124,9 +125,8 @@ fully-valid user suitable for happy-path scenarios.
    - All consent flags: `true`
    - `auth_provider`: `"EMAIL"`
    - `created_at` / `updated_at`: current timestamp
-2. **Before all tests (after user creation):** Log in via the login page UI and save the authenticated state.
-3. **After all tests:** Log out via the UI (click "Sign out").
-4. **After all tests (after logout):** Delete the user and all related records via the test API endpoint.
+2. **After each test:** Clear cookies and storage to prevent session leakage between tests.
+3. **After all tests:** Delete the user and all related records via the test API endpoint.
 
 ### Per-Test User Override
 
@@ -145,8 +145,7 @@ unconfirmed email, a different account type) provision their own user, overridin
    - `auth_provider`: `"EMAIL"`
    - `created_at` / `updated_at`: current timestamp
 2. **Start of test:** Log in as this custom user via the login page UI.
-3. **End of test:** Log out via the UI (click "Sign out").
-4. **After the test:** Delete this custom user and all related records via the test API endpoint.
+3. **After the test:** Delete this custom user and all related records via the test API endpoint (use `finally` blocks to ensure cleanup runs even on failure). Cookies are cleared by the suite-level `afterEach`.
 
 ### Test API Endpoint
 
@@ -244,14 +243,12 @@ test.beforeAll(async ({ request }) => {
   suiteUser = await createTestUser(request, { accountType: 'BUYER' });
 });
 
-test.afterAll(async ({ request, browser }) => {
-  // Log out via UI, then delete the user
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Sign out' }).click();
-  await context.close();
+test.afterEach(async ({ context }) => {
+  // Clear cookies and storage between tests to prevent session leakage
+  await context.clearCookies();
+});
 
+test.afterAll(async ({ request }) => {
   await deleteTestUser(request, suiteUser.id);
 });
 ```
@@ -262,13 +259,13 @@ test.afterAll(async ({ request, browser }) => {
 test('MSS: ...', async ({ page }) => {
   // Start at login — the ONLY page.goto() allowed
   await page.goto('/login');
-  await page.waitForLoadState('networkidle');
+  await expect(page.getByLabel('Email')).toBeVisible();
 
   // Log in as the suite user
   await page.getByLabel('Email').fill(suiteUser.email);
   await page.getByLabel('Password').fill(suiteUser.plainPassword);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await page.waitForLoadState('networkidle');
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
   // ... continue the journey
 });
@@ -286,11 +283,10 @@ test('AF2: suspended user sees account-locked screen', async ({ page, request })
 
   try {
     await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByLabel('Email')).toBeVisible();
     await page.getByLabel('Email').fill(suspendedUser.email);
     await page.getByLabel('Password').fill(suspendedUser.plainPassword);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await page.waitForLoadState('networkidle');
 
     // Verify suspended user sees the locked screen
     await expect(page.getByText('Account suspended')).toBeVisible();
@@ -306,7 +302,7 @@ test('AF2: suspended user sees account-locked screen', async ({ page, request })
 ```typescript
 // Start at the application entry point — the ONLY page.goto() allowed
 await page.goto('/');
-await page.waitForLoadState('networkidle');
+await expect(page.getByRole('heading')).toBeVisible();
 ```
 
 ### Navigate Through the UI (never via URL)
@@ -314,16 +310,13 @@ await page.waitForLoadState('networkidle');
 ```typescript
 // Click a navigation link to reach the next screen
 await page.getByRole('link', { name: 'Items' }).click();
-await page.waitForLoadState('networkidle');
+await expect(page.getByRole('heading', { name: 'Items' })).toBeVisible();
 
 // Click a button to open a form/modal
 await page.getByRole('button', { name: 'Add New' }).click();
 
 // Click a table row to navigate to detail
 await page.locator('table tbody tr').first().click();
-await page.waitForLoadState('networkidle');
-
-// Verify you arrived at the expected screen
 await expect(page.getByRole('heading')).toContainText('Item Details');
 ```
 
@@ -346,7 +339,6 @@ await page.getByLabel('Name').fill('Test Value');
 await page.getByLabel('Category').selectOption('option-1');
 await page.getByLabel('Active').check();
 await page.getByRole('button', { name: 'Save' }).click();
-await page.waitForLoadState('networkidle');
 ```
 
 ### Verify Final Outcome
@@ -407,13 +399,14 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Set up suite-level user in `test.beforeAll` (create via test API, log in via UI)
     - For tests needing a custom user, create a per-test user override (see Common Patterns)
     - `page.goto()` to the login page (the **only** goto in the test), log in via UI
+    - After every navigation or action that loads a new page, wait for a **specific UI element** (heading, table row, form field) — never `waitForLoadState('networkidle')`
     - Navigate through each screen by clicking links, buttons, and submitting forms
     - Verify intermediate states along the way (page loaded, data displayed, form visible)
     - Perform the key interactions (fill forms, click actions, confirm dialogs)
     - Assert the final outcome (success message, data in list, redirect to expected page)
-    - Log out via UI at end of test (or in `test.afterAll` for suite user)
     - Clean up test-specific entity data if created during test
     - Clean up per-test override users in `finally` blocks or `test.afterEach`
+    - Clear cookies and storage in `test.afterEach` to prevent session leakage between tests
     - Delete suite user in `test.afterAll`
 12. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
 13. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)

@@ -71,10 +71,12 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 4. Read project design rules from `docs/designs/DESIGN_RULES.md` (if it exists). These are project-specific constraints — e.g., shared layout elements (header, footer, sidebar), mandatory components, or navigation patterns — that every implementation must follow. Missing a shared element specified in design rules is a defect.
 5. Check existing code for patterns and conventions
 6. **i18n Detection** — Always check whether the project uses internationalization.
-   Look for any i18n indicators: translation/message files, i18n configuration, locale directories,
-   translation function imports (`useTranslations`, `getTranslations`, `t()`, `intl`, etc.),
-   locale-based routing segments (`[locale]`, `[lang]`), or i18n libraries in `package.json`
-   (e.g., `next-intl`, `react-intl`, `react-i18next`, `i18next`).
+   First, check the project's `CLAUDE.md` for the marker `<!-- NEXA_I18N_CONFIGURED -->`.
+   If absent, fall back to looking for i18n indicators: translation/message files, i18n
+   configuration, locale directories, translation function imports (`useTranslations`,
+   `getTranslations`, `t()`, `intl`, etc.), locale-based routing segments (`[locale]`,
+   `[lang]`), or i18n libraries in `package.json` (e.g., `next-intl`, `react-intl`,
+   `react-i18next`, `i18next`).
    If any i18n setup is found, **all user-facing strings in this implementation MUST use the
    project's established translation pattern**:
     - Study how existing pages use translations and follow the same pattern

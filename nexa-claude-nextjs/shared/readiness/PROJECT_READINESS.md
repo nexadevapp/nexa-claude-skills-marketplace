@@ -48,9 +48,15 @@ to look for.
 
 ### Internationalization (Conditional)
 
-**This section applies only when `docs/requirements.md` mentions internationalization,
-localization, multi-language, i18n, or supported locales.** If the requirements do not
-mention any of these, skip this section entirely.
+**Detection:** Check the project's `CLAUDE.md` for the marker `<!-- NEXA_I18N_CONFIGURED -->`.
+If the marker is present, i18n has been set up — apply the checks below.
+
+If the marker is absent, fall back to scanning `docs/requirements.md` for mentions of
+internationalization, localization, multi-language, i18n, or supported locales. If the
+requirements mention i18n but the marker is absent, that means `/setup-i18n` has not been
+run yet — report this as a failure.
+
+If neither the marker nor the requirements mention i18n, skip this section entirely.
 
 When internationalization is required:
 

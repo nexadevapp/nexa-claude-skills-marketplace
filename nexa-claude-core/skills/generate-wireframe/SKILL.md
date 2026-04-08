@@ -96,10 +96,11 @@ mark and accent required by the language.
 ### Locale detection
 
 Check these sources in order:
-1. i18n configuration files (e.g., `next-intl` config, `i18n.ts`, `middleware.ts` locale list)
-2. Translation files in `messages/` or `locales/` directories
-3. Use case specifications (which may contain localized text)
-4. If no locale information is found, default to `lang="en"`
+1. The project's `CLAUDE.md` for the marker `<!-- NEXA_I18N_CONFIGURED -->` (includes locale list and default locale)
+2. i18n configuration files (e.g., `next-intl` config, `i18n.ts`, `middleware.ts` locale list)
+3. Translation files in `messages/` or `locales/` directories
+4. Use case specifications (which may contain localized text)
+5. If no locale information is found, default to `lang="en"`
 
 Set the `lang` attribute on `<html>` to match the detected locale.
 

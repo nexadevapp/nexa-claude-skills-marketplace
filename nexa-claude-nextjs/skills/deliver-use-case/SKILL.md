@@ -193,8 +193,10 @@ After implementation passes build and unit tests, run an isolated audit to verif
 Definition of Done, catch i18n gaps, accessibility issues, and visual deviations before
 E2E tests are written. Fixing these issues now avoids rewriting tests later when the UI changes.
 
-This step always runs. Lenses 2–4 (i18n) are skipped if the project does not use
-internationalization (no `messages/` directory and no `i18n/` directory exist).
+This step always runs. Lenses 1–3 (i18n) are skipped if the project does not use
+internationalization. Detection: check the project's `CLAUDE.md` for the marker
+`<!-- NEXA_I18N_CONFIGURED -->`. If absent, fall back to checking for a `messages/`
+directory or `i18n/` directory. If none of these exist, skip i18n lenses.
 
 #### Phase 1: Audit (Isolated Agent)
 
@@ -239,8 +241,9 @@ Agent prompt:
 > - **Test Coverage**: Verify unit tests exist for business logic, MSS, alternative flows,
 >   and business rules
 > - **Privacy**: Search for hardcoded secrets, verify `.gitignore` covers sensitive files
-> - **Internationalization**: Only check if the project uses i18n (detected by presence of
->   `messages/` or `i18n/` directory). If not, mark all i18n items as N/A
+> - **Internationalization**: Only check if the project uses i18n. Detection: look for
+>   `<!-- NEXA_I18N_CONFIGURED -->` in the project's `CLAUDE.md`, or fall back to checking
+>   for a `messages/` or `i18n/` directory. If none found, mark all i18n items as N/A
 > - **Configuration Management**: Verify environment profiles exist
 >
 > ---

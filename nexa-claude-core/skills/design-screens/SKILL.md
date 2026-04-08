@@ -157,6 +157,7 @@ accent required by the language.
    `lang="ro"` for Romanian, `lang="fr"` for French). If the project supports multiple
    locales, use the default locale.
 3. **Detect the project locale automatically.** Check these sources in order:
+   - The project's `CLAUDE.md` for the marker `<!-- NEXA_I18N_CONFIGURED -->` (includes locale list and default locale)
    - i18n configuration files (e.g., `next-intl` config, `i18n.ts`, `middleware.ts` locale list)
    - Translation files in `messages/` or `locales/` directories
    - The use case specification (which may contain localized text)

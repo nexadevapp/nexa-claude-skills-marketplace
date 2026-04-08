@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexa Agentic Engineering — Developer Onboarding</title>
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #12151c;
+    --surface2: #1a1e28;
+    --surface3: #232936;
+    --border: #2d3344;
+    --text: #e8eaf0;
+    --text-dim: #8890a6;
+    --text-muted: #5c6478;
+    --accent: #6c8aff;
+    --accent-light: #8fa8ff;
+    --accent-glow: rgba(108,138,255,.12);
+    --success: #22c55e;
+    --success-glow: rgba(34,197,94,.12);
+    --warning: #f59e0b;
+    --warning-glow: rgba(245,158,11,.12);
+    --error: #ef4444;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --pink: #f472b6;
+    
+    /* Phase colors */
+    --inception: #f59e0b;
+    --elaboration: #a78bfa;
+    --construction: #3b82f6;
+    --setup: #22d3ee;
+    --verification: #22c55e;
+    --orchestration: #f472b6;
+    --infrastructure: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 20px; color: #fff;
+    box-shadow: 0 4px 12px rgba(108,138,255,.25);
+  }
+  .header-text h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .header-text p { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .header-actions { margin-left: auto; display: flex; gap: 8px; }
+  .header-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .header-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .header-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .header-btn.primary:hover { background: var(--accent-light); }
+
+  /* Main Layout */
+  .app { display: flex; min-height: calc(100vh - 85px); }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 320px;
+    min-width: 320px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header h2 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .sidebar-header p { font-size: 12px; color: var(--text-dim); }
+  
+  .progress-bar {
+    margin-top: 16px;
+    background: var(--surface2);
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), var(--cyan));
+    border-radius: 6px;
+    transition: width .4s ease;
+  }
+  .progress-text {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav-section { margin-bottom: 8px; }
+  .nav-section-header {
+    padding: 8px 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-section-header .phase-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all .15s;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--surface2); }
+  .nav-item.active { background: var(--accent-glow); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  
+  .nav-item .step-indicator {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    transition: all .2s;
+  }
+  .nav-item.completed .step-indicator {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+  .nav-item.current .step-indicator {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+  .nav-item.locked .step-indicator {
+    opacity: 0.5;
+  }
+
+  .nav-item-content { flex: 1; min-width: 0; }
+  .nav-item-title {
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-item-title code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .nav-item-subtitle {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .nav-item.locked .nav-item-title,
+  .nav-item.locked .nav-item-subtitle { opacity: 0.5; }
+
+  .nav-item .status-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.required { background: var(--warning-glow); color: var(--warning); }
+  .status-badge.optional { background: var(--surface3); color: var(--text-dim); }
+  .status-badge.done { background: var(--success-glow); color: var(--success); }
+
+  /* Main Content */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+    background: var(--bg);
+  }
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Welcome View */
+  .welcome-view {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .welcome-hero {
+    text-align: center;
+    padding: 48px 0;
+  }
+  .welcome-hero h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--text), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .welcome-hero p {
+    font-size: 16px;
+    color: var(--text-dim);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .onboarding-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .onboarding-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .onboarding-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  }
+  .onboarding-card .icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .onboarding-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .onboarding-card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .onboarding-card .arrow {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Step View */
+  .step-view { max-width: 800px; }
+  .step-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+  }
+  .step-breadcrumb span { color: var(--text-muted); }
+  .step-breadcrumb .phase {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .step-header {
+    margin-bottom: 32px;
+  }
+  .step-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-header h1 code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 18px;
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 4px 12px;
+    border-radius: 8px;
+  }
+  .step-header p {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 640px;
+  }
+
+  .step-content {
+    display: grid;
+    gap: 20px;
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .step-card h3 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-card h3 .icon { font-size: 14px; }
+
+  .step-card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .step-card li {
+    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .step-card li:last-child { border-bottom: none; }
+  .step-card li .bullet {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .step-card code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .step-card.highlight {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent-glow), transparent);
+  }
+
+  .prereq-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .prereq-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .prereq-tag:hover { border-color: var(--accent); }
+  .prereq-tag.done {
+    border-color: var(--success);
+    background: var(--success-glow);
+  }
+  .prereq-tag .check {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+  .prereq-tag.done .check {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+
+  .example-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .example-box .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .example-box pre {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .step-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .step-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .step-btn.primary:hover { background: var(--accent-light); }
+  .step-btn.secondary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .step-btn.secondary:hover { border-color: var(--accent); }
+  .step-btn.success {
+    background: var(--success);
+    color: #fff;
+  }
+
+  /* Quick Reference Panel */
+  .quick-ref {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    z-index: 50;
+    display: none;
+  }
+  .quick-ref.visible { display: block; }
+  .quick-ref h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .quick-ref .close-btn {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: none;
+    background: var(--surface2);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .quick-ref ul {
+    list-style: none;
+    font-size: 12px;
+  }
+  .quick-ref li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .quick-ref li:last-child { border-bottom: none; }
+  .quick-ref code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { width: 280px; min-width: 280px; }
+    .main { padding: 24px; }
+  }
+  @media (max-width: 768px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; min-width: 100%; max-height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .quick-ref { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">N</div>
+  <div class="header-text">
+    <h1>Nexa Agentic Engineering</h1>
+    <p>Developer Onboarding Guide</p>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" onclick="toggleQuickRef()">⌘ Quick Ref</button>
+    <button class="header-btn" onclick="resetProgress()">↺ Reset</button>
+    <button class="header-btn primary" onclick="window.open('https://github.com/alteriglu/nexa-claude-skills-marketplace')">GitHub</button>
+  </div>
+</header>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>Your Progress</h2>
+      <p>Complete each step to master the workflow</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-text">
+        <span id="progressText">0 of 12 steps</span>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+    <div class="sidebar-nav" id="sidebarNav"></div>
+  </nav>
+  
+  <main class="main" id="mainContent"></main>
+</div>
+
+<div class="quick-ref" id="quickRef">
+  <h4>
+    Quick Reference
+    <button class="close-btn" onclick="toggleQuickRef()">×</button>
+  </h4>
+  <ul>
+    <li><span>Requirements</span><code>/requirements</code></li>
+    <li><span>Entity Model</span><code>/entity-model</code></li>
+    <li><span>Use Cases</span><code>/use-case-diagram</code></li>
+    <li><span>Spec</span><code>/use-case-spec</code></li>
+    <li><span>Design</span><code>/design-screens</code></li>
+    <li><span>Implement</span><code>/implement</code></li>
+    <li><span>Test</span><code>/vitest-test</code></li>
+    <li><span>E2E</span><code>/playwright-test</code></li>
+    <li><span>Deliver</span><code>/deliver-use-case</code></li>
+  </ul>
+</div>
+
+<script>
+const STEPS = [
+  {
+    id: 'welcome',
+    phase: null,
+    title: 'Welcome',
+    subtitle: 'Start your onboarding journey',
+    required: false,
+    isWelcome: true
+  },
+  {
+    id: 'setup-claude',
+    phase: 'Setup',
+    phaseColor: '#22d3ee',
+    title: 'Install Claude Code',
+    subtitle: 'Get your AI coding assistant ready',
+    cmd: null,
+    required: true,
+    content: {
+      description: 'Before using Nexa skills, you need Claude Code installed and configured. This is your AI-powered development environment.',
+      checklist: [
+        'Install Claude Code from claude.ai/code',
+        'Sign in with your Anthropic account',
+        'Verify installation by running claude in terminal'
+      ],
+      example: '$ claude\nWelcome to Claude Code! Type /help for commands.',
+      next: 'Clone the marketplace repository'
+    }
+  },
+  {
+    id: 'clone-marketplace',
+    phase: 'Setup',
+    phaseColor: '#22d3ee',
+    title: 'Clone Marketplace',
+    subtitle: 'Get the Nexa skills on your machine',
+    cmd: null,
+    required: true,
+    content: {
+      description: 'The Nexa skills live in a GitHub repository. Clone it to access all the slash commands and methodology.',
+      checklist: [
+        'Clone the nexa-claude-skills-marketplace repo',
+        'Navigate to your project directory',
+        'Add marketplace as a Claude plugin reference'
+      ],
+      example: '$ git clone https://github.com/alteriglu/nexa-claude-skills-marketplace\n$ cd your-project\n$ claude /add-plugin ../nexa-claude-skills-marketplace',
+      next: 'Write your project vision'
+    }
+  },
+  {
+    id: 'requirements',
+    phase: 'Inception',
+    phaseColor: '#f59e0b',
+    title: 'Requirements',
+    subtitle: 'Transform vision into structured requirements',
+    cmd: '/requirements',
+    required: true,
+    content: {
+      description: 'Start by describing what you want to build. Claude will help you organize it into user stories, non-functional requirements, and constraints.',
+      checklist: [
+        'Write a brief vision document (1 paragraph to 1 page)',
+        'Run /requirements in Claude Code',
+        'Review generated FR, NFR, and Constraints',
+        'Refine until requirements feel complete'
+      ],
+      output: 'docs/requirements.md',
+      example: 'User: /requirements\n\nClaude: I\'ll help you create a requirements catalog.\nWhat\'s the vision for your project?\n\nUser: A task management app for small teams...',
+      triggers: ['write requirements', 'create a PRD', 'define user stories']
+    }
+  },
+  {
+    id: 'entity-model',
+    phase: 'Elaboration',
+    phaseColor: '#a78bfa',
+    title: 'Entity Model',
+    subtitle: 'Design your data model with ER diagrams',
+    cmd: '/entity-model',
+    required: true,
+    prereqs: ['requirements'],
+    content: {
+      description: 'Based on your requirements, Claude designs the data model — entities, relationships, attributes, and validation rules, visualized as a Mermaid ER diagram.',
+      checklist: [
+        'Ensure docs/requirements.md exists',
+        'Run /entity-model',
+        'Review generated ER diagram in Mermaid',
+        'Check entity attributes and relationships',
+        'Iterate until model is complete'
+      ],
+      output: 'docs/entity_model.md',
+      inputs: ['docs/requirements.md'],
+      example: 'User: /entity-model\n\nClaude: I\'ll create an entity model from your requirements.\n\n```mermaid\nerDiagram\n  User ||--o{ Task : owns\n  Task }o--|| Project : belongs_to\n```'
+    }
+  },
+  {
+    id: 'use-case-diagram',
+    phase: 'Elaboration',
+    phaseColor: '#a78bfa',
+    title: 'Use Case Diagram',
+    subtitle: 'Map actors to system behaviors',
+    cmd: '/use-case-diagram',
+    required: true,
+    prereqs: ['requirements'],
+    content: {
+      description: 'Generate a PlantUML use case diagram showing actors (users, external systems) and their interactions with the system.',
+      checklist: [
+        'Run /use-case-diagram',
+        'Review actors and use cases',
+        'Verify all major features are captured',
+        'Add missing use cases if needed'
+      ],
+      output: 'docs/use_cases.puml',
+      inputs: ['docs/requirements.md']
+    }
+  },
+  {
+    id: 'sprint-prepare',
+    phase: 'Elaboration',
+    phaseColor: '#a78bfa',
+    title: 'Sprint Preparation',
+    subtitle: 'Select and refine use cases for delivery',
+    cmd: '/sprint-prepare',
+    required: false,
+    prereqs: ['entity-model', 'use-case-diagram'],
+    content: {
+      description: 'Select which use cases to tackle in the current sprint. Claude refines requirements, updates the entity model, generates detailed specs and screen designs.',
+      checklist: [
+        'Pick 2-4 use cases for the sprint',
+        'Run /sprint-prepare',
+        'Review generated specs and designs',
+        'Validate sprint readiness report'
+      ],
+      output: 'Sprint readiness report with specs and designs'
+    }
+  },
+  {
+    id: 'setup-env',
+    phase: 'Setup (Next.js)',
+    phaseColor: '#22d3ee',
+    title: 'Environment Profiles',
+    subtitle: 'Configure local, dev, and prod environments',
+    cmd: '/setup-env-profiles',
+    required: true,
+    stack: 'nextjs',
+    content: {
+      description: 'Set up environment profiles with database URLs and configuration for local development, staging, and production.',
+      checklist: [
+        'Run /setup-env-profiles',
+        'Provide database URLs when prompted',
+        'Review generated .env files',
+        'Test local database connection'
+      ],
+      output: '.env.local, .env.development, .env.production, .env.test'
+    }
+  },
+  {
+    id: 'prisma-migration',
+    phase: 'Setup (Next.js)',
+    phaseColor: '#22d3ee',
+    title: 'Prisma Migration',
+    subtitle: 'Generate database schema from entity model',
+    cmd: '/prisma-migration',
+    required: true,
+    stack: 'nextjs',
+    prereqs: ['entity-model'],
+    content: {
+      description: 'Convert your entity model into Prisma schema and generate database migrations.',
+      checklist: [
+        'Ensure entity model is complete',
+        'Run /prisma-migration',
+        'Review generated Prisma schema',
+        'Run migration against local database',
+        'Verify tables are created correctly'
+      ],
+      output: 'prisma/schema.prisma, prisma/migrations/',
+      inputs: ['docs/entity_model.md']
+    }
+  },
+  {
+    id: 'implement',
+    phase: 'Construction',
+    phaseColor: '#3b82f6',
+    title: 'Implement Use Cases',
+    subtitle: 'Build pages, components, and APIs',
+    cmd: '/implement',
+    required: true,
+    stack: 'nextjs',
+    prereqs: ['use-case-spec', 'prisma-migration'],
+    content: {
+      description: 'Implement a use case: Next.js pages, React components, API routes, server actions, and unit tests. Implementation follows the spec and design artifact.',
+      checklist: [
+        'Ensure use case spec exists',
+        'Ensure design artifact exists (or run /design-screens)',
+        'Run /implement UC-XXX',
+        'Review generated code',
+        'Verify with next build',
+        'Run unit tests'
+      ],
+      output: 'app/, components/, app/api/, unit tests',
+      example: 'User: /implement UC-001\n\nClaude: Implementing UC-001: User Registration...\n✓ Created app/register/page.tsx\n✓ Created components/RegisterForm.tsx\n✓ Created app/api/auth/register/route.ts'
+    }
+  },
+  {
+    id: 'testing',
+    phase: 'Construction',
+    phaseColor: '#3b82f6',
+    title: 'Testing',
+    subtitle: 'Integration and E2E tests',
+    cmd: '/vitest-test, /playwright-test',
+    required: true,
+    stack: 'nextjs',
+    prereqs: ['implement'],
+    content: {
+      description: 'Create comprehensive tests: Vitest for integration tests with real databases (via Testcontainers), Playwright for browser-based E2E tests.',
+      checklist: [
+        'Run /vitest-test for integration tests',
+        'Run /playwright-test for E2E tests',
+        'Review test coverage',
+        'Fix any failing tests',
+        'Run full test suite'
+      ],
+      output: 'src/**/*.test.ts, e2e/**/*.spec.ts'
+    }
+  },
+  {
+    id: 'deliver',
+    phase: 'Orchestration',
+    phaseColor: '#f472b6',
+    title: 'Deliver Use Case',
+    subtitle: 'Full pipeline: spec → design → implement → test → review',
+    cmd: '/deliver-use-case',
+    required: false,
+    stack: 'nextjs',
+    prereqs: ['requirements', 'entity-model'],
+    content: {
+      description: 'The power move: orchestrates the entire pipeline automatically. Spec → Design → Migration → Implement → Test → Code Review → Evaluate. Iterates up to 3 times until all quality gates pass.',
+      checklist: [
+        'Ensure requirements and entity model exist',
+        'Run /deliver-use-case UC-XXX',
+        'Watch the pipeline execute',
+        'Review final summary',
+        'Address any remaining issues'
+      ],
+      output: 'Fully delivered use case with all artifacts',
+      example: 'User: /deliver-use-case UC-001\n\nClaude: Starting delivery pipeline for UC-001...\n\n✓ Step 1: Use Case Specification\n✓ Step 2: Design Screens\n✓ Step 3: Entity Gate (all entities present)\n✓ Step 4: Implementation\n✓ Step 5: Integration Tests\n✓ Step 6: E2E Tests\n✓ Step 7: Code Review (PASS)\n✓ Step 8: Evaluation (PASS)\n\n🎉 UC-001 delivered successfully!'
+    }
+  }
+];
+
+// State
+let completedSteps = JSON.parse(localStorage.getItem('nexa-onboarding-progress') || '[]');
+let currentStep = 'welcome';
+
+function saveProgress() {
+  localStorage.setItem('nexa-onboarding-progress', JSON.stringify(completedSteps));
+  updateProgressBar();
+  renderSidebar();
+}
+
+function resetProgress() {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    completedSteps = [];
+    currentStep = 'welcome';
+    saveProgress();
+    renderMain();
+  }
+}
+
+function toggleQuickRef() {
+  document.getElementById('quickRef').classList.toggle('visible');
+}
+
+function updateProgressBar() {
+  const total = STEPS.filter(s => !s.isWelcome).length;
+  const done = completedSteps.length;
+  const percent = Math.round((done / total) * 100);
+  document.getElementById('progressFill').style.width = percent + '%';
+  document.getElementById('progressText').textContent = `${done} of ${total} steps`;
+  document.getElementById('progressPercent').textContent = percent + '%';
+}
+
+function getStepStatus(step) {
+  if (completedSteps.includes(step.id)) return 'completed';
+  if (step.prereqs) {
+    const allPrereqsDone = step.prereqs.every(p => completedSteps.includes(p));
+    if (!allPrereqsDone) return 'locked';
+  }
+  return 'available';
+}
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  let html = '';
+  let currentPhase = null;
+  let stepNum = 0;
+
+  STEPS.forEach(step => {
+    if (step.isWelcome) {
+      html += `
+        <div class="nav-item ${currentStep === step.id ? 'active' : ''}" onclick="goToStep('${step.id}')">
+          <div class="step-indicator" style="background: var(--accent); border-color: var(--accent); color: #fff">★</div>
+          <div class="nav-item-content">
+            <div class="nav-item-title">Welcome</div>
+            <div class="nav-item-subtitle">Start here</div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    if (step.phase !== currentPhase) {
+      currentPhase = step.phase;
+      html += `
+        <div class="nav-section">
+          <div class="nav-section-header">
+            ${currentPhase}
+            <div class="phase-line"></div>
+          </div>
+        </div>`;
+    }
+
+    stepNum++;
+    const status = getStepStatus(step);
+    const statusClass = status === 'completed' ? 'completed' : (status === 'locked' ? 'locked' : (currentStep === step.id ? 'current' : ''));
+
+    html += `
+      <div class="nav-item ${statusClass} ${currentStep === step.id ? 'active' : ''}" onclick="goToStep('${step.id}')">
+        <div class="step-indicator">${status === 'completed' ? '✓' : stepNum}</div>
+        <div class="nav-item-content">
+          <div class="nav-item-title">
+            ${step.title}
+            ${step.cmd ? `<code>${step.cmd}</code>` : ''}
+          </div>
+          <div class="nav-item-subtitle">${step.subtitle}</div>
+        </div>
+        ${step.required ? '<span class="status-badge required">Required</span>' : ''}
+        ${status === 'completed' ? '<span class="status-badge done">Done</span>' : ''}
+      </div>`;
+  });
+
+  nav.innerHTML = html;
+}
+
+function goToStep(stepId) {
+  currentStep = stepId;
+  renderSidebar();
+  renderMain();
+}
+
+function markComplete(stepId) {
+  if (!completedSteps.includes(stepId)) {
+    completedSteps.push(stepId);
+    saveProgress();
+  }
+  // Go to next step
+  const currentIndex = STEPS.findIndex(s => s.id === stepId);
+  if (currentIndex < STEPS.length - 1) {
+    goToStep(STEPS[currentIndex + 1].id);
+  }
+}
+
+function renderMain() {
+  const main = document.getElementById('mainContent');
+  const step = STEPS.find(s => s.id === currentStep);
+
+  if (step.isWelcome) {
+    main.innerHTML = `
+      <div class="welcome-view">
+        <div class="welcome-hero">
+          <h1>Welcome to Nexa Agentic Engineering</h1>
+          <p>A structured methodology for building software with AI assistance. Follow the steps to learn how to go from vision to deployed application.</p>
+        </div>
+        
+        <div class="onboarding-cards">
+          <div class="onboarding-card" onclick="goToStep('setup-claude')">
+            <div class="icon" style="background: linear-gradient(135deg, var(--cyan), var(--accent));">🚀</div>
+            <h3>Quick Start</h3>
+            <p>New to Nexa? Start here. We'll guide you through setup, your first requirements, and building a feature.</p>
+            <div class="arrow">Begin Setup →</div>
+          </div>
+          
+          <div class="onboarding-card" onclick="goToStep('requirements')">
+            <div class="icon" style="background: linear-gradient(135deg, var(--inception), var(--warning));">📋</div>
+            <h3>I have Claude Code</h3>
+            <p>Already set up? Jump straight to writing requirements and designing your system.</p>
+            <div class="arrow">Start Building →</div>
+          </div>
+          
+          <div class="onboarding-card" onclick="goToStep('deliver')">
+            <div class="icon" style="background: linear-gradient(135deg, var(--pink), var(--purple));">⚡</div>
+            <h3>Power User</h3>
+            <p>Know the basics? Learn about /deliver-use-case — the one command that does everything.</p>
+            <div class="arrow">Learn Orchestration →</div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 48px; text-align: center;">
+          <h3 style="font-size: 16px; margin-bottom: 16px;">The Workflow at a Glance</h3>
+          <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+            <span style="padding: 8px 16px; background: var(--inception); color: #000; border-radius: 8px; font-size: 13px; font-weight: 600;">Inception</span>
+            <span style="color: var(--text-dim);">→</span>
+            <span style="padding: 8px 16px; background: var(--elaboration); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600;">Elaboration</span>
+            <span style="color: var(--text-dim);">→</span>
+            <span style="padding: 8px 16px; background: var(--construction); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600;">Construction</span>
+            <span style="color: var(--text-dim);">→</span>
+            <span style="padding: 8px 16px; background: var(--verification); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600;">Verification</span>
+            <span style="color: var(--text-dim);">→</span>
+            <span style="padding: 8px 16px; background: var(--infrastructure); color: #fff; border-radius: 8px; font-size: 13px; font-weight: 600;">Deployment</span>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const status = getStepStatus(step);
+  const c = step.content;
+
+  let prereqsHtml = '';
+  if (step.prereqs) {
+    prereqsHtml = `
+      <div class="step-card">
+        <h3><span class="icon">🔗</span> Prerequisites</h3>
+        <div class="prereq-list">
+          ${step.prereqs.map(p => {
+            const prereqStep = STEPS.find(s => s.id === p);
+            const done = completedSteps.includes(p);
+            return `<div class="prereq-tag ${done ? 'done' : ''}" onclick="goToStep('${p}')">
+              <span class="check">${done ? '✓' : ''}</span>
+              ${prereqStep.cmd || prereqStep.title}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  main.innerHTML = `
+    <div class="step-view">
+      <div class="step-breadcrumb">
+        <span class="phase" style="background: ${step.phaseColor}22; color: ${step.phaseColor}">${step.phase}</span>
+        <span>›</span>
+        Step ${STEPS.filter(s => !s.isWelcome).findIndex(s => s.id === step.id) + 1}
+      </div>
+      
+      <div class="step-header">
+        <h1>
+          ${step.title}
+          ${step.cmd ? `<code>${step.cmd}</code>` : ''}
+        </h1>
+        <p>${c.description}</p>
+      </div>
+      
+      <div class="step-content">
+        ${prereqsHtml}
+        
+        <div class="step-card highlight">
+          <h3><span class="icon">✓</span> What to Do</h3>
+          <ul>
+            ${c.checklist.map(item => `<li><span class="bullet"></span>${item}</li>`).join('')}
+          </ul>
+        </div>
+        
+        ${c.output ? `
+        <div class="step-card">
+          <h3><span class="icon">📁</span> Output</h3>
+          <p><code>${c.output}</code></p>
+        </div>` : ''}
+        
+        ${c.inputs ? `
+        <div class="step-card">
+          <h3><span class="icon">📥</span> Inputs</h3>
+          <ul>
+            ${c.inputs.map(i => `<li><span class="bullet"></span><code>${i}</code></li>`).join('')}
+          </ul>
+        </div>` : ''}
+        
+        ${c.example ? `
+        <div class="step-card">
+          <h3><span class="icon">💡</span> Example</h3>
+          <div class="example-box">
+            <pre>${c.example}</pre>
+          </div>
+        </div>` : ''}
+        
+        ${c.triggers ? `
+        <div class="step-card">
+          <h3><span class="icon">🎯</span> Trigger Phrases</h3>
+          <p style="color: var(--text-dim); font-size: 13px;">You can also invoke this skill by saying:</p>
+          <ul>
+            ${c.triggers.map(t => `<li><span class="bullet"></span>"${t}"</li>`).join('')}
+          </ul>
+        </div>` : ''}
+      </div>
+      
+      <div class="step-actions">
+        ${status !== 'completed' ? `
+          <button class="step-btn success" onclick="markComplete('${step.id}')">
+            ✓ Mark as Complete
+          </button>
+        ` : `
+          <button class="step-btn secondary" style="pointer-events: none; opacity: 0.6;">
+            ✓ Completed
+          </button>
+        `}
+        ${STEPS.findIndex(s => s.id === step.id) < STEPS.length - 1 ? `
+          <button class="step-btn primary" onclick="goToStep('${STEPS[STEPS.findIndex(s => s.id === step.id) + 1].id}')">
+            Next Step →
+          </button>
+        ` : ''}
+      </div>
+    </div>`;
+}
+
+// Initialize
+renderSidebar();
+renderMain();
+updateProgressBar();
+</script>
+
+</body>
+</html>

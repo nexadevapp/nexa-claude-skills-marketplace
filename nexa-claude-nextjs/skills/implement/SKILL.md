@@ -130,14 +130,6 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
       - **Source/Reasoning:** Quote the source document or explain the reasoning
     - INFERRED decisions are candidates for stakeholder review before merge
 
-## DoD Check
-
-- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE.md`.
-- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE_TT.md`.
-- For **BUG-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE_BUG.md`.
-
-Do not proceed to post-implementation tracking until all items pass or the user explicitly waives failures.
-
 ## Post-Implementation Tracking
 
 Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.

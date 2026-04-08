@@ -189,12 +189,12 @@ If verification fails, fix the issues and re-verify. Do not proceed until both c
 
 ### Step 2.5: Implementation Audit (Isolated Agent)
 
-After implementation passes build and unit tests, run an isolated audit to catch i18n gaps,
-accessibility issues, and visual deviations before E2E tests are written. Fixing these issues
-now avoids rewriting tests later when the UI changes.
+After implementation passes build and unit tests, run an isolated audit to verify the
+Definition of Done, catch i18n gaps, accessibility issues, and visual deviations before
+E2E tests are written. Fixing these issues now avoids rewriting tests later when the UI changes.
 
-**Skip if** the project does not use internationalization (no `messages/` directory and no
-`i18n/` directory exist).
+This step always runs. Lenses 2–4 (i18n) are skipped if the project does not use
+internationalization (no `messages/` directory and no `i18n/` directory exist).
 
 #### Phase 1: Audit (Isolated Agent)
 
@@ -211,12 +211,41 @@ Agent prompt:
 > - Use case specification: `docs/use_cases/$ARGUMENTS.md`
 > - Frontend design: `docs/designs/$ARGUMENTS-design.html`
 > - Entity model: `docs/entity_model.md`
+> - Definition of Done checklist: `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_DONE.md`
 > - i18n configuration: `i18n/config.ts` (for supported locales)
 > - Message files: `messages/*.json` (one per locale)
 >
 > ---
 >
-> **Lens 1: i18n Completeness** (file analysis — no browser)
+> **Lens 0: Definition of Done** (file and code analysis — no browser)
+>
+> Read the Definition of Done checklist. For every item in the checklist, independently
+> verify whether the implementation satisfies it by reading the code, the spec, and the
+> entity model. Do NOT trust that the implementer already checked these — verify from
+> scratch.
+>
+> For each checklist item, report:
+> 1. The item name (e.g., "Main Success Scenario coverage")
+> 2. **PASS** or **FAIL** with evidence: file paths, line numbers, or specific observations
+> 3. If FAIL: what is missing or incorrect
+>
+> Key verification points:
+> - **Task Completeness**: Cross-reference every MSS step, alternative flow, business rule,
+>   precondition, and postcondition from the spec against the actual code
+> - **Acceptance Criteria**: Check the GitHub tracking issue for $ARGUMENTS and verify each
+>   acceptance criterion is satisfiable
+> - **Code Quality**: Run `npx next build` and check for errors; verify input validation
+>   exists at system boundaries; verify error states surface meaningful feedback
+> - **Test Coverage**: Verify unit tests exist for business logic, MSS, alternative flows,
+>   and business rules
+> - **Privacy**: Search for hardcoded secrets, verify `.gitignore` covers sensitive files
+> - **Internationalization**: Only check if the project uses i18n (detected by presence of
+>   `messages/` or `i18n/` directory). If not, mark all i18n items as N/A
+> - **Configuration Management**: Verify environment profiles exist
+>
+> ---
+>
+> **Lens 1: i18n Completeness** (file analysis — no browser) — **skip if no i18n**
 >
 > Identify every user-facing string introduced or modified for $ARGUMENTS. For each string:
 > 1. Verify it uses a translation function (`t('key')`, `getTranslations`, `useTranslations`),
@@ -231,7 +260,7 @@ Agent prompt:
 > 4. Flag any key in non-default locales that still has a `[TRANSLATE]` prefix (placeholder
 >    not yet translated).
 >
-> **Lens 2: i18n Correctness** (file analysis — no browser)
+> **Lens 2: i18n Correctness** (file analysis — no browser) — **skip if no i18n**
 >
 > For every translation key used by $ARGUMENTS, compare the values across all locale files:
 > 1. Verify placeholders (e.g., `{name}`, `{count}`) match across all locales — same names,
@@ -242,7 +271,7 @@ Agent prompt:
 >    to the default locale (suggesting they were not actually translated).
 > 4. Flag translations where the meaning clearly diverges from the default locale.
 >
-> **Lens 3: Error Message i18n** (file analysis — no browser)
+> **Lens 3: Error Message i18n** (file analysis — no browser) — **skip if no i18n**
 >
 > Search all implementation files for $ARGUMENTS and identify every error-handling path:
 > 1. `catch` blocks that display messages to the user
@@ -309,8 +338,10 @@ Agent prompt:
 > - **Suggested fix:** how to fix it
 >
 > Use this severity guide:
-> - **Critical:** User sees broken/untranslated text, app crashes, WCAG A violation
-> - **Major:** Missing translation in non-default locale, WCAG AA violation, missing error state
+> - **Critical:** DoD item FAIL (missing scenario coverage, missing business rule enforcement,
+>   build failure, hardcoded secrets), user sees broken/untranslated text, app crashes, WCAG A violation
+> - **Major:** Missing translation in non-default locale, WCAG AA violation, missing error state,
+>   missing unit tests for a business rule or alternative flow
 > - **Minor:** Placeholder not yet translated (`[TRANSLATE]`), minor style deviation, missing
 >   decorative alt text
 >

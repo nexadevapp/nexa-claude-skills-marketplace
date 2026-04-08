@@ -3,10 +3,10 @@ name: sprint-complete
 description: >
   Completes the current sprint by validating all use cases are delivered, running an E2E
   regression gate, closing GitHub issues, generating a sprint summary, updating the sprints
-  overview dashboard, archiving the sprint folder, and publishing the report to the
-  sprint-report branch for Amplify deployment. Use when the user asks to "complete the
-  sprint", "close the sprint", "finish the sprint", "wrap up the sprint", or mentions
-  sprint completion, sprint close, or sprint demo preparation.
+  overview dashboard, archiving the sprint folder, and creating a pull request from the
+  sprint branch to main. The PR body contains the sprint report. Use when the user asks to
+  "complete the sprint", "close the sprint", "finish the sprint", "wrap up the sprint", or
+  mentions sprint completion, sprint close, or sprint demo preparation.
 user_invocable: true
 arguments: none
 ---
@@ -17,17 +17,19 @@ arguments: none
 
 Complete the current sprint by validating delivery, running the E2E regression gate,
 closing GitHub issues, generating a summary report, updating the project dashboard,
-archiving sprint artifacts, and publishing the updated report for stakeholder review.
+archiving sprint artifacts, and creating a pull request to merge the sprint branch
+into `main`.
 
-The sprints overview dashboard (`docs/sprints/sprints-overview/index.html`) is the
-stakeholder-facing artifact — it is what gets presented in the sprint demo. This skill
-ensures it reflects the completed sprint.
+The PR serves as the formal release gate — E2E tests run in GitHub Actions on the PR,
+and a formal code review must be completed before merging. Merging the PR to `main` is
+the release / sprint demo moment.
 
 ## Prerequisites
 
 - Sprint has been delivered (`/sprint-deliver` completed for all use cases in scope)
 - The application builds successfully (`npx next build`)
 - `docs/sprints/next-sprint/readiness-report.md` exists
+- Currently on a `sprint-<N>` branch (created by `/sprint-kickoff`)
 
 If any prerequisite fails, stop and report which prerequisite is not met.
 
@@ -38,8 +40,8 @@ If any prerequisite fails, stop and report which prerequisite is not met.
 - Fix bugs or implementation issues — the sprint is done, this is closing time
 - Skip the GitHub issue closure step
 - Archive without generating the summary first
-- Force-push to `sprint-report` without confirming the dashboard renders correctly
 - Create a git commit on the current branch without user confirmation
+- Create the PR without user confirmation
 - **Sleep or wait between test retries** — when `npx playwright test` fails, present options to the user immediately. Never use `sleep`, `setTimeout`, or any delay before re-running. The fix-then-rerun cycle must be immediate — no pauses of any duration
 
 ## Pipeline
@@ -166,11 +168,14 @@ Report the results to the user before proceeding.
 
 ### Phase 4: Determine Sprint Number
 
-1. List existing sprint folders in `docs/sprints/`:
-   - Pattern: `sprint-1/`, `sprint-2/`, etc.
-   - Find the highest number N
-   - New sprint number = N + 1
-   - If no numbered sprints exist, start with sprint-1
+1. Read the sprint number from the current branch name:
+   ```bash
+   git branch --show-current
+   ```
+   - Expected format: `sprint-<N>` (e.g., `sprint-3`)
+   - Extract N from the branch name
+   - If the current branch does not match `sprint-<N>`, stop and report:
+     "Not on a sprint branch. Expected `sprint-<N>` branch (created by `/sprint-kickoff`)."
 
 ---
 
@@ -322,52 +327,9 @@ manifest entry with status `in-progress`.
 
 ---
 
-### Phase 8: Publish to Sprint Report Branch
+### Phase 8: Commit Sprint Artifacts
 
-Rebase the `sprint-report` branch from the main branch and push so AWS Amplify auto-deploys
-the updated dashboard. The `sprint-report` branch is the long-lived branch from which the
-sprint demo is presented — it accumulates the state of all completed sprints.
-
-1. Verify the dashboard files are in place:
-   - `docs/sprints/sprints-overview/index.html` exists
-   - `docs/sprints/sprints-overview/manifest.json` exists and is valid JSON
-   - `docs/sprints/sprints-overview/md-viewer.html` exists
-
-2. Determine the main branch name:
-   ```bash
-   git remote show origin | sed -n 's/.*HEAD branch: //p'
-   ```
-   Use the result (typically `main` or `master`) as `<main-branch>` below.
-
-3. Create or rebase the `sprint-report` branch:
-
-   **If `sprint-report` does not exist locally or on remote:**
-   ```bash
-   git branch sprint-report <main-branch>
-   ```
-
-   **If `sprint-report` already exists:**
-   ```bash
-   git checkout sprint-report
-   git rebase <main-branch>
-   ```
-
-   If the rebase has conflicts, abort and report to the user — do not force-resolve.
-
-4. Push to remote:
-   ```bash
-   git push origin sprint-report --force-with-lease
-   git checkout -
-   ```
-
-5. Confirm the push succeeded. If it fails (e.g., no remote, auth issue), warn the user
-   but do not fail the entire sprint-complete pipeline — the local artifacts are still valid.
-
----
-
-### Phase 9: Commit and Report
-
-1. Stage all changes on the current branch:
+1. Stage all changes on the sprint branch:
    ```bash
    git add docs/sprints/ docs/delivery/
    ```
@@ -390,6 +352,38 @@ sprint demo is presented — it accumulates the state of all completed sprints.
    git commit -m "Close sprint-N: [1-line summary of delivered UCs]"
    ```
 
+4. Push to remote:
+   ```bash
+   git push origin sprint-<N>
+   ```
+
+---
+
+### Phase 9: Create Pull Request
+
+Create a PR from `sprint-<N>` → `main`. The sprint report becomes the PR body so that
+reviewers see the full sprint summary, and GitHub Actions runs E2E tests on the PR.
+
+1. Read the generated `docs/sprints/sprint-N/SUMMARY.md` to use as the PR body content.
+
+2. Ask the user for confirmation:
+
+   > **Ready to create the sprint PR.**
+   >
+   > - From: `sprint-<N>`
+   > - To: `main`
+   > - Title: `Sprint N: [1-line summary]`
+   > - Body: Sprint summary report
+   >
+   > Create the pull request?
+
+3. If confirmed, create the PR:
+   ```bash
+   gh pr create --base main --head sprint-<N> \
+     --title "Sprint N: [1-line summary of delivered UCs]" \
+     --body "<sprint summary content from SUMMARY.md>"
+   ```
+
 4. Report to user:
 
    > **Sprint N completed!**
@@ -400,14 +394,18 @@ sprint demo is presented — it accumulates the state of all completed sprints.
    >
    > **GitHub Issues Closed:** #42, #43
    >
+   > **Pull Request:** [PR URL]
+   >
    > **Dashboard:** `docs/sprints/sprints-overview/index.html`
-   > **Published:** Force-pushed to `sprint-report` branch (Amplify will deploy)
    >
    > **Summary:** `docs/sprints/sprint-N/SUMMARY.md`
    >
    > **Next steps:**
-   > - Present the dashboard to stakeholders for sprint demo
-   > - Run `/sprint-prepare` to plan the next sprint
+   > 1. GitHub Actions will run E2E tests on the PR
+   > 2. Perform a formal code review on the PR
+   > 3. Merge the PR to `main` — this is the release
+   > 4. Present the dashboard to stakeholders for sprint demo
+   > 5. Run `/sprint-prepare` to plan the next sprint
 
 ## Folder Structure After Completion
 

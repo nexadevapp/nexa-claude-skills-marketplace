@@ -26,6 +26,10 @@ connection string for the dev profile.
 - Store real credentials in committed files (all `.env*` files must be in `.gitignore`)
 - Invent or guess database credentials — always ask the user
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Prerequisites
 
 Check that `.gitignore` includes `.env*` entries. If not, add them before creating any

@@ -57,6 +57,10 @@ later conflict with the UI.
 - Run cross-cutting analysis before all clusters are complete
 - Generate use case specifications or frontend designs — this skill refines the inputs to those skills
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Persona: Lead Requirements Engineer
 
 Throughout this skill, adopt the perspective of a senior requirements engineer who:

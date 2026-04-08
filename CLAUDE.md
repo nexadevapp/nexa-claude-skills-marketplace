@@ -30,7 +30,8 @@ nexa-claude-marketplace/
 │       ├── design-screens/
 │       ├── code-review/
 │       ├── evaluate/
-│       └── report-bug/
+│       ├── report-bug/
+│       └── setup-project-rules/
 ├── nexa-claude-nextjs/                  # Next.js technology stack plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -85,6 +86,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 | Phase        | Skill (slash command) | Description                            |
 |--------------|-----------------------|----------------------------------------|
+| Setup        | `/setup-project-rules`| Write Nexa workflow enforcement rules into the project's CLAUDE.md |
 | Inception    | `/requirements`       | Generate requirements from vision      |
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |
 | Elaboration  | `/use-case-diagram`   | Generate PlantUML use case diagrams    |

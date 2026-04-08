@@ -20,6 +20,10 @@ Create or update technical task specification documents for $ARGUMENTS in `docs/
 - Mix multiple unrelated tasks in one document
 - Use a technical task for work that has user-facing scenarios (use a use case instead)
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Template
 
 Use [templates/technical-task.md](templates/technical-task.md) as the document structure.

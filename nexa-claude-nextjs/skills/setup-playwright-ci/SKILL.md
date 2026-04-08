@@ -16,6 +16,10 @@ description: >
 Generate a GitHub Actions workflow that runs the project's Playwright end-to-end tests: $ARGUMENTS.
 $ARGUMENTS may specify the branch, workflow name, or special requirements.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Prerequisites
 
 - The project must already have Playwright tests (use the `/playwright-test` skill first if needed)

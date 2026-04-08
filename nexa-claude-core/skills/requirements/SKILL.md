@@ -25,6 +25,10 @@ tables.
 - Use duplicate IDs across requirement types
 - Leave the Status column empty
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Requirement Types
 
 ### Functional Requirements (FR)

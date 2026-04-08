@@ -56,6 +56,10 @@ documentation says for the installed version — not with hardcoded assumptions.
 - Set security headers in both the interception entry point and `next.config.js` — pick one location to avoid duplication and conflicts
 - Hardcode file names or runtime constraints without checking the documentation first
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Prerequisites
 
 The following must exist before running this skill:

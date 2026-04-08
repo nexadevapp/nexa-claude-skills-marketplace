@@ -16,6 +16,10 @@ description: >
 Generate AWS App Runner deployment infrastructure for the current project: $ARGUMENTS.
 $ARGUMENTS may specify the app name, region, or special requirements.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Prerequisites
 
 - The project must already have a Dockerfile (use the `aws-dockerize` skill first if needed)

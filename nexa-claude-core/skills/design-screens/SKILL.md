@@ -216,6 +216,10 @@ accent required by the language.
   must be followed. Missing a shared element (header, footer, sidebar) specified in design rules
   is a defect.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Workflow
 
 ### Phase 1 — Gather context

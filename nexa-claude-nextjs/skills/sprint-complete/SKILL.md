@@ -44,6 +44,10 @@ If any prerequisite fails, stop and report which prerequisite is not met.
 - Create the PR without user confirmation
 - **Sleep or wait between test retries** — when `npx playwright test` fails, present options to the user immediately. Never use `sleep`, `setTimeout`, or any delay before re-running. The fix-then-rerun cycle must be immediate — no pauses of any duration
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Pipeline
 
 Execute these phases in order.

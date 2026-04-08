@@ -28,6 +28,10 @@ what was built and report any gaps.
 - Skip checking Alternative Flows or edge cases
 - Accept partial implementations without flagging missing pieces
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Evaluation Dimensions
 
 ### 1. Specification Conformance

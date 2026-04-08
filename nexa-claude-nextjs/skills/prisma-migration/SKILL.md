@@ -20,6 +20,10 @@ Create or update the Prisma schema and generate migrations based on `docs/entity
 - Skip relations defined in the entity model
 - Use `autoincrement()` unless the entity model explicitly requires it (prefer `uuid()` or `cuid()` for IDs)
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Schema Location
 
 ```

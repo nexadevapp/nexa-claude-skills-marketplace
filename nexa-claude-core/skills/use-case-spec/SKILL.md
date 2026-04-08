@@ -23,6 +23,10 @@ Create or update use case specification documents for $ARGUMENTS in `docs/use_ca
 - Mix multiple use cases in one document
 - Use technical implementation details in the flow steps
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Template
 
 Use [templates/use-case.md](templates/use-case.md) as the document structure.

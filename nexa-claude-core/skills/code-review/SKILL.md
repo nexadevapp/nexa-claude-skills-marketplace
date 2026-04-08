@@ -27,6 +27,10 @@ discussions. Judge the code purely on what is there, not on what was intended.
 - Praise code unnecessarily — focus on actionable findings
 - Repeat findings — each issue should appear exactly once
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Review Dimensions
 
 Evaluate the changes across these dimensions, in priority order:

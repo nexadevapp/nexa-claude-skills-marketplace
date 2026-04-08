@@ -49,6 +49,10 @@ Do not proceed with the pipeline until all items pass or the user explicitly wai
 - Create or modify entities in `docs/entity_model.md` or `prisma/schema.prisma` during the pipeline — all entities must exist before `/deliver-use-case` is invoked
 - **Sleep or wait between test retries** — when `npx playwright test` fails, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate — no pauses of any duration
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Iteration Artifacts
 
 Maintain a delivery log at `docs/delivery/$ARGUMENTS-iterations.md` that records every

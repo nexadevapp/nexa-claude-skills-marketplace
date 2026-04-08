@@ -20,6 +20,10 @@ arguments: none
 
 Deliver the next use case from the sprint scope by invoking `/deliver-use-case`.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Step 1: Locate the Sprint Folder
 
 The active sprint is always `docs/sprints/next-sprint/`.

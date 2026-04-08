@@ -26,6 +26,10 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 - Put database calls in client components or API routes called only by server components
 - Make implementation decisions without documenting their provenance (EXPLICIT vs INFERRED)
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## External Dependencies
 
 Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.

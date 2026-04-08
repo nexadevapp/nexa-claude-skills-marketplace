@@ -55,6 +55,10 @@ and API choice must align with what the documentation says for the installed ver
 - Use client-side i18n libraries (react-i18next, react-intl) — use next-intl which is built for App Router server components
 - Create a separate middleware file for i18n if one already exists for auth — compose them in the same entry point
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Prerequisites
 
 The following must exist before running this skill:

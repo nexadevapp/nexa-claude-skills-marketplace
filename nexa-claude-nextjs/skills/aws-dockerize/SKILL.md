@@ -53,3 +53,7 @@ $ARGUMENTS may specify special requirements or be empty.
 - Copy secrets, `.env` files, or credentials into the image
 - Run the application as root in the final stage
 - Install dev dependencies in the production stage
+
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.

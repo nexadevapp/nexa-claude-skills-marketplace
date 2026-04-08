@@ -23,6 +23,10 @@ the bug was discovered.
 - Downplay severity — classify based on actual user or system impact
 - Skip searching for related bugs — check `docs/bugs/` for duplicates first
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Template
 
 Use [templates/bug-report.md](templates/bug-report.md) as the document structure.

@@ -15,6 +15,10 @@ Run these checks after generating or modifying TypeScript/JavaScript files.
 This applies to implementation code, test files, and any `.ts`/`.tsx`/`.js`/`.jsx` files.
 It does **not** apply to Prisma schema files.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## ESLint
 
 Next.js ships with built-in ESLint support. Run the linter and fix all auto-fixable issues:

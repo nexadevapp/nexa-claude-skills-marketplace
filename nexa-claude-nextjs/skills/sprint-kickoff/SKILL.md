@@ -15,6 +15,10 @@ Provides the user-facing "kick off the sprint" command. Performs a quick readine
 check, creates the sprint branch, confirms with the user, then hands off to
 `/sprint-deliver` for autonomous delivery of all use cases.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Flow
 
 ### Step 1: Locate the Sprint

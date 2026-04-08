@@ -38,6 +38,10 @@ assignments, and dependency relationships (includes/extends) that this skill ope
 requirements file provides the substance — functional requirements, NFRs, business rules, and
 acceptance criteria. Both are required inputs and are read together.
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Immutability Rule — Delivered Use Cases
 
 **Delivered use cases are immutable.** A use case is delivered if `docs/delivery/UC-XXX-iterations.md`

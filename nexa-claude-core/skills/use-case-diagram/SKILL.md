@@ -20,6 +20,10 @@ Create or update the PlantUML use case diagram at `docs/use_cases.puml` based on
 - Use non-standard PlantUML syntax
 - Include implementation details in use case names
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Template
 
 ```plantuml

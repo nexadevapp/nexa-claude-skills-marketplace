@@ -125,6 +125,10 @@ Set the `lang` attribute on `<html>` to match the detected locale.
 - Add responsive breakpoints or mobile layouts — that is `/design-screens`' responsibility
 - Strip or approximate diacritics/accents — all UI text must use correct Unicode characters
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Workflow
 
 ### Phase 1 — Gather Context

@@ -22,6 +22,10 @@ The document contains an ER diagram and attribute tables.
 - Create a "Relationships" table
 - Skip the attribute tables
 
+## Nexa Rules Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+
 ## Document Structure
 
 ```markdown

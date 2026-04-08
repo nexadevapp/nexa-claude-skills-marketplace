@@ -31,6 +31,10 @@ Use the context7 MCP server for Next.js documentation when needed.
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
 
+## Sprint Branch Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+
 ## Testcontainers Global Setup
 
 Before writing tests, ensure the project has a global setup file that starts a PostgreSQL

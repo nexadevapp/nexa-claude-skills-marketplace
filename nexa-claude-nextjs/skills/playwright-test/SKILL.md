@@ -109,6 +109,10 @@ await expect(page.locator('table')).toContainText(['New Item']);
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
 
+## Sprint Branch Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+
 ## Test User Provisioning
 
 Every E2E test requires an authenticated user. User provisioning operates at two levels:

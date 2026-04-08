@@ -24,6 +24,10 @@ Create or update the Prisma schema and generate migrations based on `docs/entity
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
 
+## Sprint Branch Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+
 ## Schema Location
 
 ```

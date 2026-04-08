@@ -53,6 +53,10 @@ Do not proceed with the pipeline until all items pass or the user explicitly wai
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
 
+## Sprint Branch Gate
+
+Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+
 ## Iteration Artifacts
 
 Maintain a delivery log at `docs/delivery/$ARGUMENTS-iterations.md` that records every

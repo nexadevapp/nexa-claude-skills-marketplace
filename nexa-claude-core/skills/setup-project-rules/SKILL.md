@@ -72,6 +72,14 @@ When creating a new use case, always read `docs/use_cases.puml` to find the high
 existing UC-XXX number and use the next sequential number. The same applies to TT-XXX
 (technical tasks) and BUG-XXX (bug reports). Never reuse a number, never skip numbers,
 never ask the user to choose.
+
+### Rule 6: Never write code on main/master
+
+Never run code-writing skills (`/implement`, `/deliver-use-case`, `/sprint-deliver`,
+`/prisma-migration`, `/vitest-test`, `/playwright-test`) on the `main` or `master` branch.
+All code changes must happen on a sprint branch (`sprint-*`) created by `/sprint-kickoff`.
+If the current branch is `main` or `master` and the user asks to implement something,
+redirect them to `/sprint-kickoff` first.
 ~~~
 
 ## Marker
@@ -99,6 +107,7 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
    3. Always check for duplicate use cases before creating new ones
    4. Never ask for a preferred use case number
    5. Always use the next available sequential number
+   6. Never write code on main/master — use a sprint branch
 
    These rules are enforced by the Nexa Rules Gate on every skill invocation.
    ```

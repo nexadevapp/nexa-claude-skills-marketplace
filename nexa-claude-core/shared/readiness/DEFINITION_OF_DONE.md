@@ -44,6 +44,17 @@ tracking until the user either fixes the issues or explicitly waives the failing
 - [ ] **Secrets externalized** — Secrets are stored using the stack's standard mechanism (e.g., environment variables, secret managers)
 - [ ] **Sensitive files ignored** — Sensitive files (`.env`, `.env.local`, credentials) are listed in `.gitignore`
 
+### Internationalization
+
+Always check whether the project uses internationalization — look for translation/message files,
+i18n configuration, locale directories, translation function imports, locale-based routing, or
+i18n libraries in `package.json`. If the project uses i18n:
+
+- [ ] **No hardcoded user-facing strings** — Every user-facing string in new or modified components, pages, server actions, and API route handlers uses the project's translation pattern, not a hardcoded literal
+- [ ] **Translation keys added to all locales** — Every new translation key exists in all locale files, following the project's existing file structure and conventions
+- [ ] **Namespace structure maintained** — New keys are organized consistently with the existing message file structure
+- [ ] **Localized navigation used** — If the project provides localized navigation utilities, new code uses them instead of raw framework imports
+
 ### Configuration Management
 
 - [ ] **Environment profiles exist** — Environment-specific configuration exists for dev and prod using the stack's profile mechanism (Spring profiles, `.env.development`/`.env.production`)

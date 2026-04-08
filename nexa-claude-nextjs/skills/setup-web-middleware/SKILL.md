@@ -427,7 +427,46 @@ Regardless of strategy, test these behaviors:
    - Visit a public route (e.g. `/`) → should load normally
    - Check response headers in browser DevTools → security headers should be present
 
-### Step 10: Summary
+### Step 10: Update CLAUDE.md
+
+Append a `## Web Middleware` section to the target project's `CLAUDE.md` so that future
+sessions know the auth strategy, route protection rules, and middleware architecture.
+
+1. If `CLAUDE.md` does not exist, create it
+2. If a `## Web Middleware` section already exists (check for `<!-- NEXA_WEB_MIDDLEWARE_CONFIGURED -->`),
+   ask the user whether to overwrite or skip
+3. Append the following section (fill in the actual values from the setup):
+
+~~~markdown
+## Web Middleware
+
+<!-- NEXA_WEB_MIDDLEWARE_CONFIGURED -->
+
+- Auth strategy: [chosen strategy, e.g. `next-auth` with JWT sessions]
+- Request interception: [file name, e.g. `middleware.ts`] (runtime: [runtime, e.g. Edge])
+- Instrumentation: [file name, e.g. `instrumentation.ts`]
+
+### Auth helpers (`lib/auth/`)
+- `middleware.ts` — `getSessionFromRequest(request)`, `isAuthenticated(session)`, `hasRole(session, role)`
+- `constants.ts` — `PUBLIC_ROUTES`, `AUTH_ROUTES`, `ROLE_PROTECTED_ROUTES`, `DEFAULT_LOGIN_REDIRECT`, `LOGIN_PAGE`
+- `headers.ts` — `securityHeaders()` (CSP, X-Frame-Options, HSTS in production, etc.)
+- `logger.ts` — structured JSON logger for auth events
+
+### Route protection rules
+| Pattern             | Rule                              |
+|---------------------|-----------------------------------|
+| [actual patterns and rules from the setup]             |
+
+### Middleware conventions for implementation
+- Protected routes automatically redirect to login — no manual auth checks needed in pages
+- Server actions called directly (not via fetch/form) bypass middleware — keep explicit auth in those
+- Security headers are set in middleware only — do not duplicate in `next.config.js`
+- The `/implement` skill can assume auth infrastructure exists
+~~~
+
+Do not remove or modify any other content in `CLAUDE.md`.
+
+### Step 11: Summary
 
 Present a summary of what was created:
 

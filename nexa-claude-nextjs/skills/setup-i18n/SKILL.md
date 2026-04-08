@@ -446,7 +446,42 @@ testing them creates maintenance burden without catching real bugs.
    - Check the `<html lang="...">` attribute matches the locale
    - Check that the URL prefix is hidden for the default locale
 
-### Step 13: Summary
+### Step 13: Update CLAUDE.md
+
+Append a `## Internationalization (i18n)` section to the target project's `CLAUDE.md` so that
+future sessions know the i18n strategy and conventions.
+
+1. If `CLAUDE.md` does not exist, create it
+2. If a `## Internationalization (i18n)` section already exists (check for `<!-- NEXA_I18N_CONFIGURED -->`),
+   ask the user whether to overwrite or skip
+3. Append the following section (fill in the actual values from the setup):
+
+~~~markdown
+## Internationalization (i18n)
+
+<!-- NEXA_I18N_CONFIGURED -->
+
+- Library: `next-intl` (server-side, App Router native)
+- Supported locales: [list, e.g. `en`, `de`, `fr`]
+- Default locale: [locale, e.g. `en`]
+- Routing: URL prefix (`/en/...`, `/de/...`), hidden for default locale
+- Locale detection: `Accept-Language` header → cookie → default
+- Translation files: `messages/{locale}.json`
+- Config files: `i18n/config.ts`, `i18n/request.ts`, `i18n/routing.ts`, `i18n/navigation.ts`
+- Locale layout: `app/[locale]/layout.tsx` — all pages live under `app/[locale]/`
+
+### i18n conventions for implementation
+- **Server components:** `const t = await getTranslations('namespace');` then `t('key')`
+- **Client components:** `const t = useTranslations('namespace');` then `t('key')`
+- **Navigation:** import `Link`, `redirect`, `useRouter` from `@/i18n/navigation` (not `next/link`)
+- **New pages:** always create under `app/[locale]/` — never directly under `app/`
+- **New translation keys:** add to `messages/en.json` first, then to other locale files
+- **No hardcoded strings:** all user-facing text must use translation functions
+~~~
+
+Do not remove or modify any other content in `CLAUDE.md`.
+
+### Step 14: Summary
 
 Present a summary of what was created:
 

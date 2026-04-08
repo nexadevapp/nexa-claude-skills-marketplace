@@ -230,7 +230,37 @@ indicates it is the recommended approach for the project's Prisma version, sugge
 one to the user and explain the benefits (centralized config, TypeScript support, env file
 resolution). Do not create it without user confirmation.
 
-### Step 9: Summary
+### Step 9: Update CLAUDE.md
+
+Append a `## Environment Profiles` section to the target project's `CLAUDE.md` so that
+future sessions know which profiles exist and how they work.
+
+1. If `CLAUDE.md` does not exist, create it
+2. If a `## Environment Profiles` section already exists (check for `<!-- NEXA_ENV_PROFILES_CONFIGURED -->`),
+   ask the user whether to overwrite or skip
+3. Append the following section (fill in the actual values from the setup):
+
+~~~markdown
+## Environment Profiles
+
+<!-- NEXA_ENV_PROFILES_CONFIGURED -->
+
+| Profile | File               | Database                            |
+|---------|--------------------|-------------------------------------|
+| local   | `.env.local`       | Testcontainers (dynamic at runtime) |
+| dev     | `.env.development` | Supabase                            |
+| test    | `.env.test`        | Testcontainers (dynamic at runtime) |
+
+- `.env` is a symlink to `.env.local` (default profile for tools that read `.env`)
+- Local and test `DATABASE_URL` is injected at runtime by Testcontainers — do not set it in the `.env` files
+- Dev `DATABASE_URL` uses Supabase connection pooling; `DIRECT_URL` is the direct connection for Prisma migrations
+- Prisma config: [state whether `prisma.config.ts` is used and its location, or `schema.prisma` datasource block]
+- All `.env*` files are in `.gitignore`
+~~~
+
+Do not remove or modify any other content in `CLAUDE.md`.
+
+### Step 10: Summary
 
 Present a summary of what was created:
 

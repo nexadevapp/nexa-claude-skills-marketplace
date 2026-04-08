@@ -88,6 +88,31 @@ The `playwright.config.ts` uses `fullyParallel: false` so tests within each file
 (a use case journey may have ordered steps). However, separate test files (separate use cases) run
 in parallel via the `workers` setting. The CI workflow respects this — no sharding needed.
 
+## Update CLAUDE.md
+
+After creating the workflow, append a `## Playwright CI` section to the target project's
+`CLAUDE.md` so that future sessions know CI is configured.
+
+1. If `CLAUDE.md` does not exist, create it
+2. If a `## Playwright CI` section already exists (check for `<!-- NEXA_PLAYWRIGHT_CI_CONFIGURED -->`),
+   ask the user whether to overwrite or skip
+3. Append the following section (fill in the actual values from the setup):
+
+~~~markdown
+## Playwright CI
+
+<!-- NEXA_PLAYWRIGHT_CI_CONFIGURED -->
+
+- Workflow: `.github/workflows/playwright.yml`
+- Triggers: push to `[branch]`, pull requests to `[branch]`
+- Database: PostgreSQL via Testcontainers (no Docker-in-Docker needed)
+- Browser: Chromium only (installed via `npx playwright install --with-deps chromium`)
+- Artifacts: traces and reports uploaded on failure
+- Global setup: `e2e/global-setup.ts` (starts Testcontainers + dev server)
+~~~
+
+Do not remove or modify any other content in `CLAUDE.md`.
+
 ## DO NOT
 
 - Use the Playwright Docker image as the job container — Testcontainers needs direct Docker access on the runner

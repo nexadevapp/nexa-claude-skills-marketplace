@@ -6,5 +6,6 @@
     "name": "Marius Achim",
     "email": "marius@nexadev.app",
     "url": "https://nexadev.app"
-  }
+  },
+  "hooks": "hooks/hooks.json"
 }

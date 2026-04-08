@@ -186,12 +186,31 @@ Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claud
 ## Testcontainers Global Setup
 
 Before writing tests, ensure the project has a global setup file that starts a PostgreSQL
-Testcontainer, runs Prisma migrations, seeds the database, and starts the Next.js dev server.
+Testcontainer, runs Prisma migrations, and seeds the database. The dev server is handled
+separately by Playwright's `webServer` option.
 
 If `e2e/global-setup.ts` does not exist, create it using [templates/global-setup.ts](templates/global-setup.ts).
 
-Ensure `playwright.config.ts` references the global setup and does **not** use `webServer`
-(the global setup handles both the database and the dev server).
+### `.env.e2e` — Single Source of Truth
+
+All E2E test environment variables live in a `.env.e2e` file at the project root. The global
+setup loads it via `dotenv`, and the `webServer` command sources it before starting the dev
+server. This eliminates dynamic env file generation and scattered `env:` blocks.
+
+```
+NODE_ENV=test
+DATABASE_URL=postgresql://test:test@localhost:5432/testdb
+DIRECT_URL=postgresql://test:test@localhost:5432/testdb
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+AUTH_SECRET=test-secret-for-vitest-at-least-32-characters-long
+AUTH_URL=http://localhost:3000
+E2E_TEST=true
+```
+
+Add project-specific env vars as needed. Commit this file (add `!.env.e2e` to `.gitignore`
+if `.env*` is ignored).
+
+### Playwright Configuration
 
 **Single browser only** — use Chromium. Do NOT add Firefox or WebKit projects. Cross-browser
 testing is not the purpose of E2E tests; verifying user journeys is.
@@ -203,20 +222,22 @@ export default defineConfig({
   testDir: './e2e',
   globalSetup: './e2e/global-setup.ts',
   globalTeardown: './e2e/global-teardown.ts',
-  fullyParallel: false, // E2E journeys may share state; run sequentially
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1, // one worker — journeys are sequential
+  workers: process.env.CI ? 3 : 6,
   reporter: 'html',
-  timeout: 30_000, // 30s max per single test (full journey: login → actions → assertions)
-  expect: {
-    timeout: 3_000, // 3s max per assertion
-  },
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
-    actionTimeout: 5_000, // 5s max per click/fill/select
-    navigationTimeout: 5_000, // 5s max per page navigation
+  },
+  webServer: {
+    // .env.e2e is the single source of truth for E2E test env vars.
+    // `set -a` exports all sourced vars into the process environment.
+    command: 'bash -c \'set -a; source .env.e2e; set +a; exec npx next dev\'',
+    url: 'http://localhost:3000',
+    reuseExistingServer: false,
+    timeout: 60_000,
   },
   projects: [
     {

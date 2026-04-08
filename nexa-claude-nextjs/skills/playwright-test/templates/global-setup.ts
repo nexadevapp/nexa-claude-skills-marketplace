@@ -1,19 +1,31 @@
-import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { execSync, type ChildProcess, spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { GenericContainer, Wait } from 'testcontainers';
 import path from 'node:path';
-
-const STATE_FILE = path.join(__dirname, '.global-state.json');
+import { execSync } from 'node:child_process';
+import { config as dotenvConfig } from 'dotenv';
 
 async function globalSetup() {
-  // 1. Start PostgreSQL Testcontainer
-  const container: StartedPostgreSqlContainer = await new PostgreSqlContainer('postgres:16')
-    .withDatabase('testdb')
-    .withUsername('test')
-    .withPassword('test')
+  // Load all config from .env.e2e (single source of truth for test env vars)
+  dotenvConfig({ path: path.join(__dirname, '..', '.env.e2e'), override: true });
+
+  // Ryuk handles automatic cleanup of containers when the test process exits.
+  process.env.TESTCONTAINERS_RYUK_DISABLED = 'false';
+  process.env.TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = '/var/run/docker.sock';
+
+  // 1. Start PostgreSQL container on fixed port 5432 (matches .env.e2e)
+  await new GenericContainer('postgres:16')
+    .withEnvironment({
+      POSTGRES_USER: 'test',
+      POSTGRES_PASSWORD: 'test',
+      POSTGRES_DB: 'testdb',
+    })
+    .withExposedPorts({ container: 5432, host: 5432 })
+    .withWaitStrategy(
+      Wait.forLogMessage('database system is ready to accept connections', 2),
+    )
+    .withStartupTimeout(60_000)
     .start();
 
-  const databaseUrl = container.getConnectionUri();
+  const databaseUrl = process.env.DATABASE_URL!;
 
   // 2. Run Prisma migrations
   execSync('npx prisma migrate deploy', {
@@ -30,38 +42,6 @@ async function globalSetup() {
   } catch {
     // Seed script is optional
   }
-
-  // 4. Start the Next.js dev server against the Testcontainer database
-  const devServer: ChildProcess = spawn('npx', ['next', 'dev'], {
-    env: { ...process.env, DATABASE_URL: databaseUrl, NODE_ENV: 'test' },
-    stdio: 'pipe',
-  });
-
-  // Wait for the dev server to be ready
-  await waitForServer('http://localhost:3000', 30_000);
-
-  // 5. Save state for teardown
-  writeFileSync(
-    STATE_FILE,
-    JSON.stringify({
-      containerId: container.getId(),
-      devServerPid: devServer.pid,
-    }),
-  );
-}
-
-async function waitForServer(url: string, timeoutMs: number): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const response = await fetch(url);
-      if (response.ok || response.status === 404) return;
-    } catch {
-      // Server not ready yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  throw new Error(`Server at ${url} did not start within ${timeoutMs}ms`);
 }
 
 export default globalSetup;

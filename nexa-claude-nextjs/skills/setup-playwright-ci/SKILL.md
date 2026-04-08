@@ -82,10 +82,11 @@ Running inside the Playwright Docker image would require Docker-in-Docker for Te
 Instead, the workflow installs Chromium directly on the runner via `npx playwright install --with-deps chromium`,
 which is simpler and faster.
 
-### Sequential execution
+### Parallel test files, sequential tests within files
 
-The `playwright.config.ts` enforces `workers: 1` and `fullyParallel: false` because E2E journeys
-may share state through the database. The CI workflow respects this — no sharding or parallel jobs.
+The `playwright.config.ts` uses `fullyParallel: false` so tests within each file run sequentially
+(a use case journey may have ordered steps). However, separate test files (separate use cases) run
+in parallel via the `workers` setting. The CI workflow respects this — no sharding needed.
 
 ## DO NOT
 

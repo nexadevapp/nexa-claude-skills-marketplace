@@ -34,10 +34,6 @@ Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-cor
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
 
-## External Dependencies
-
-Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
-
 ## Project Readiness Gate
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`.
@@ -59,6 +55,10 @@ Do not proceed with implementation until all items pass or the user explicitly w
 ## Tracking
 
 Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+
+## Test Data Conventions
+
+- Use only `example.com` for test emails and accounts (e.g., `user@example.com`, `admin@example.com`). This is an IANA-reserved domain that will never route real mail.
 
 ## Workflow
 

@@ -15,8 +15,6 @@ description: >
 Create Vitest integration tests for Next.js API routes, server actions, and components based on the use case $ARGUMENTS.
 Unit tests are already created by the `/implement` skill — this skill focuses on integration tests that hit real dependencies via Testcontainers.
 
-Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
-
 Use the context7 MCP server for Next.js documentation when needed.
 
 ## DO NOT
@@ -34,6 +32,10 @@ Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-cor
 ## Sprint Branch Gate
 
 Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+
+## Test Data Conventions
+
+- Use only `example.com` for test emails and accounts (e.g., `user@example.com`, `admin@example.com`). This is an IANA-reserved domain that will never route real mail.
 
 ## Testcontainers Global Setup
 

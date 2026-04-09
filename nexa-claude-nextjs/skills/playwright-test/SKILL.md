@@ -179,9 +179,9 @@ If `e2e/helpers/test-user.ts` does not exist, create it from the template.
 | API calls         | Within test setup            | Test-specific entity data        |
 | Manual cleanup    | afterEach hooks              | Remove data created during test  |
 
-## External Dependencies
+## Test Data Conventions
 
-Read and follow the dependency strategies in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/mocking/MOCKING.md`.
+- Use only `example.com` for test emails and accounts (e.g., `user@example.com`, `admin@example.com`). This is an IANA-reserved domain that will never route real mail.
 
 ## Testcontainers Global Setup
 

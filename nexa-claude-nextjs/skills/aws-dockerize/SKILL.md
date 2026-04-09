@@ -39,7 +39,7 @@ $ARGUMENTS may specify special requirements or be empty.
    - If the build fails, fix the Dockerfile and retry
    - Remove the test image after verification
 
-6. **Create `docker-compose.yml`** only if the project has external dependencies (database, Redis, etc.) or the user explicitly requests it.
+6. **Create `docker-compose.yml`** — Always prefer Docker Compose over a bare `docker build`/`docker run` workflow. Define the Next.js service in `docker-compose.yml` and add any external dependencies (database, Redis, etc.) as companion services. This gives the team a single `docker compose up` command for the full stack.
 
 ## Reference Templates
 

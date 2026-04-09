@@ -25,6 +25,7 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 - Use client components when server components suffice
 - Put database calls in client components or API routes called only by server components
 - Make implementation decisions without documenting their provenance (EXPLICIT vs INFERRED)
+- Over-engineer — implement only what the specification requires. No speculative abstractions, unnecessary indirection, premature generalisation, or features not in the spec. Three similar lines of code are better than a premature abstraction. If a simple approach satisfies the requirement, use it.
 
 ## Nexa Rules Gate
 

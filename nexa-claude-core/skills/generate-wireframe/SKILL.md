@@ -128,7 +128,7 @@ Set the `lang` attribute on `<html>` to match the detected locale.
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Workflow
 

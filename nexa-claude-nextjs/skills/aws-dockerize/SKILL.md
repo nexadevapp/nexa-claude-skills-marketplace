@@ -43,8 +43,8 @@ $ARGUMENTS may specify special requirements or be empty.
 
 ## Reference Templates
 
-- **Dockerfile**: `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/aws-dockerize/templates/Dockerfile.nextjs`
-- **`.dockerignore`**: `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/aws-dockerize/templates/dockerignore`
+- **Dockerfile**: `${CLAUDE_PLUGIN_ROOT}/skills/aws-dockerize/templates/Dockerfile.nextjs`
+- **`.dockerignore`**: `${CLAUDE_PLUGIN_ROOT}/skills/aws-dockerize/templates/dockerignore`
 
 ## DO NOT
 

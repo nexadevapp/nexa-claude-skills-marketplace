@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This is the Nexa skills project for Claude – a collection of professional-level engineering skills for AI coding agents
 
 ## Overview
 
@@ -14,7 +14,7 @@ technology-specific plugins.
 nexa-claude-marketplace/
 ├── .claude-plugin/
 │   └── marketplace.json          # Marketplace metadata listing all plugins
-├── nexa-claude-core/                    # Stack-agnostic core methodology
+├── nexa-claude-core/             # Stack-agnostic core methodology
 │   ├── .claude-plugin/
 │   │   └── plugin.json
 │   ├── .mcp.json                 # context7
@@ -126,4 +126,11 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 ## Git
 
-- Do NOT bump the `version` field in `**/.claude-plugin/plugin.json` files. Always keep the version at `1.0.0` because the path is referenced in the instructions, in the skills.
+- Do NOT bump the `version` field in `**/.claude-plugin/plugin.json` files. Always keep the version at `1.0.0`.
+- Skills reference files within their own plugin using `${CLAUDE_PLUGIN_ROOT}` — never hardcode the cache path.
+
+## Boundaries
+
+- Always: Follow the skill-anatomy.md format for new skills
+- Never: Add skills that are vague advice instead of actionable processes
+- Never: Duplicate content between skills — reference other skills instead

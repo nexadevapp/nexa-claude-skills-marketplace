@@ -22,7 +22,7 @@ Create or update technical task specification documents for $ARGUMENTS in `docs/
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Template
 
@@ -66,4 +66,4 @@ Use [templates/technical-task.md](templates/technical-task.md) as the document s
 5. Identify affected areas of the codebase
 6. List dependencies on other TTs or UCs
 7. Set status to Draft (or Approved if the user confirms)
-8. Create a GitHub tracking issue by following the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`
+8. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`

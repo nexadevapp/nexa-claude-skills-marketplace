@@ -31,7 +31,7 @@ If any prerequisite is missing, stop and tell the user which `/command` to run f
 
 ## Project Readiness Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/shared/readiness/PROJECT_READINESS.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`.
 
 This gate verifies that cross-cutting infrastructure (middleware, error logging, security headers,
 environment configuration) is in place before the pipeline begins. Without it, implemented use
@@ -177,7 +177,7 @@ If this is a standalone delivery:
 ### Step 2: Implementation
 
 Read and follow:
-`~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/implement/SKILL.md`
+`${CLAUDE_PLUGIN_ROOT}/skills/implement/SKILL.md`
 
 **Verify:**
 1. `npx next build` succeeds (or `npm run build`)
@@ -389,7 +389,7 @@ was *built*.
 
 Agent prompt:
 > You are an independent E2E test author. Read and follow the complete instructions in
-> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
+> `${CLAUDE_PLUGIN_ROOT}/skills/playwright-test/SKILL.md`.
 > Write Playwright end-to-end tests for $ARGUMENTS.
 > Your inputs are the use case specification in `docs/use_cases/$ARGUMENTS.md` and the
 > frontend design in `docs/designs/$ARGUMENTS-design.html`. Test scenarios derive from the
@@ -590,7 +590,7 @@ If the QA evaluation identifies **Missing** items (not just Partial or Observati
 the **E2E agent** with the gap analysis and iteration history as input:
 
 > You are an independent E2E test author. Read and follow the complete instructions in
-> `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/skills/playwright-test/SKILL.md`.
+> `${CLAUDE_PLUGIN_ROOT}/skills/playwright-test/SKILL.md`.
 > Fix and extend the Playwright end-to-end tests for $ARGUMENTS.
 >
 > The following QA gap analysis was produced by reviewing the current tests against the

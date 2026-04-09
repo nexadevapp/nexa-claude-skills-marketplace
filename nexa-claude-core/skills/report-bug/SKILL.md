@@ -25,7 +25,7 @@ the bug was discovered.
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Template
 
@@ -96,5 +96,5 @@ and shipping. The discount is visually applied to line items but not reflected i
    - **Low** — Cosmetic issue, minor inconvenience, or edge case
 6. Identify related artifacts (use cases, business rules, affected files)
 7. Set status to Open
-8. Create a GitHub tracking issue by following the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`
+8. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
 9. Update the bug report's **GitHub Issue** field in the Overview section with the issue URL (e.g., `https://github.com/owner/repo/issues/42`)

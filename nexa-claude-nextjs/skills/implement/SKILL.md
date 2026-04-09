@@ -40,7 +40,7 @@ Read and follow the instructions in `~/.claude/plugins/cache/nexa-claude-marketp
 
 ## Project Readiness Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-nextjs/1.0.0/shared/readiness/PROJECT_READINESS.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`.
 
 This gate checks that cross-cutting infrastructure (middleware, error logging, security headers,
 environment configuration) exists before use case implementation begins. It applies to `UC-XXX`

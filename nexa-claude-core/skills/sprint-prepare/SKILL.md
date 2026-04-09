@@ -40,7 +40,7 @@ acceptance criteria. Both are required inputs and are read together.
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Immutability Rule — Delivered Use Cases
 
@@ -595,7 +595,7 @@ generating specs and designs:
 1. Check if any use case IDs in the sprint scope do NOT have a corresponding screen section
    (anchor `#UC-XXX`) in `docs/wireframes/index.html`.
 2. If missing screens exist, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/generate-wireframe/SKILL.md`
+   `${CLAUDE_PLUGIN_ROOT}/skills/generate-wireframe/SKILL.md`
    with the missing UC IDs as arguments (e.g., `UC-015 UC-016`).
 3. **Verify:** Every user-facing use case in scope has a wireframe screen section.
 
@@ -608,7 +608,7 @@ For each selected use case, in dependency order:
 1. **If** `docs/use_cases/UC-XXX.md` already exists AND the use case was not split or
    renumbered in Phase 4, **skip** but log for the readiness report.
 2. **Otherwise**, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/use-case-spec/SKILL.md`
+   `${CLAUDE_PLUGIN_ROOT}/skills/use-case-spec/SKILL.md`
    with the use case ID as the argument.
    **Important:** When generating the spec, use the refined requirements from
    `docs/sprints/next-sprint/requirements-refinement-proposal.md` as the primary source of business
@@ -640,7 +640,7 @@ For each selected use case, in dependency order:
 2. **Skip if** the use case has no user-facing interaction (e.g., background jobs, system-triggered
    processes with no UI). Log the skip reason.
 3. **Otherwise**, read and follow:
-   `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/skills/design-screens/SKILL.md`
+   `${CLAUDE_PLUGIN_ROOT}/skills/design-screens/SKILL.md`
    with the use case ID as the argument.
 4. **Verify:** The file exists and contains at least one screen definition.
 

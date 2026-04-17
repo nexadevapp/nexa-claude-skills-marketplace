@@ -52,7 +52,17 @@ Present a brief summary to the user:
    ```
    If there are uncommitted changes, ask the user to commit or stash them before proceeding.
 
-2. Create and checkout the sprint branch from main:
+2. Verify local `main` is up-to-date with the remote:
+   ```bash
+   git fetch origin main
+   git diff main..origin/main --stat
+   ```
+   If there are differences, stop:
+   > **Local `main` is behind `origin/main`.** Sprint preparation artifacts may not be
+   > on this branch. Run `git pull origin main` first, or verify that `/sprint-prepare`
+   > was completed (Phase 9 commits and pushes all preparation artifacts to `main`).
+
+3. Create and checkout the sprint branch from main:
    ```bash
    git checkout -b sprint-<N>
    ```

@@ -899,3 +899,50 @@ After updating the dashboard, inform the user:
 >
 > Sprint N registered as in-progress with [N] use cases in scope.
 > Open the dashboard locally to verify it renders correctly before delivery.
+
+---
+
+### Phase 9: Commit and Push to Main
+
+Sprint preparation modifies living documents and produces sprint artifacts that must be on
+`main` before `/sprint-kickoff` creates the sprint branch. This phase ensures that.
+
+**This phase is mandatory. The skill is not complete until the push succeeds.**
+
+#### Step 9a: Stage Changes
+
+Stage all files changed or created during sprint preparation:
+
+```bash
+git add docs/
+```
+
+#### Step 9b: Commit
+
+Create a commit with a message summarizing the sprint scope:
+
+```
+docs: prepare sprint <N> — <UC list summary>
+```
+
+Where `<N>` is the sprint number from the manifest and `<UC list summary>` is a brief
+list of the use case IDs in scope (e.g., `UC-003, UC-004, UC-005a`).
+
+#### Step 9c: Push to Main
+
+Push the commit to the remote:
+
+```bash
+git push origin main
+```
+
+If the push fails (e.g., due to divergence), stop and ask the user to resolve the issue
+before proceeding. Do NOT force-push.
+
+#### Step 9d: Confirm
+
+> **Sprint preparation committed and pushed to `main`.**
+>
+> Commit: `docs: prepare sprint <N> — <UC list>`
+>
+> You can now run `/sprint-kickoff` to create the sprint branch and begin delivery.

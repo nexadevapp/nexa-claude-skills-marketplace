@@ -34,11 +34,13 @@ Use [templates/technical-task.md](templates/technical-task.md) as the document s
 
 ## Overview
 
-**Task ID:** TT-001
-**Task Name:** Set Up Dev Profile
-**Category:** Configuration
-**Goal:** Create a development profile with seed data and relaxed security so developers can run the application locally without external dependencies.
-**Status:** Approved
+| | |
+|---|---|
+| **Task ID** | TT-001 |
+| **Task Name** | Set Up Dev Profile |
+| **Category** | Configuration |
+| **Goal** | Create a development profile with seed data and relaxed security so developers can run the application locally without external dependencies. |
+| **Status** | Approved |
 
 ## Acceptance Criteria
 

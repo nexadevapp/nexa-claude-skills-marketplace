@@ -2,11 +2,13 @@
 
 ## Overview
 
-**Task ID:** TT-XXX
-**Task Name:** [Descriptive Name]
-**Category:** Configuration | Cleanup | Dependency | Infrastructure | DevEx
-**Goal:** [What this task achieves and why it is needed]
-**Status:** Draft | Reviewed | Approved | Implemented | Tested | Done | Obsolete
+| | |
+|---|---|
+| **Task ID** | TT-XXX |
+| **Task Name** | [Descriptive Name] |
+| **Category** | Configuration \| Cleanup \| Dependency \| Infrastructure \| DevEx |
+| **Goal** | [What this task achieves and why it is needed] |
+| **Status** | Draft \| Reviewed \| Approved \| Implemented \| Tested \| Done \| Obsolete |
 
 ## Acceptance Criteria
 

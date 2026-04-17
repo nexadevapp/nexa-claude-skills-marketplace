@@ -37,11 +37,13 @@ Use [templates/use-case.md](templates/use-case.md) as the document structure.
 
 ## Overview
 
-**Use Case ID:** UC-001
-**Use Case Name:** Create Reservation
-**Primary Actor:** Front Desk Clerk
-**Goal:** Create a new room reservation for a guest
-**Status:** Approved
+| | |
+|---|---|
+| **Use Case ID** | UC-001 |
+| **Use Case Name** | Create Reservation |
+| **Primary Actor** | Front Desk Clerk |
+| **Goal** | Create a new room reservation for a guest |
+| **Status** | Approved |
 
 ## Preconditions
 

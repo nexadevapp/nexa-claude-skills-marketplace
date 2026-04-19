@@ -437,7 +437,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Clean up per-test override users in `finally` blocks or `test.afterEach`
     - Clear cookies and storage in `test.afterEach` to prevent session leakage between tests
     - Delete suite user in `test.afterAll`
-12. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+12. Run the `/code-quality` skill
 13. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
 14. **Verify the test results — this is mandatory before declaring success:**
     - The Playwright output must show **0 failed** and the exit code must be **0**

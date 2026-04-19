@@ -63,6 +63,22 @@ export default defineConfig({
       // Load static test variables; DATABASE_URL is set by global setup
       NODE_ENV: 'test',
     },
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/test/**',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.d.ts',
+        'src/**/generated/**',
+      ],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+      },
+    },
   },
 });
 ```
@@ -264,14 +280,17 @@ describe('ExampleForm', () => {
     - Assert expected outcomes (including database persistence where applicable)
     - Clean up test data in afterEach/afterAll hooks
 8. Only mock Next.js framework modules (`next/cache`, `next/navigation`) — never mock Prisma
-9. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+9. Run the `/code-quality` skill
 10. Run tests with `npx vitest run` to verify they pass
-11. If a test fails:
+11. Run tests with coverage to verify thresholds: `npx vitest run --coverage`
+    - If coverage falls below 80% on any metric (statements, branches, functions, lines), add tests until thresholds are met
+    - Focus on uncovered branches and functions first — they have the highest impact on coverage
+12. If a test fails:
     - Check that Testcontainers started successfully (Docker must be running)
     - Verify Prisma migrations are up to date
     - Ensure async operations are properly awaited
     - Check test data cleanup is not interfering with other tests
-12. Mark todos complete
+13. Mark todos complete
 
 ## Resources
 

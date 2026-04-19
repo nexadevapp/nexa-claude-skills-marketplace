@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: ["{{BRANCH}}"]
 
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -16,14 +20,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect package manager
+        id: pm
+        run: |
+          if [ -f pnpm-lock.yaml ]; then echo "manager=pnpm" >> "$GITHUB_OUTPUT"
+          elif [ -f yarn.lock ]; then echo "manager=yarn" >> "$GITHUB_OUTPUT"
+          else echo "manager=npm" >> "$GITHUB_OUTPUT"; fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "{{NODE_VERSION}}"
-          cache: npm
+          cache: ${{ steps.pm.outputs.manager }}
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ "${{ steps.pm.outputs.manager }}" = "pnpm" ]; then corepack enable && pnpm install --frozen-lockfile
+          elif [ "${{ steps.pm.outputs.manager }}" = "yarn" ]; then yarn install --frozen-lockfile
+          else npm ci; fi
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        env:
+          DATABASE_URL: 'postgresql://fake:fake@localhost:5432/fake'
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium

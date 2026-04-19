@@ -52,6 +52,7 @@ nexa-claude-marketplace/
 │       ├── sprint-complete/
 │       ├── sprint-rework/
 │       ├── setup-playwright-ci/
+│       ├── setup-quality-ci/
 │       ├── aws-dockerize/
 │       └── aws-setup-apprunner/
 └── README.md
@@ -175,11 +176,12 @@ These are the subtle errors that look like productivity but create problems:
 | Setup        | `/setup-i18n`           | Set up server-side internationalization with next-intl              |
 | Setup        | `/setup-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
+| Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for code quality and coverage gates |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
-| Construction | `/code-quality`         | Run ESLint and Prettier checks                                     |
+| Construction | `/code-quality`         | Run oxlint and oxfmt checks (lint, complexity, formatting)         |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |

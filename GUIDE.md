@@ -63,7 +63,7 @@ Claude builds Next.js pages, components, API routes, and server actions for each
 
 ### 11. Check code quality → `/code-quality`
 
-Runs ESLint and Prettier to enforce consistent formatting and catch issues.
+Runs oxlint (lint + cyclomatic complexity) and oxfmt (formatting) via the Oxc toolchain.
 
 ### 12. Or just deliver end-to-end → `/deliver-use-case`
 

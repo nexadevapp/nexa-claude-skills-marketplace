@@ -124,7 +124,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
         - Test that server actions and API route handlers reject invalid input and return appropriate error responses
         - Test that form components display validation errors for invalid input
     - Run tests with `npx vitest run` to verify they pass
-11. Run code quality checks as described in `nexa-claude-nextjs/skills/code-quality/CODE_QUALITY.md`
+11. Run the `/code-quality` skill
 12. Verify the implementation compiles successfully with `next build`
 13. Document implementation decisions in a `DECISIONS.md` file (or in the PR description):
     - For each non-trivial decision made during implementation, record:

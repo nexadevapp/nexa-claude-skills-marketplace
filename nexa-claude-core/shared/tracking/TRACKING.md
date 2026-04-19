@@ -95,7 +95,10 @@ This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), and bug (`BUG
 4. If all acceptance criteria and definition-of-done items are checked, close the issue:
    - `gh issue close <issue-number>`
 5. If not all items are checked, leave the issue open and inform the user what remains
-6. Commit the implementation with a message prefixed by the ID:
-   - Format: `UC-XXX: <description>`, `TT-XXX: <description>`, or `BUG-XXX: <description>` (XXX is always 3 digits, zero-padded)
-   - Examples: `UC-003: Implement place order page and API`, `TT-001: Set up dev profile with seed data`, `BUG-003: Fix discount code not applied to order total`
+6. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
+   - **UC** → `feat(UC-XXX): <description>`
+   - **TT** → `chore(TT-XXX): <description>`
+   - **BUG** → `fix(BUG-XXX): <description>`
+   - XXX is always 3 digits, zero-padded
+   - Examples: `feat(UC-003): implement place order page and API`, `chore(TT-001): set up dev profile with seed data`, `fix(BUG-003): fix discount code not applied to order total`
    - Always use the ID from the specification (e.g., `UC-001`, `TT-012`, `BUG-003`)

@@ -353,7 +353,7 @@ manifest entry with status `in-progress`.
 
 3. If confirmed, commit:
    ```bash
-   git commit -m "Close sprint-N: [1-line summary of delivered UCs]"
+   git commit -m "chore(sprint-N): close — [1-line summary of delivered UCs]"
    ```
 
 4. Push to remote:

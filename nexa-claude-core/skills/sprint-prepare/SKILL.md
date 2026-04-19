@@ -944,7 +944,7 @@ git add docs/
 Create a commit with a message summarizing the sprint scope:
 
 ```
-docs: prepare sprint <N> — <UC list summary>
+docs(sprint-<N>): prepare — <UC list summary>
 ```
 
 Where `<N>` is the sprint number from the manifest and `<UC list summary>` is a brief

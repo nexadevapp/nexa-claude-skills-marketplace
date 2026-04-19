@@ -160,7 +160,7 @@ artifacts that live on `<BASE>` — they must never be committed on the sprint b
 5. Commit all refinements on `<BASE>`:
    ```bash
    git add docs/use_cases/ docs/designs/ docs/sprints/
-   git commit -m "Refine specs/designs for sprint-<N> rework"
+   git commit -m "docs(sprint-<N>): refine specs/designs for rework"
    git push origin <BASE>
    ```
 
@@ -258,7 +258,7 @@ all use cases as undelivered:
 6. Commit the cleanup:
    ```bash
    git add docs/delivery/ docs/sprints/
-   git commit -m "Reset sprint-<N> for rework: clean delivery artifacts"
+   git commit -m "chore(sprint-<N>): reset for rework — clean delivery artifacts"
    git push origin sprint-<N>
    ```
 

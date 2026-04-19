@@ -639,10 +639,32 @@ For each selected use case, in dependency order:
    in Phase 4, **skip**.
 2. **Skip if** the use case has no user-facing interaction (e.g., background jobs, system-triggered
    processes with no UI). Log the skip reason.
-3. **Otherwise**, read and follow:
-   `${CLAUDE_PLUGIN_ROOT}/skills/design-screens/SKILL.md`
-   with the use case ID as the argument.
-4. **Verify:** The file exists and contains at least one screen definition.
+3. **Otherwise**, launch an **isolated agent** (using the Agent tool) to produce the design
+   from a clean context. The agent must NOT have access to sprint planning context,
+   implementation details, or conversation history — it works only from the specification,
+   wireframe, entity model, and design examples.
+
+   Agent prompt:
+   > You are an independent frontend designer. Read and follow the complete instructions in
+   > `${CLAUDE_PLUGIN_ROOT}/skills/design-screens/SKILL.md`.
+   > Create a screen design artifact for $UC_ID.
+   >
+   > **Your inputs (read these and nothing else):**
+   > - Use case specification: `docs/use_cases/$UC_ID.md`
+   > - Entity model: `docs/entity_model.md` (if it exists)
+   > - Wireframe: `docs/wireframes/index.html`
+   > - Design rules: `docs/designs/DESIGN_RULES.md` (if it exists)
+   > - Existing theme files in `docs/designs/` (if they exist)
+   > - Example files in the skill's `examples/` directory
+   >
+   > **Your output:** `docs/designs/$UC_ID-design.html`
+   >
+   > Do NOT read implementation code, sprint planning documents, requirements refinement
+   > proposals, or any file outside of the inputs listed above. Your design must be based
+   > solely on the use case specification and wireframe.
+
+4. **Verify:** The file `docs/designs/UC-XXX-design.html` exists and contains at least one
+   screen definition (check for `design-screen` class in the HTML).
 
 **Step gate:** All applicable frontend design files must exist before proceeding.
 

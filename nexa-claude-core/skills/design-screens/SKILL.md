@@ -9,6 +9,7 @@ description: >
   config, so changing the theme across all designs requires only swapping CSS files.
   Use when the user asks to "design a screen", "create a wireframe", "define the UI",
   "design the frontend", or mentions screen design, wireframes, UI layout, or frontend design.
+context: fork
 ---
 
 # Frontend Design

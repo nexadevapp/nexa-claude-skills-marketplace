@@ -1,0 +1,4 @@
+/* Theme switcher.
+   Swap the @import below to retheme every UC-XXX-design.html simultaneously.
+   The matching Tailwind config must be loaded via current-tailwind-config.js. */
+@import url('shore-theme-001.css');

@@ -1,0 +1,305 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Shore theme — derived from docs/wireframes/index.html visual language.
+   Tone: privacy-first, tech-confident, slightly editorial.
+   Palette: midnight shore + electric lime spark + warm ember accents.
+   ────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Palette tokens ── */
+  --shore-50:  #F7F4ED;
+  --shore-100: #EDE7D7;
+  --shore-200: #D9CFB6;
+  --shore-300: #A89F87;
+  --shore-400: #6B7889;
+  --shore-500: #3C4A5C;
+  --shore-600: #243240;
+  --shore-700: #1A2734;
+  --shore-800: #13202E;
+  --shore-900: #0F1B2D;
+
+  --spark-400: #C2FF7B;
+  --spark-500: #A8FF60;
+  --spark-600: #85DB44;
+
+  --ember-400: #FF8554;
+  --ember-500: #FF6B35;
+
+  /* ── Semantic aliases ── */
+  --bg-page:        var(--shore-900);
+  --bg-card:        var(--shore-800);
+  --bg-soft:        var(--shore-700);
+  --bg-input:       rgba(247, 244, 237, 0.03);
+  --bg-cream:       var(--shore-50);
+
+  --text-primary:   var(--shore-50);
+  --text-secondary: var(--shore-200);
+  --text-muted:     var(--shore-300);
+  --text-dim:       var(--shore-400);
+  --text-on-cream:  var(--shore-900);
+  --text-on-spark:  var(--shore-900);
+
+  --accent:         var(--spark-500);
+  --accent-hover:   var(--spark-400);
+  --warning:        var(--ember-500);
+
+  --line:           rgba(247, 244, 237, 0.08);
+  --line-strong:    rgba(247, 244, 237, 0.15);
+  --line-accent:    rgba(168, 255, 96, 0.18);
+
+  /* ── Type scale ── */
+  --fs-hero:    clamp(2.75rem, 5vw + 1rem, 4.25rem);
+  --fs-display: clamp(1.75rem, 2.5vw + 0.75rem, 2.5rem);
+  --fs-h2:      1.5rem;
+  --fs-h3:      1.125rem;
+  --fs-body:    1rem;
+  --fs-small:   0.875rem;
+  --fs-caption: 0.75rem;
+
+  /* ── Radii ── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+
+  /* ── Shadows ── */
+  --shadow-card:  0 1px 0 rgba(247, 244, 237, 0.04) inset, 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+  --shadow-cta:   0 8px 24px -8px rgba(168, 255, 96, 0.5);
+  --shadow-hover: 0 12px 32px -12px rgba(168, 255, 96, 0.6);
+}
+
+/* ── Base ── */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, var(--shore-700) 0%, var(--shore-900) 60%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle film grain over the page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(247, 244, 237, 0.025) 1px, transparent 0);
+  background-size: 3px 3px;
+  z-index: 1;
+}
+
+/* ── Component primitives ── */
+.theme-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-xl);
+}
+
+.theme-viewport {
+  background: linear-gradient(180deg, var(--shore-700) 0%, var(--shore-900) 100%);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-xl);
+}
+
+.theme-input {
+  background: var(--bg-input);
+  border: 1px solid var(--line-strong);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s, background 0.2s;
+}
+.theme-input:focus-within {
+  border-color: var(--accent);
+  background: rgba(168, 255, 96, 0.04);
+}
+.theme-input.is-error {
+  border-color: var(--warning);
+  background: rgba(255, 107, 53, 0.04);
+}
+
+.theme-btn-primary {
+  background: var(--accent);
+  color: var(--text-on-spark);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-md);
+  transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+}
+.theme-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-cta);
+  background: var(--accent-hover);
+}
+.theme-btn-primary:disabled {
+  background: var(--shore-600);
+  color: var(--text-dim);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.theme-btn-ghost {
+  background: rgba(247, 244, 237, 0.04);
+  color: var(--text-primary);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  transition: background 0.15s;
+}
+.theme-btn-ghost:hover { background: rgba(247, 244, 237, 0.07); }
+
+.theme-pill-owned {
+  background: rgba(168, 255, 96, 0.08);
+  color: var(--accent);
+  border: 1px solid var(--line-accent);
+}
+.theme-pill-anonymous {
+  background: rgba(255, 107, 53, 0.08);
+  color: var(--warning);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+}
+.theme-pill-error {
+  background: rgba(255, 107, 53, 0.12);
+  color: var(--warning);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.theme-badge {
+  background: rgba(168, 255, 96, 0.08);
+  color: var(--accent);
+  border: 1px solid var(--line-accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+.theme-badge-muted {
+  background: rgba(247, 244, 237, 0.04);
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.theme-link-spark {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dotted transparent;
+  transition: border-color 0.15s;
+}
+.theme-link-spark:hover { border-bottom-color: var(--accent); }
+
+/* ── Design-doc annotation classes ── */
+.design-section-divider {
+  border-top: 1px dashed var(--line-strong);
+  margin: 3rem 0 2rem;
+  padding-top: 2rem;
+}
+
+.design-header {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 2.5rem;
+}
+
+.design-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  margin-bottom: 1.25rem;
+  border-radius: 999px;
+  background: rgba(247, 244, 237, 0.04);
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.design-annotation {
+  background: rgba(168, 255, 96, 0.05);
+  border-left: 2px solid var(--accent);
+  color: var(--text-muted);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.875rem;
+  margin: 1rem 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  line-height: 1.5;
+}
+.design-annotation strong { color: var(--accent); font-weight: 600; }
+.design-annotation code {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: rgba(168, 255, 96, 0.08);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+}
+
+.design-state-label {
+  display: inline-block;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+}
+
+.design-data-table {
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+.design-data-table th,
+.design-data-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.design-data-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.design-data-table code {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+/* ── Animations ── */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.spin-slow { animation: spin-slow 1s linear infinite; }

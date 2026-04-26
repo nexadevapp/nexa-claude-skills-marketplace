@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UC-003 — Redirect to destination · Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="current-theme.css">
+  <script src="current-tailwind-config.js"></script>
+</head>
+<body class="font-body">
+
+<div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+
+  <header class="design-header">
+    <div class="design-meta"><span class="w-1.5 h-1.5 rounded-full bg-spark-500 pulse-soft"></span><span>Design — UC-003 / Redirect to destination</span></div>
+    <h1 class="font-display text-5xl font-bold tracking-tight">Redirect to destination</h1>
+    <p class="mt-3 text-shore-200 max-w-xl mx-auto leading-relaxed">
+      Backend-only on the success path. Failure surfaces 404 / 410 / 451 pages. Spec: <code class="font-mono text-spark-500 text-sm">docs/use_cases/UC-003.md</code>
+    </p>
+  </header>
+
+  <section class="theme-card p-8 mb-10">
+    <h2 class="font-display text-xl font-bold mb-5">Overview</h2>
+    <table class="design-data-table">
+      <tr><th>Route</th><td><code>GET /:slug</code> · Route Handler <code>app/[slug]/route.ts</code></td></tr>
+      <tr><th>Actor</th><td>Anyone with a short link</td></tr>
+      <tr><th>Reads</th><td><code>LINK</code> by <code>slug</code> (unique index)</td></tr>
+      <tr><th>Writes</th><td>None — redirect is idempotent</td></tr>
+      <tr><th>Headers (success)</th><td><code>Location: {destinationUrl}</code> · <code>Cache-Control: private, no-store</code> · no <code>Set-Cookie</code> · no third-party requests</td></tr>
+      <tr><th>Latency budget</th><td>p95 &lt; 100ms (NFR-002) — entire response must fit in 100ms including DB roundtrip</td></tr>
+    </table>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SUCCESS — backend only, no UI -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">Path 01 · Success — server-side 302 (no UI)</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+        <div class="max-w-2xl mx-auto">
+
+          <!-- HTTP exchange -->
+          <div class="font-mono text-xs space-y-4">
+            <div>
+              <div class="text-shore-400 mb-1">→ Request</div>
+              <div class="bg-shore-900/60 border border-shore-700 rounded-md p-4 leading-relaxed">
+                <span class="text-spark-500">GET</span> /k3p9w2x <span class="text-shore-400">HTTP/2</span><br>
+                <span class="text-shore-300">Host:</span> lnk.sh<br>
+                <span class="text-shore-300">User-Agent:</span> Mozilla/5.0 …
+              </div>
+            </div>
+
+            <div>
+              <div class="text-shore-400 mb-1">← Response</div>
+              <div class="bg-shore-900/60 border border-spark-500/30 rounded-md p-4 leading-relaxed">
+                <span class="text-shore-400">HTTP/2</span> <span class="text-spark-500">302 Found</span><br>
+                <span class="text-shore-300">Location:</span> <span class="text-shore-50">https://example.com/very-long-article-…</span><br>
+                <span class="text-shore-300">Cache-Control:</span> <span class="text-shore-50">private, no-store</span><br>
+                <span class="text-shore-300">Content-Length:</span> 0
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 text-center text-xs text-shore-300">
+            No HTML body. No tracking pixel. No <code class="font-mono text-spark-500">Set-Cookie</code>. Total wire time target: &lt; 100ms p95.
+          </div>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>BR-001 — privacy-respecting:</strong> Response body is empty. The browser never renders an interstitial because the server never produces one. Any analytics for this redirect happen server-side, not in the browser.
+      </div>
+      <div class="design-annotation">
+        <strong>BR-002 — no interstitial:</strong> Even if a future stakeholder asks for "redirecting…" text, the answer is no. Latency budget plus privacy posture forbid it.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- A1 — 404 -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">Path A1 · 404 Not Found — slug never existed</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-12 text-center">
+        <div class="font-display text-7xl font-bold mb-4 text-spark-500">404</div>
+        <div class="font-display text-2xl mb-3">Short link not found</div>
+        <p class="text-shore-200 max-w-sm mx-auto mb-8 leading-relaxed">
+          The link you followed doesn't point to anything in our system. It may have been mistyped.
+        </p>
+        <a href="#" class="theme-btn-primary inline-block px-6 py-3">← Back to lnk.sh</a>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Distinguished from 410:</strong> 404 is for slugs that <em>never existed</em>. The user agent treats this differently from 410 (gone) — bookmarks, search engines, and Linkrot crawlers see "this was never valid" instead of "this used to work."
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- A2 — 410 -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">Path A2 · 410 Gone — anonymous link expired</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-12 text-center">
+        <div class="font-display text-7xl font-bold mb-4 text-ember-500">410</div>
+        <div class="font-display text-2xl mb-3">This link has expired</div>
+        <p class="text-shore-200 max-w-sm mx-auto mb-8 leading-relaxed">
+          Anonymous links expire 30 days after they're created. <a href="#" class="theme-link-spark">Shorten a new one</a> — or sign in to keep links forever.
+        </p>
+        <div class="flex gap-3 justify-center flex-wrap">
+          <a href="#" class="theme-btn-primary px-6 py-3">+ Shorten a new link</a>
+          <a href="#" class="theme-btn-ghost px-6 py-3 text-sm">Sign in</a>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Conversion moment:</strong> 410 is the second strongest sign-up moment after the post-shorten success state. The user just hit a dead link they cared about — the offer "sign in to keep links forever" is timely.
+      </div>
+      <div class="design-annotation">
+        <strong>Status code matters:</strong> 410 (vs 404) tells crawlers and clients that this URL <em>used to work</em>. SEO and bookmark tools handle the two differently.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- A3 — 451 -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">Path A3 · 451 Unavailable — destination on blocklist</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-12 text-center">
+        <div class="font-display text-7xl font-bold mb-4 text-ember-500">451</div>
+        <div class="font-display text-2xl mb-3">This link is no longer available</div>
+        <p class="text-shore-200 max-w-sm mx-auto mb-8 leading-relaxed">
+          If you believe this is a mistake, please contact support.
+        </p>
+        <a href="#" class="theme-btn-primary inline-block px-6 py-3">← Back to lnk.sh</a>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>BR-004 — generic message:</strong> The page deliberately omits any mention of <em>which</em> destination, <em>which</em> rule, or <em>which</em> reporter triggered the block. Disclosure would let bad actors probe the blocklist.
+      </div>
+      <div class="design-annotation">
+        <strong>Status code 451:</strong> Honest signal to clients that the resource exists but cannot be served for policy reasons. More accurate than 404 (which would imply non-existence) or 403 (which implies the requester specifically is forbidden).
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BEHAVIOR MATRIX ── -->
+  <section class="theme-card p-8 mb-10">
+    <h2 class="font-display text-xl font-bold mb-5">Behavior matrix</h2>
+    <table class="design-data-table">
+      <thead><tr><th>Slug found?</th><th>expiresAt</th><th>destination on blocklist?</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr><td>No</td><td>—</td><td>—</td><td><code>404</code> Not Found page</td></tr>
+        <tr><td>Yes</td><td><code>NULL</code> or future</td><td>No</td><td><code>302</code> Found · <code>Location: destinationUrl</code></td></tr>
+        <tr><td>Yes</td><td>past</td><td>—</td><td><code>410</code> Gone page</td></tr>
+        <tr><td>Yes</td><td>NULL or future</td><td>Yes</td><td><code>451</code> Unavailable page (generic)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="text-center py-6 text-xs text-shore-300 border-t border-shore-700">
+    Generated from <code class="font-mono text-spark-500">UC-003.md</code> + wireframe <code class="font-mono text-spark-500">#UC-003</code> · Theme: shore-001
+  </footer>
+
+</div>
+</body>
+</html>

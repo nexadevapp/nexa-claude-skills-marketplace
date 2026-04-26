@@ -1,0 +1,35 @@
+@startuml Use Cases Overview
+left to right direction
+
+actor "Anonymous Visitor" as visitor
+actor "Link Owner" as owner
+
+rectangle "lnk.sh" {
+    usecase "UC-001\nList my links" as UC001
+    usecase "UC-002\nShorten a URL" as UC002
+    usecase "UC-003\nRedirect to destination" as UC003
+
+    usecase "TT-001\nAuth middleware" as TT001 <<technical>>
+}
+
+owner --> UC001
+visitor --> UC002
+owner --> UC002
+visitor --> UC003
+
+UC001 ..> TT001 : <<requires>>
+
+note right of UC002
+  FR-001 (Shorten URL)
+  FR-002 (Custom slug)
+end note
+
+note right of UC003
+  FR-003 (Redirect)
+end note
+
+note right of UC001
+  FR-004 (List owned links)
+end note
+
+@enduml

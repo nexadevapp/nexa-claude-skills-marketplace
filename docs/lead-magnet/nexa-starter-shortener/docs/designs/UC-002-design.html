@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UC-002 — Shorten a URL · Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="current-theme.css">
+  <script src="current-tailwind-config.js"></script>
+</head>
+<body class="font-body">
+
+<div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+
+  <!-- ── DESIGN HEADER ── -->
+  <header class="design-header">
+    <div class="design-meta"><span class="w-1.5 h-1.5 rounded-full bg-spark-500 pulse-soft"></span><span>Design — UC-002 / Shorten a URL</span></div>
+    <h1 class="font-display text-5xl font-bold tracking-tight">Shorten a URL</h1>
+    <p class="mt-3 text-shore-200 max-w-xl mx-auto leading-relaxed">
+      Hero use case. Anonymous Visitor enters a URL, optionally a custom slug, and receives a short link. Spec: <code class="font-mono text-spark-500 text-sm">docs/use_cases/UC-002.md</code>
+    </p>
+  </header>
+
+  <!-- ── OVERVIEW ── -->
+  <section class="theme-card p-8 mb-10">
+    <h2 class="font-display text-xl font-bold mb-5">Overview</h2>
+    <table class="design-data-table">
+      <tr><th>Route</th><td><code>GET /</code> · Server Action <code>app/actions/shorten.ts</code></td></tr>
+      <tr><th>Actor(s)</th><td>Anonymous Visitor (primary) · Link Owner (secondary, when authenticated)</td></tr>
+      <tr><th>Reads</th><td><code>USER</code> (when session is present, to set <code>ownerId</code>)</td></tr>
+      <tr><th>Writes</th><td><code>LINK</code> with <code>slug, destinationUrl, ownerId, creatorIp, expiresAt, createdAt</code></td></tr>
+      <tr><th>Ceiling</th><td>p95 &lt; 200ms @ 100 RPS (NFR-001) · 20 links / IP / hour (NFR-004)</td></tr>
+      <tr><th>Layout breakpoints</th><td><code>sm</code> (640px) hero collapses to single column · <code>md</code> (768px) form max-width 32rem</td></tr>
+    </table>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 1 — DEFAULT (empty form) -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">State 01 · Default — empty form</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+
+        <!-- Navbar -->
+        <div class="flex items-center justify-between mb-12">
+          <div class="font-display font-bold text-xl">lnk<span class="text-spark-500">.</span>sh</div>
+          <nav class="flex gap-6 text-sm font-medium items-center">
+            <a href="#" class="text-shore-50">Shorten</a>
+            <a href="#" class="text-shore-300 hover:text-spark-500">My links</a>
+            <a href="#" class="theme-btn-ghost px-4 py-1.5 text-sm">Sign in</a>
+          </nav>
+        </div>
+
+        <!-- Hero copy -->
+        <div class="max-w-2xl mx-auto text-center mb-10">
+          <h1 class="font-display text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+            Long links,<br><span class="text-spark-500">handled.</span>
+          </h1>
+          <p class="mt-5 text-shore-200 text-lg leading-relaxed">
+            Paste a URL. Get a short link. No account needed. No trackers. Anonymous links expire after 30 days.
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form class="max-w-2xl mx-auto space-y-3" autocomplete="off">
+          <div class="theme-input p-5 flex items-center gap-3">
+            <span class="text-shore-300 font-mono text-sm">→</span>
+            <input type="url" placeholder="https://example.com/very-long-article" class="bg-transparent flex-1 outline-none text-base placeholder:text-shore-400" disabled>
+          </div>
+          <details class="theme-input">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm text-shore-200 flex items-center justify-between list-none">
+              <span>Custom slug <span class="text-shore-400">(optional)</span></span><span class="text-shore-400">+</span>
+            </summary>
+            <div class="px-5 pb-4 flex items-center gap-2 border-t border-shore-700 pt-3 mt-1">
+              <span class="font-mono text-sm text-shore-300">lnk.sh/</span>
+              <input type="text" placeholder="my-launch" class="bg-transparent flex-1 outline-none text-sm font-mono placeholder:text-shore-400" disabled>
+              <span class="text-xs text-shore-400 font-mono">3–32 · [a-z0-9-]</span>
+            </div>
+          </details>
+          <button type="button" class="theme-btn-primary w-full py-4 text-base font-display" disabled>Shorten →</button>
+        </form>
+
+      </div>
+
+      <div class="design-annotation mt-5">
+        <strong>Step mapping:</strong> Spec steps 1–2. Empty form, button is in <code>disabled</code> visual treatment until URL field has a value (client-side; the server action also validates).
+      </div>
+      <div class="design-annotation">
+        <strong>Accessibility:</strong> Form fields use semantic <code>input[type=url]</code> for browser-level URL validation. The <code>details</code> summary is keyboard-focusable; arrow-down opens it. Button focus ring is the lime accent at 2px offset.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 2 — SUBMITTING -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">State 02 · Submitting — server action in flight</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+        <div class="max-w-2xl mx-auto space-y-3">
+          <div class="theme-input p-5 flex items-center gap-3 opacity-70">
+            <span class="text-shore-300 font-mono text-sm">→</span>
+            <span class="bg-transparent flex-1 outline-none text-base text-shore-50">https://example.com/very-long-article-title-that-needs-shortening</span>
+          </div>
+          <button type="button" class="theme-btn-primary w-full py-4 text-base font-display flex items-center justify-center gap-3" disabled>
+            <svg class="w-5 h-5 spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
+            </svg>
+            <span>Shortening…</span>
+          </button>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Step mapping:</strong> Spec steps 5–9. Form is locked, spinner replaces the arrow on the CTA. <code>aria-busy="true"</code> on the form. Server action target: <code>app/actions/shorten.ts</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 3 — SUCCESS -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">State 03 · Success — link created, copied to clipboard</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+        <div class="max-w-2xl mx-auto">
+          <div class="theme-card p-5 flex items-center justify-between flex-wrap gap-3 mb-4">
+            <div>
+              <div class="font-mono text-spark-500 text-lg">lnk.sh/k3p9w2x</div>
+              <div class="text-xs text-shore-300 mt-1">→ https://example.com/very-long-article-…</div>
+            </div>
+            <div class="flex gap-2 items-center">
+              <button class="theme-btn-ghost px-4 py-2 text-sm">Copy</button>
+              <span class="theme-pill-anonymous px-3 py-1.5 text-xs font-medium rounded-md">Expires in 30 days</span>
+            </div>
+          </div>
+          <div class="bg-spark-500/10 border border-spark-500/30 rounded-md px-4 py-2 text-xs text-spark-500 flex items-center gap-2 mb-4">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Copied to clipboard</span>
+          </div>
+          <p class="text-sm text-shore-200">
+            <a href="#" class="theme-link-spark">Sign up</a> to keep this link forever.
+          </p>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Step mapping:</strong> Spec step 10. Result block appears below the form (form persists for follow-up shortening). Clipboard write uses <code>navigator.clipboard.writeText()</code> client-side after the server action returns.
+      </div>
+      <div class="design-annotation">
+        <strong>Conversion CTA:</strong> "Sign up to keep this link forever" links to authenticated UC-001. This is the natural moment to convert anonymous → owner, before the visitor closes the tab.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 4 — ERROR: invalid URL (A1) -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">State 04 · Error A1 — invalid destination URL</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+        <div class="max-w-2xl mx-auto space-y-3">
+          <div class="theme-input is-error p-5 flex items-center gap-3">
+            <span class="text-ember-500 font-mono text-sm">!</span>
+            <span class="bg-transparent flex-1 outline-none text-base text-shore-50">not-a-url</span>
+          </div>
+          <p class="text-sm text-ember-500 px-2 flex items-center gap-2">
+            <span aria-hidden="true">·</span>
+            <span>Enter a valid http or https URL.</span>
+          </p>
+          <button class="theme-btn-primary w-full py-4 text-base font-display">Shorten →</button>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Step mapping:</strong> Spec A1. Inline error below the field, ember accent. The field gets the <code>.is-error</code> modifier (red border). Focus is moved to the field.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 5 — ERROR: slug taken (A3) -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">State 05 · Error A3 — custom slug already taken</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8">
+        <div class="max-w-2xl mx-auto space-y-3">
+          <div class="theme-input p-5 flex items-center gap-3">
+            <span class="text-shore-300 font-mono text-sm">→</span>
+            <span class="bg-transparent flex-1 outline-none text-base text-shore-50">https://example.com/article</span>
+          </div>
+          <details class="theme-input is-error" open>
+            <summary class="px-5 py-3.5 text-sm text-shore-200 flex items-center justify-between list-none">
+              <span>Custom slug</span><span class="text-ember-500">!</span>
+            </summary>
+            <div class="px-5 pb-4 border-t border-shore-700 pt-3 mt-1">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-sm text-shore-300">lnk.sh/</span>
+                <span class="bg-transparent flex-1 font-mono text-sm text-shore-50">launch-2026</span>
+              </div>
+              <p class="text-xs text-ember-500 mt-2">Slug unavailable. Try another.</p>
+            </div>
+          </details>
+          <button class="theme-btn-primary w-full py-4 text-base font-display">Shorten →</button>
+        </div>
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>Step mapping:</strong> Spec A3. Server returns 409 Conflict on slug clash. The error scopes to the slug section only — the URL field is not invalidated.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- STATE 6 — ERROR: blocklist (A2) / rate limit (A5) -->
+  <!-- ============================================================ -->
+  <section class="mb-10">
+    <div class="design-state-label">States 06 · Generic rejections — blocklist (A2) and rate limit (A5)</div>
+    <div class="theme-card p-8">
+      <div class="theme-viewport p-8 space-y-6">
+
+        <!-- Blocklist -->
+        <div class="max-w-2xl mx-auto">
+          <p class="text-xs uppercase tracking-wider text-shore-300 mb-2">A2 · Blocklist hit</p>
+          <div class="theme-pill-error rounded-md px-4 py-3 text-sm flex items-start gap-3">
+            <span class="font-mono text-base leading-none mt-0.5">⊘</span>
+            <div>
+              <div class="font-medium">This URL cannot be shortened.</div>
+              <div class="text-xs opacity-80 mt-1">If you believe this is a mistake, please contact support.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rate limit -->
+        <div class="max-w-2xl mx-auto">
+          <p class="text-xs uppercase tracking-wider text-shore-300 mb-2">A5 · Rate limit (HTTP 429)</p>
+          <div class="theme-pill-error rounded-md px-4 py-3 text-sm flex items-start gap-3">
+            <span class="font-mono text-base leading-none mt-0.5">⏱</span>
+            <div>
+              <div class="font-medium">Too many links from this network.</div>
+              <div class="text-xs opacity-80 mt-1">You can create up to 20 links per hour. Try again in 14 minutes — or <a href="#" class="theme-link-spark">sign in</a> to lift the limit.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="design-annotation mt-5">
+        <strong>BR-004 enforcement:</strong> The blocklist message is intentionally generic — it does not name the rule, the source, or the destination. This prevents probing.
+      </div>
+      <div class="design-annotation">
+        <strong>Sign-in upsell:</strong> The rate-limit copy nudges anonymous → owner conversion. Owners can be subject to a higher limit (out of scope here).
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DATA MAPPING ── -->
+  <section class="theme-card p-8 mb-10">
+    <h2 class="font-display text-xl font-bold mb-5">Data mapping (per submit)</h2>
+    <table class="design-data-table">
+      <thead><tr><th>UI field</th><th>LINK attribute</th><th>Validation / source</th></tr></thead>
+      <tbody>
+        <tr><td>Destination URL</td><td><code>destinationUrl</code></td><td>RFC 3986 · scheme ∈ {http, https} · max 2048</td></tr>
+        <tr><td>Custom slug (optional)</td><td><code>slug</code></td><td><code>^[a-z0-9-]{3,32}$</code> · DB-level UNIQUE</td></tr>
+        <tr><td>(generated)</td><td><code>slug</code> if no custom</td><td>7-char URL-safe, retried up to 5×</td></tr>
+        <tr><td>(session)</td><td><code>ownerId</code></td><td><code>currentUser.id</code> or <code>NULL</code></td></tr>
+        <tr><td>(request)</td><td><code>creatorIp</code></td><td>X-Forwarded-For first hop · max 45 chars (IPv6)</td></tr>
+        <tr><td>(computed)</td><td><code>expiresAt</code></td><td><code>NULL</code> if owned · else <code>createdAt + interval '30 days'</code></td></tr>
+        <tr><td>(server)</td><td><code>createdAt</code></td><td><code>now()</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer class="text-center py-6 text-xs text-shore-300 border-t border-shore-700">
+    Generated from <code class="font-mono text-spark-500">UC-002.md</code> + wireframe <code class="font-mono text-spark-500">#UC-002</code> · Theme: shore-001
+  </footer>
+
+</div>
+
+</body>
+</html>

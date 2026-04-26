@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lnk.sh — Wireframe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            shore: {
+              50:  '#F7F4ED',
+              100: '#EDE7D7',
+              200: '#D9CFB6',
+              300: '#A89F87',
+              500: '#3C4A5C',
+              700: '#1A2734',
+              800: '#13202E',
+              900: '#0F1B2D',
+            },
+            spark: '#A8FF60',
+            ember: '#FF6B35',
+          },
+          fontFamily: {
+            display: ['Bricolage Grotesque', 'serif'],
+            body:    ['Manrope', 'sans-serif'],
+            mono:    ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg-page:   #0F1B2D;
+      --bg-card:   #13202E;
+      --bg-soft:   #1A2734;
+      --bg-cream:  #F7F4ED;
+      --text-primary: #F7F4ED;
+      --text-muted:   #A89F87;
+      --text-dim:     #6B7889;
+      --accent:    #A8FF60;
+      --accent-ink: #0F1B2D;
+      --warm:      #FF6B35;
+      --line:      rgba(247, 244, 237, 0.08);
+    }
+
+    body {
+      background: radial-gradient(ellipse at top, #1A2734 0%, #0F1B2D 60%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      font-feature-settings: "ss01", "cv11";
+    }
+
+    .grain::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(247, 244, 237, 0.025) 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 1;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      box-shadow:
+        0 1px 0 rgba(247, 244, 237, 0.04) inset,
+        0 30px 60px -30px rgba(0, 0, 0, 0.6);
+    }
+
+    .viewport {
+      background: linear-gradient(180deg, #182536 0%, #0F1B2D 100%);
+      border: 1px dashed rgba(247, 244, 237, 0.12);
+    }
+
+    .badge {
+      background: rgba(168, 255, 96, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(168, 255, 96, 0.18);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .badge-muted {
+      background: rgba(247, 244, 237, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--line);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .wf-annotation {
+      background: rgba(168, 255, 96, 0.05);
+      border-left: 2px solid var(--accent);
+      color: var(--text-muted);
+      padding: 0.85rem 1.1rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .wf-annotation strong { color: var(--accent); font-weight: 600; }
+
+    .nav-link { color: var(--text-muted); transition: color 0.15s; }
+    .nav-link:hover { color: var(--accent); }
+    .nav-link.active { color: var(--text-primary); }
+
+    .input-mock {
+      background: rgba(247, 244, 237, 0.03);
+      border: 1px solid rgba(247, 244, 237, 0.12);
+      color: var(--text-primary);
+      transition: border-color 0.2s;
+    }
+    .input-mock:focus-within { border-color: var(--accent); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px -8px rgba(168, 255, 96, 0.5);
+    }
+
+    .btn-ghost {
+      background: rgba(247, 244, 237, 0.04);
+      color: var(--text-primary);
+      border: 1px solid var(--line);
+    }
+    .btn-ghost:hover { background: rgba(247, 244, 237, 0.07); }
+
+    .table-row { border-bottom: 1px solid var(--line); }
+    .table-row:hover { background: rgba(168, 255, 96, 0.02); }
+
+    .stat-card { background: rgba(247, 244, 237, 0.02); border: 1px solid var(--line); }
+    .stat-value { color: var(--accent); }
+
+    .toc-link { color: var(--text-muted); transition: color 0.15s; }
+    .toc-link:hover { color: var(--accent); }
+
+    .nav-node {
+      background: rgba(168, 255, 96, 0.06);
+      border: 1px solid rgba(168, 255, 96, 0.15);
+      color: var(--text-primary);
+    }
+    .nav-node a { color: inherit; text-decoration: none; }
+
+    .anonymous-pill {
+      background: rgba(255, 107, 53, 0.08);
+      color: var(--warm);
+      border: 1px solid rgba(255, 107, 53, 0.2);
+    }
+
+    .owned-pill {
+      background: rgba(168, 255, 96, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(168, 255, 96, 0.2);
+    }
+  </style>
+</head>
+<body class="font-body antialiased grain">
+
+<div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+
+  <!-- ============================================================ -->
+  <!-- HEADER -->
+  <!-- ============================================================ -->
+  <div class="text-center py-10 mb-10 border-b border-shore-700">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 mb-5 rounded-full badge-muted">
+      <span class="w-1.5 h-1.5 rounded-full bg-spark animate-pulse"></span>
+      <span>Wireframe — generated by /generate-wireframe</span>
+    </div>
+    <h1 class="font-display text-5xl font-bold tracking-tight">
+      lnk<span class="text-spark">.</span>sh
+    </h1>
+    <p class="mt-4 text-shore-300 max-w-xl mx-auto leading-relaxed">
+      Privacy-respecting URL shortener · 2 screens · Actors: Anonymous Visitor, Link Owner
+    </p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TABLE OF CONTENTS -->
+  <!-- ============================================================ -->
+  <div class="card rounded-xl p-6 mb-10">
+    <h2 class="font-display text-lg font-semibold mb-5 flex items-baseline gap-3">
+      <span>Screens</span>
+      <span class="text-xs font-body font-normal text-shore-300">tracing to FR-001 → FR-004</span>
+    </h2>
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 list-none">
+      <li class="flex items-baseline gap-3">
+        <span class="font-mono text-xs text-spark">UC-002</span>
+        <a href="#UC-002" class="toc-link font-medium">Shorten a URL</a>
+        <span class="text-xs text-shore-300">— Anonymous Visitor</span>
+      </li>
+      <li class="flex items-baseline gap-3">
+        <span class="font-mono text-xs text-spark">UC-001</span>
+        <a href="#UC-001" class="toc-link font-medium">List my links</a>
+        <span class="text-xs text-shore-300">— Link Owner</span>
+      </li>
+      <li class="flex items-baseline gap-3 md:col-span-2">
+        <span class="font-mono text-xs text-shore-500">UC-003</span>
+        <span class="text-shore-300 line-through">Redirect to destination</span>
+        <span class="text-xs text-shore-500 italic">— no UI: server-side 302</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-002 — Shorten a URL -->
+  <!-- ============================================================ -->
+  <div class="card rounded-2xl p-8 mb-10" id="UC-002">
+    <div class="flex justify-between items-baseline border-b border-shore-700 pb-5 mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-display text-2xl font-bold">UC-002 — Shorten a URL</h2>
+        <p class="text-sm text-shore-300 mt-1">Hero use case — the entry point for the entire product.</p>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <span class="badge px-3 py-1 rounded-md">Anonymous Visitor</span>
+        <span class="badge-muted px-3 py-1 rounded-md">Form</span>
+        <span class="badge-muted px-3 py-1 rounded-md font-mono">/</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Visitor pastes a destination URL, optionally chooses a slug, and gets a short link copied to their clipboard.
+    </div>
+
+    <!-- ── VIEWPORT ── -->
+    <div class="viewport rounded-xl p-8">
+      <!-- Browser chrome -->
+      <div class="flex items-center gap-2 pb-5 mb-6 border-b border-shore-700">
+        <div class="flex gap-1.5">
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+        </div>
+        <div class="ml-3 px-4 py-1.5 rounded-md bg-shore-800 text-xs font-mono text-shore-300 flex-1 max-w-md">
+          🔒 lnk.sh
+        </div>
+      </div>
+
+      <!-- App navbar -->
+      <div class="flex items-center justify-between mb-12">
+        <div class="font-display font-bold text-xl">
+          lnk<span class="text-spark">.</span>sh
+        </div>
+        <nav class="flex gap-6 text-sm font-medium">
+          <a href="#UC-002" class="nav-link active">Shorten</a>
+          <a href="#UC-001" class="nav-link">My links</a>
+          <a href="#UC-001" class="btn-ghost px-4 py-1.5 rounded-md text-sm">Sign in</a>
+        </nav>
+      </div>
+
+      <!-- Hero -->
+      <div class="max-w-2xl mx-auto text-center mb-10">
+        <h1 class="font-display text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+          Long links,<br>
+          <span class="text-spark">handled.</span>
+        </h1>
+        <p class="mt-5 text-shore-300 text-lg leading-relaxed">
+          Paste a URL. Get a short link. No account needed. No trackers. Anonymous links expire after 30 days.
+        </p>
+      </div>
+
+      <!-- Form -->
+      <div class="max-w-2xl mx-auto space-y-3">
+        <!-- Destination URL -->
+        <div class="input-mock rounded-xl p-5 flex items-center gap-3">
+          <span class="text-shore-300 font-mono text-sm">→</span>
+          <input
+            type="url"
+            placeholder="https://example.com/very-long-article-title-that-needs-shortening"
+            class="bg-transparent flex-1 outline-none text-base placeholder:text-shore-500"
+            disabled>
+        </div>
+
+        <!-- Custom slug (collapsible) -->
+        <details class="input-mock rounded-xl">
+          <summary class="px-5 py-3.5 cursor-pointer text-sm text-shore-300 flex items-center justify-between">
+            <span>Custom slug <span class="text-shore-500">(optional)</span></span>
+            <span class="text-shore-500">+</span>
+          </summary>
+          <div class="px-5 pb-4 flex items-center gap-2 border-t border-shore-700 pt-3 mt-1">
+            <span class="font-mono text-sm text-shore-300">lnk.sh/</span>
+            <input
+              type="text"
+              placeholder="my-launch"
+              class="bg-transparent flex-1 outline-none text-sm font-mono placeholder:text-shore-500"
+              disabled>
+            <span class="text-xs text-shore-500 font-mono">3–32 · [a-z0-9-]</span>
+          </div>
+        </details>
+
+        <!-- Submit -->
+        <button class="btn-primary w-full py-4 rounded-xl text-base font-display">
+          Shorten →
+        </button>
+      </div>
+
+      <!-- Result preview (post-submit state) -->
+      <div class="max-w-2xl mx-auto mt-10 pt-8 border-t border-dashed border-shore-700">
+        <div class="text-xs uppercase tracking-wider text-shore-300 mb-3">↓ Post-submit state</div>
+        <div class="card rounded-xl p-5 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <div class="font-mono text-spark text-lg">lnk.sh/k3p9w2x</div>
+            <div class="text-xs text-shore-300 mt-1">→ https://example.com/very-long-article-…</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn-ghost px-4 py-2 rounded-md text-sm">Copy</button>
+            <span class="anonymous-pill px-3 py-1.5 rounded-md text-xs font-medium">Expires in 30 days</span>
+          </div>
+        </div>
+        <p class="text-xs text-shore-300 mt-3">
+          <a href="#UC-001" class="text-spark underline-offset-2 hover:underline">Sign up</a>
+          to keep this link forever.
+        </p>
+      </div>
+
+      <!-- Trust bar -->
+      <div class="max-w-2xl mx-auto mt-12 pt-8 border-t border-shore-700 text-xs text-shore-300 flex flex-wrap gap-x-6 gap-y-2 justify-center">
+        <span>· No third-party trackers</span>
+        <span>· 20 links/hour rate limit</span>
+        <span>· Open-source</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation mt-5">
+      <strong>Navigation:</strong> Submit → stays on this screen, displays the result block above. "Sign up" / "My links" link → <a href="#UC-001" class="text-spark">UC-001</a>. Following the short link → server-side 302 (UC-003, no UI).
+    </div>
+    <div class="wf-annotation mt-2">
+      <strong>States to design (handled by /design-screens):</strong> empty · validating · submitting · success · error (invalid URL · slug taken · blocklist hit · rate limited).
+    </div>
+    <div class="wf-annotation mt-2">
+      <strong>Data sources:</strong> writes <code class="font-mono text-xs text-spark">LINK</code> with attributes <code class="font-mono text-xs text-spark">slug, destinationUrl, ownerId (null), creatorIp, expiresAt = createdAt + 30d, createdAt</code>. See <a href="../entity_model.md" class="text-spark">entity_model.md</a>.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN: UC-001 — List my links -->
+  <!-- ============================================================ -->
+  <div class="card rounded-2xl p-8 mb-10" id="UC-001">
+    <div class="flex justify-between items-baseline border-b border-shore-700 pb-5 mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-display text-2xl font-bold">UC-001 — List my links</h2>
+        <p class="text-sm text-shore-300 mt-1">Authenticated dashboard. Owners see their permanent links and recent anonymous links they've claimed.</p>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <span class="badge px-3 py-1 rounded-md">Link Owner</span>
+        <span class="badge-muted px-3 py-1 rounded-md">List</span>
+        <span class="badge-muted px-3 py-1 rounded-md font-mono">/dashboard</span>
+      </div>
+    </div>
+
+    <div class="wf-annotation">
+      <strong>Purpose:</strong> Owners find any link they've created, copy it, and confirm it is still active. <strong>Requires</strong> <a href="#TT-001" class="text-spark">TT-001 (Auth middleware)</a>.
+    </div>
+
+    <!-- ── VIEWPORT ── -->
+    <div class="viewport rounded-xl p-8">
+      <!-- Browser chrome -->
+      <div class="flex items-center gap-2 pb-5 mb-6 border-b border-shore-700">
+        <div class="flex gap-1.5">
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+          <div class="w-3 h-3 rounded-full bg-shore-500/40"></div>
+        </div>
+        <div class="ml-3 px-4 py-1.5 rounded-md bg-shore-800 text-xs font-mono text-shore-300 flex-1 max-w-md">
+          🔒 lnk.sh/dashboard
+        </div>
+      </div>
+
+      <!-- App navbar (consistent with UC-002) -->
+      <div class="flex items-center justify-between mb-10">
+        <div class="font-display font-bold text-xl">
+          lnk<span class="text-spark">.</span>sh
+        </div>
+        <nav class="flex gap-6 text-sm font-medium items-center">
+          <a href="#UC-002" class="nav-link">Shorten</a>
+          <a href="#UC-001" class="nav-link active">My links</a>
+          <span class="w-px h-5 bg-shore-700"></span>
+          <span class="text-shore-300 text-sm">maria@example.com</span>
+          <button class="btn-ghost px-3 py-1.5 rounded-md text-sm">Sign out</button>
+        </nav>
+      </div>
+
+      <!-- Page header -->
+      <div class="flex items-baseline justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <div class="text-xs uppercase tracking-wider text-shore-300 mb-2">Dashboard</div>
+          <h1 class="font-display text-4xl font-bold tracking-tight">My links</h1>
+        </div>
+        <a href="#UC-002" class="btn-primary px-5 py-2.5 rounded-lg text-sm">+ New link</a>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="stat-card rounded-xl p-5">
+          <div class="text-xs uppercase tracking-wider text-shore-300 mb-2">Total links</div>
+          <div class="font-display text-3xl font-bold stat-value">14</div>
+        </div>
+        <div class="stat-card rounded-xl p-5">
+          <div class="text-xs uppercase tracking-wider text-shore-300 mb-2">Owned (permanent)</div>
+          <div class="font-display text-3xl font-bold stat-value">11</div>
+        </div>
+        <div class="stat-card rounded-xl p-5">
+          <div class="text-xs uppercase tracking-wider text-shore-300 mb-2">Expiring soon</div>
+          <div class="font-display text-3xl font-bold text-ember">3</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="input-mock rounded-lg px-4 py-2 flex items-center gap-2 flex-1 max-w-sm">
+          <span class="text-shore-500 text-sm">⌕</span>
+          <input
+            type="text"
+            placeholder="Filter by slug or destination…"
+            class="bg-transparent flex-1 outline-none text-sm placeholder:text-shore-500"
+            disabled>
+        </div>
+        <div class="flex gap-1 text-xs">
+          <button class="btn-ghost px-3 py-1.5 rounded-md text-shore-300">All</button>
+          <button class="btn-ghost px-3 py-1.5 rounded-md text-spark">Owned</button>
+          <button class="btn-ghost px-3 py-1.5 rounded-md text-shore-300">Anonymous</button>
+        </div>
+      </div>
+
+      <!-- Links table -->
+      <div class="card rounded-xl overflow-hidden">
+        <!-- Table header -->
+        <div class="grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-3 text-xs uppercase tracking-wider text-shore-300 border-b border-shore-700 bg-shore-800/40">
+          <div>Slug</div>
+          <div>Destination</div>
+          <div>Status</div>
+          <div>Created</div>
+          <div></div>
+        </div>
+
+        <!-- Row 1 -->
+        <div class="table-row grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-4 items-center">
+          <div class="font-mono text-sm text-spark">launch-2026</div>
+          <div class="text-sm text-shore-50 truncate">https://maria.example/launch-announcement-spring-2026</div>
+          <div><span class="owned-pill px-2.5 py-1 rounded text-xs">Owned</span></div>
+          <div class="text-xs text-shore-300 font-mono">2026-04-19</div>
+          <div class="text-right">
+            <button class="btn-ghost px-2.5 py-1 rounded text-xs">⋯</button>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="table-row grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-4 items-center">
+          <div class="font-mono text-sm text-spark">k3p9w2x</div>
+          <div class="text-sm text-shore-50 truncate">https://example.com/very-long-article-title-that-needs-shortening</div>
+          <div><span class="anonymous-pill px-2.5 py-1 rounded text-xs">12d left</span></div>
+          <div class="text-xs text-shore-300 font-mono">2026-04-14</div>
+          <div class="text-right">
+            <button class="btn-ghost px-2.5 py-1 rounded text-xs">⋯</button>
+          </div>
+        </div>
+        <!-- Row 3 -->
+        <div class="table-row grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-4 items-center">
+          <div class="font-mono text-sm text-spark">cv</div>
+          <div class="text-sm text-shore-50 truncate">https://maria.example/cv.pdf</div>
+          <div><span class="owned-pill px-2.5 py-1 rounded text-xs">Owned</span></div>
+          <div class="text-xs text-shore-300 font-mono">2026-03-02</div>
+          <div class="text-right">
+            <button class="btn-ghost px-2.5 py-1 rounded text-xs">⋯</button>
+          </div>
+        </div>
+        <!-- Row 4 -->
+        <div class="table-row grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-4 items-center">
+          <div class="font-mono text-sm text-spark">talk-london</div>
+          <div class="text-sm text-shore-50 truncate">https://conf.example/sessions/maria-popescu-keynote</div>
+          <div><span class="owned-pill px-2.5 py-1 rounded text-xs">Owned</span></div>
+          <div class="text-xs text-shore-300 font-mono">2026-02-28</div>
+          <div class="text-right">
+            <button class="btn-ghost px-2.5 py-1 rounded text-xs">⋯</button>
+          </div>
+        </div>
+        <!-- Row 5 (expiring soon) -->
+        <div class="table-row grid grid-cols-[140px_1fr_120px_140px_60px] gap-4 px-5 py-4 items-center">
+          <div class="font-mono text-sm text-spark">draft-share</div>
+          <div class="text-sm text-shore-50 truncate">https://docs.example/d/abcdef-draft-document</div>
+          <div><span class="anonymous-pill px-2.5 py-1 rounded text-xs">3d left</span></div>
+          <div class="text-xs text-shore-300 font-mono">2026-04-04</div>
+          <div class="text-right">
+            <button class="btn-ghost px-2.5 py-1 rounded text-xs">⋯</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state alt -->
+      <div class="mt-6 text-center text-xs text-shore-500">
+        Showing 5 of 14 ·
+        <a href="#" class="text-spark underline-offset-2 hover:underline">Load more</a>
+      </div>
+    </div>
+
+    <div class="wf-annotation mt-5">
+      <strong>Navigation:</strong> "+ New link" → <a href="#UC-002" class="text-spark">UC-002</a>. Row click → copy slug to clipboard (no detail page in this scope). "Sign out" → marketing landing (out of scope).
+    </div>
+    <div class="wf-annotation mt-2">
+      <strong>States to design (handled by /design-screens):</strong> empty (no links yet) · loading · loaded · filter active · pagination loaded · auth-required redirect.
+    </div>
+    <div class="wf-annotation mt-2">
+      <strong>Data sources:</strong> reads <code class="font-mono text-xs text-spark">LINK</code> filtered by <code class="font-mono text-xs text-spark">ownerId = currentUser.id</code> sorted by <code class="font-mono text-xs text-spark">createdAt DESC</code>. Joins <code class="font-mono text-xs text-spark">USER</code> for the navbar email.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- UC-003 — backend-only -->
+  <!-- ============================================================ -->
+  <div class="card rounded-2xl p-8 mb-10" id="UC-003">
+    <div class="flex justify-between items-baseline border-b border-shore-700 pb-5 mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-display text-2xl font-bold text-shore-300">UC-003 — Redirect to destination</h2>
+        <p class="text-sm text-shore-300 mt-1">Server-side 302 — no user-facing screen.</p>
+      </div>
+      <div class="flex gap-2">
+        <span class="badge-muted px-3 py-1 rounded-md">Backend</span>
+        <span class="badge-muted px-3 py-1 rounded-md font-mono">GET /:slug</span>
+      </div>
+    </div>
+    <div class="wf-annotation">
+      <strong>Why no screen:</strong> The redirect is an HTTP 302 issued from the server within p95 &lt; 100ms (NFR-002). Showing an interstitial page would violate NFR-008 (no third-party trackers) by tempting analytics injection, and would frustrate users. The only failure path with UI is the <strong>404 / expired</strong> page below.
+    </div>
+    <div class="viewport rounded-xl p-10 text-center">
+      <div class="font-display text-6xl font-bold mb-3 text-ember">410</div>
+      <div class="font-display text-xl mb-2">This link has expired</div>
+      <p class="text-shore-300 text-sm max-w-sm mx-auto mb-6">
+        Anonymous links expire 30 days after creation.
+        <a href="#UC-002" class="text-spark underline-offset-2 hover:underline">Shorten a new one</a>
+        — or sign in to keep links forever.
+      </p>
+      <a href="#UC-002" class="btn-primary inline-block px-6 py-2.5 rounded-lg text-sm">← Back to lnk.sh</a>
+    </div>
+    <div class="wf-annotation mt-5">
+      <strong>States to design (handled by /design-screens):</strong> 404 (slug not found) · 410 (expired) · 451 (blocked destination, generic message per UC-002 BR).
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TT-001 — technical task -->
+  <!-- ============================================================ -->
+  <div class="card rounded-2xl p-8 mb-10 border-dashed" id="TT-001" style="border-style: dashed;">
+    <div class="flex justify-between items-baseline border-b border-dashed border-shore-700 pb-5 mb-6 flex-wrap gap-3">
+      <div>
+        <h2 class="font-display text-2xl font-bold text-shore-300">TT-001 — Auth middleware</h2>
+        <p class="text-sm text-shore-300 mt-1">Technical task. No screen. Delivered by <code class="font-mono text-xs text-spark">/setup-web-middleware</code>.</p>
+      </div>
+      <span class="badge-muted px-3 py-1 rounded-md">&lt;&lt;technical&gt;&gt;</span>
+    </div>
+    <div class="wf-annotation">
+      <strong>Required by:</strong> UC-001 (Link Owner authentication). The middleware enforces session presence on <code class="font-mono text-xs text-spark">/dashboard/*</code>, redirects unauthenticated visitors to the marketing landing.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- NAVIGATION MAP -->
+  <!-- ============================================================ -->
+  <div class="card rounded-xl p-8 mb-10">
+    <h2 class="font-display text-xl font-bold mb-6">Navigation map</h2>
+
+    <div class="space-y-4">
+      <!-- Anonymous flow -->
+      <div>
+        <div class="text-xs uppercase tracking-wider text-shore-300 mb-3">Anonymous Visitor</div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-002">UC-002 Shorten</a></div>
+          <span class="text-shore-300 text-sm">→ shares short link →</span>
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-003">UC-003 Redirect (302)</a></div>
+          <span class="text-shore-300 text-sm">→ destination URL</span>
+        </div>
+      </div>
+
+      <!-- Owner flow -->
+      <div>
+        <div class="text-xs uppercase tracking-wider text-shore-300 mb-3">Link Owner</div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-001">UC-001 My links</a></div>
+          <span class="text-shore-300 text-sm">→ "+ New link" →</span>
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-002">UC-002 Shorten</a></div>
+          <span class="text-shore-300 text-sm">→ stays in dashboard scope</span>
+        </div>
+      </div>
+
+      <!-- Conversion flow -->
+      <div>
+        <div class="text-xs uppercase tracking-wider text-shore-300 mb-3">Conversion (anonymous → owner)</div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-002">UC-002 Shorten</a></div>
+          <span class="text-shore-300 text-sm">→ "Sign up to keep" CTA →</span>
+          <div class="nav-node px-3 py-1.5 rounded-lg text-sm font-mono"><a href="#UC-001">UC-001 My links</a></div>
+          <span class="text-shore-300 text-sm">(post-auth)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-annotation mt-8">
+      <strong>Out of wireframe scope:</strong> sign-up/sign-in screens are delivered by <a href="#TT-001" class="text-spark">TT-001</a>. The marketing landing page (anonymous "/" experience) is not in this release — anonymous visitors land directly on UC-002.
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================================ -->
+  <div class="text-center py-6 text-xs text-shore-300 border-t border-shore-700">
+    Generated from <code class="font-mono text-spark">docs/use_cases.puml</code> · <code class="font-mono text-spark">docs/requirements.md</code> · <code class="font-mono text-spark">docs/entity_model.md</code>
+  </div>
+
+</div>
+
+</body>
+</html>

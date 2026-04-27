@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Sprint Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Palette (shore theme) ── */
+:root {
+  --shore-50:  #F7F4ED;
+  --shore-100: #EDE7D7;
+  --shore-200: #D9CFB6;
+  --shore-300: #A89F87;
+  --shore-400: #6B7889;
+  --shore-500: #3C4A5C;
+  --shore-600: #243240;
+  --shore-700: #1A2734;
+  --shore-800: #13202E;
+  --shore-900: #0F1B2D;
+  --spark-400: #C2FF7B;
+  --spark-500: #A8FF60;
+  --spark-600: #85DB44;
+  --ember-400: #FF8554;
+  --ember-500: #FF6B35;
+  --bg-page:   var(--shore-900);
+  --bg-card:   var(--shore-800);
+  --bg-soft:   var(--shore-700);
+  --line:      rgba(247, 244, 237, 0.08);
+  --line-strong: rgba(247, 244, 237, 0.15);
+}
+
+/* ── Base ── */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+  background: var(--bg-page);
+  color: var(--shore-50);
+  line-height: 1.7;
+}
+
+/* ── Print ── */
+@media print {
+  body { background: var(--bg-page) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: avoid; }
+  .no-break { page-break-inside: avoid; break-inside: avoid; }
+}
+@page {
+  size: A4;
+  margin: 0;
+}
+
+/* ── Layout ── */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 2rem;
+  padding: 48px 56px;
+  background: var(--bg-page);
+  position: relative;
+  overflow: hidden;
+}
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(247, 244, 237, 0.02) 1px, transparent 0);
+  background-size: 3px 3px;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 {
+  font-family: 'Bricolage Grotesque', serif;
+  font-weight: 700;
+  line-height: 1.15;
+}
+h1 { font-size: 2.75rem; letter-spacing: -0.02em; }
+h2 { font-size: 1.75rem; letter-spacing: -0.01em; color: var(--spark-500); margin-bottom: 0.75rem; }
+h3 { font-size: 1.25rem; color: var(--shore-100); margin-bottom: 0.5rem; }
+h4 { font-size: 1rem; color: var(--shore-200); }
+p { margin-bottom: 1rem; color: var(--shore-200); }
+strong { color: var(--shore-50); font-weight: 600; }
+code, .mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875em;
+}
+.text-spark { color: var(--spark-500); }
+.text-ember { color: var(--ember-500); }
+.text-muted { color: var(--shore-300); }
+.text-dim   { color: var(--shore-400); }
+.text-sm    { font-size: 0.875rem; }
+.text-xs    { font-size: 0.75rem; }
+
+/* ── Components ── */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-spark {
+  background: rgba(168, 255, 96, 0.12);
+  color: var(--spark-500);
+  border: 1px solid rgba(168, 255, 96, 0.2);
+}
+.badge-ember {
+  background: rgba(255, 107, 53, 0.12);
+  color: var(--ember-500);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+}
+.badge-shore {
+  background: rgba(247, 244, 237, 0.05);
+  color: var(--shore-200);
+  border: 1px solid var(--line-strong);
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 1.25rem;
+}
+.card-accent {
+  border-color: rgba(168, 255, 96, 0.18);
+}
+
+.callout {
+  background: rgba(168, 255, 96, 0.06);
+  border-left: 3px solid var(--spark-500);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  margin: 1.25rem 0;
+}
+.callout-title {
+  font-family: 'Bricolage Grotesque', serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--spark-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.callout p { margin-bottom: 0; font-size: 0.9rem; }
+
+.callout-ember {
+  background: rgba(255, 107, 53, 0.06);
+  border-left-color: var(--ember-500);
+}
+.callout-ember .callout-title { color: var(--ember-500); }
+
+.screenshot {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line-strong);
+  margin: 1rem 0;
+  display: block;
+}
+.screenshot-sm {
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+.divider-accent {
+  border-top: 1px solid rgba(168, 255, 96, 0.18);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-soft);
+  color: var(--shore-100);
+  font-weight: 600;
+  border-bottom: 1px solid var(--line-strong);
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--shore-200);
+}
+
+ol, ul { padding-left: 1.5rem; margin-bottom: 1rem; color: var(--shore-200); }
+li { margin-bottom: 0.4rem; }
+li strong { color: var(--shore-50); }
+
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+.flow-step {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.flow-arrow {
+  color: var(--shore-400);
+  font-size: 1rem;
+}
+.flow-inception  { background: rgba(168, 255, 96, 0.1); color: var(--spark-500); border: 1px solid rgba(168, 255, 96, 0.2); }
+.flow-elaboration { background: rgba(194, 255, 123, 0.08); color: var(--spark-400); border: 1px solid rgba(194, 255, 123, 0.15); }
+.flow-construction { background: rgba(255, 133, 84, 0.1); color: var(--ember-400); border: 1px solid rgba(255, 133, 84, 0.2); }
+.flow-verification { background: rgba(247, 244, 237, 0.06); color: var(--shore-200); border: 1px solid var(--line-strong); }
+
+.footer-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--spark-500), var(--ember-500));
+}
+
+.cover-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--shore-400);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.numbered-list { counter-reset: numbered; list-style: none; padding-left: 0; }
+.numbered-list li { counter-increment: numbered; position: relative; padding-left: 2.25rem; margin-bottom: 1rem; }
+.numbered-list li::before {
+  content: counter(numbered);
+  position: absolute; left: 0; top: 1px;
+  width: 1.5rem; height: 1.5rem;
+  background: rgba(168, 255, 96, 0.12);
+  color: var(--spark-500);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.space-y > * + * { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page" style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
+  <div class="cover-logo mb-2">Nexa Agentic Engineering</div>
+
+  <h1 style="font-size:3.25rem; line-height:1.08; margin-bottom:1.5rem;">
+    The AI Sprint<br>Playbook
+  </h1>
+
+  <p style="font-size:1.25rem; color:var(--shore-200); max-width:32rem; line-height:1.5; margin-bottom:2.5rem;">
+    How engineering teams ship production code with AI agents&nbsp;&mdash; without the slop.
+  </p>
+
+  <div style="display:flex; gap:1rem; align-items:center; margin-bottom:3rem;">
+    <span class="badge badge-spark">Methodology</span>
+    <span class="badge badge-shore">Claude Code</span>
+    <span class="badge badge-shore">Next.js</span>
+  </div>
+
+  <div class="card" style="max-width:28rem;">
+    <p class="text-sm" style="margin-bottom:0.5rem; color:var(--shore-300);">What's inside:</p>
+    <ul style="list-style:none; padding:0; margin:0; font-size:0.9rem;">
+      <li style="padding:6px 0; border-bottom:1px solid var(--line);">A real URL shortener shipped in one sprint, every artifact shown</li>
+      <li style="padding:6px 0; border-bottom:1px solid var(--line);">The 5 failure modes of AI-generated code &mdash; and how to prevent each one</li>
+      <li style="padding:6px 0; border-bottom:1px solid var(--line);">Requirements &rarr; Entity model &rarr; Spec &rarr; Design &rarr; Code &rarr; Tests</li>
+      <li style="padding:6px 0;">Every screenshot is a real artifact &mdash; no mockups, no edits</li>
+    </ul>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 2 — COLD OPEN
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-ember mb-1" style="display:inline-block;">The problem</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1.5rem;">The 200-line PR that took 4 hours to review</h2>
+
+  <p style="font-size:1.05rem; line-height:1.8;">
+    Your team adopted Claude Code six months ago. The demos were electric &mdash; a senior engineer shipped a feature in 20 minutes that used to take a day. You rolled it out to the whole team.
+  </p>
+
+  <p style="font-size:1.05rem; line-height:1.8;">
+    Now it's sprint review. The board looks great: stories are closing faster than ever. But something is wrong.
+  </p>
+
+  <div class="card" style="margin:1.5rem 0;">
+    <p style="color:var(--shore-50); font-weight:600; margin-bottom:0.75rem;">What you're actually seeing:</p>
+    <ul class="space-y" style="padding-left:1.25rem;">
+      <li><strong>200-line PRs that take 4 hours to review</strong> because the agent silently invented a <code>BaseRepository&lt;T&gt;</code> abstraction nobody asked for. The reviewer has to reverse-engineer <em>why</em> it exists before they can evaluate whether it's correct.</li>
+      <li><strong>Specs and code that drift apart by week two.</strong> The spec was a Notion doc. The agent never re-reads it. By the time QA looks at the PR, the feature does something subtly different from what was agreed.</li>
+      <li><strong>Tests that pass. Production that breaks.</strong> The agent mocked the database layer &mdash; the exact layer where the bug lives. 100% coverage, zero confidence.</li>
+      <li><strong>Onboarding that got harder, not easier.</strong> There are no design docs, just commits. A new engineer reading the codebase has to reconstruct the "why" from diffs.</li>
+    </ul>
+  </div>
+
+  <p style="font-size:1.05rem; line-height:1.8;">
+    The AI is fast. It's also unsupervised. And unsupervised speed produces slop at scale.
+  </p>
+
+  <p style="font-size:1.05rem; line-height:1.8; color:var(--shore-50); font-weight:600;">
+    This playbook shows you how to fix it.
+  </p>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 3 — FIVE FAILURE MODES
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-ember mb-1" style="display:inline-block;">Section 1</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1.5rem;">Five failure modes of AI-generated code</h2>
+
+  <p>These aren't bugs. They're structural problems &mdash; they emerge from how AI agents work, not from any particular agent being "bad." Every team using AI coding tools hits at least three of them within the first quarter.</p>
+
+  <div class="card no-break" style="margin-top:1.25rem;">
+    <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:0.5rem;">
+      <span class="badge badge-ember" style="font-size:0.7rem;">#1</span>
+      <h3 style="margin:0;">Silent assumptions</h3>
+    </div>
+    <p style="margin-bottom:0;">The agent guesses what "user" means and ships the wrong domain model. You asked for a link shortener. It built a user management system with roles, teams, and invitations &mdash; because it <em>assumed</em> that's what "user" requires. No one told it otherwise because no one wrote it down.</p>
+  </div>
+
+  <div class="card no-break">
+    <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:0.5rem;">
+      <span class="badge badge-ember" style="font-size:0.7rem;">#2</span>
+      <h3 style="margin:0;">Spec amnesia</h3>
+    </div>
+    <p style="margin-bottom:0;">The agent forgets the spec mid-implementation and invents new behavior. Halfway through UC-002, it decides the form should also support batch URL uploads. That wasn't in the spec. Nobody asked for it. But the agent's context window moved on, and it filled the gap with creativity instead of compliance.</p>
+  </div>
+
+  <div class="card no-break">
+    <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:0.5rem;">
+      <span class="badge badge-ember" style="font-size:0.7rem;">#3</span>
+      <h3 style="margin:0;">Phantom abstractions</h3>
+    </div>
+    <p style="margin-bottom:0;">The agent introduces a <code>BaseRepository&lt;T&gt;</code> for a project with one repository. A <code>withErrorHandler</code> decorator wrapping a single endpoint. An abstract Strategy pattern for a feature that has exactly one strategy. Each one adds cognitive load, review time, and maintenance burden &mdash; for zero value.</p>
+  </div>
+
+  <div class="card no-break">
+    <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:0.5rem;">
+      <span class="badge badge-ember" style="font-size:0.7rem;">#4</span>
+      <h3 style="margin:0;">Verification theater</h3>
+    </div>
+    <p style="margin-bottom:0;">Tests pass. The feature is broken. The agent mocked every dependency that matters &mdash; the database, the API client, the middleware &mdash; and tested that the mocks return what the mocks were told to return. 100% coverage, zero confidence.</p>
+  </div>
+
+  <div class="card no-break">
+    <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:0.5rem;">
+      <span class="badge badge-ember" style="font-size:0.7rem;">#5</span>
+      <h3 style="margin:0;">Scope drift</h3>
+    </div>
+    <p style="margin-bottom:0;">A bug fix becomes a 600-line refactor. The agent noticed "while it was in there" that the error handling could be "improved." Now the PR touches 12 files across 3 domains, the reviewer can't separate the fix from the cleanup, and the deploy risk just tripled.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 4 — THE METHOD
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-spark mb-1" style="display:inline-block;">Section 2</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1rem;">The method: enforce the workflow, not the agent</h2>
+
+  <p style="font-size:1.05rem; margin-bottom:1.5rem;">
+    Nexa Agentic Engineering doesn't make the agent smarter. It makes the <em>process</em> structural. Every phase produces a machine-readable artifact. Every downstream phase reads it. The agent cannot skip, invent, or forget &mdash; because the methodology is configuration, not discipline.
+  </p>
+
+  <div class="flow-diagram" style="justify-content:center; margin:2rem 0;">
+    <span class="flow-step flow-inception">/requirements</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">/entity-model</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">/use-case-diagram</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">/wireframe</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">/use-case-spec</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">/design-screens</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">/implement</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">/test</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-verification">/evaluate</span>
+  </div>
+
+  <p>Each skill reads the upstream artifacts and writes a new one. The chain is enforced &mdash; <code>/implement</code> refuses to run without a spec and design. <code>/evaluate</code> checks the implementation against both.</p>
+
+  <div class="two-col mt-2">
+    <div class="card card-accent no-break">
+      <h4 class="text-spark" style="margin-bottom:0.5rem;">What each phase prevents</h4>
+      <table>
+        <tr><td><strong>Requirements</strong></td><td>Silent assumptions (#1)</td></tr>
+        <tr><td><strong>Entity model</strong></td><td>Wrong data model (#1)</td></tr>
+        <tr><td><strong>Use case spec</strong></td><td>Spec amnesia (#2)</td></tr>
+        <tr><td><strong>Code review</strong></td><td>Phantom abstractions (#3)</td></tr>
+        <tr><td><strong>Real tests</strong></td><td>Verification theater (#4)</td></tr>
+        <tr><td style="border:none;"><strong>Scope gate</strong></td><td style="border:none;">Scope drift (#5)</td></tr>
+      </table>
+    </div>
+    <div class="card no-break">
+      <h4 style="margin-bottom:0.5rem;">Two layers</h4>
+      <p class="text-sm"><span class="badge badge-spark" style="font-size:0.65rem;">Free</span> <strong>nexa-claude-core</strong><br>Stack-agnostic. Vision &rarr; requirements &rarr; entity model &rarr; diagrams &rarr; wireframes &rarr; specs &rarr; designs. Works with any technology.</p>
+      <hr class="divider" style="margin:0.75rem 0;">
+      <p class="text-sm" style="margin:0;"><span class="badge badge-ember" style="font-size:0.65rem;">Paid</span> <strong>nexa-claude-nextjs</strong><br>Implementation &rarr; Vitest + Playwright tests &rarr; sprint delivery &rarr; evaluation. Closes the loop from spec to merged code.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:1.5rem;">
+    <div class="callout-title">The rest of this playbook</div>
+    <p>We built <strong>lnk.sh</strong> &mdash; a privacy-respecting URL shortener &mdash; end-to-end with this methodology. Every screenshot that follows is a real artifact generated by a Nexa skill. No edits, no after-the-fact polish.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 5 — THE PRODUCT
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-spark mb-1" style="display:inline-block;">The walkthrough</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1rem;">lnk.sh &mdash; a URL shortener built by an AI agent</h2>
+
+  <p style="font-size:1.05rem; margin-bottom:1.5rem;">
+    Small enough to read in one sitting. Rich enough to demand a real entity model, non-trivial business rules (rate limits, slug collisions, abuse blocklists, anonymous expiry), and three distinct UI states per screen.
+  </p>
+
+  <div class="two-col">
+    <div class="card no-break">
+      <h4 style="margin-bottom:0.75rem;">Three use cases</h4>
+      <div style="margin-bottom:0.75rem;">
+        <span class="badge badge-spark" style="font-size:0.65rem;">UC-002</span>
+        <strong style="margin-left:0.5rem;">Shorten a URL</strong>
+        <p class="text-sm text-muted" style="margin:4px 0 0;">Anonymous Visitor pastes a URL, gets a short link</p>
+      </div>
+      <div style="margin-bottom:0.75rem;">
+        <span class="badge badge-shore" style="font-size:0.65rem;">UC-001</span>
+        <strong style="margin-left:0.5rem;">List my links</strong>
+        <p class="text-sm text-muted" style="margin:4px 0 0;">Link Owner views their dashboard</p>
+      </div>
+      <div>
+        <span class="badge badge-shore" style="font-size:0.65rem;">UC-003</span>
+        <strong style="margin-left:0.5rem;">Redirect to destination</strong>
+        <p class="text-sm text-muted" style="margin:4px 0 0;">302 redirect &mdash; no UI on the success path</p>
+      </div>
+    </div>
+    <div class="card no-break">
+      <h4 style="margin-bottom:0.75rem;">Stack</h4>
+      <ul style="list-style:none; padding:0; font-size:0.875rem;">
+        <li style="padding:5px 0; border-bottom:1px solid var(--line);"><code>Next.js 15</code> &nbsp;App Router + Server Actions</li>
+        <li style="padding:5px 0; border-bottom:1px solid var(--line);"><code>Prisma 6</code> &nbsp;+ PostgreSQL 16</li>
+        <li style="padding:5px 0; border-bottom:1px solid var(--line);"><code>Vitest</code> &nbsp;unit tests (pure functions)</li>
+        <li style="padding:5px 0; border-bottom:1px solid var(--line);"><code>Playwright</code> &nbsp;E2E against real Postgres</li>
+        <li style="padding:5px 0;"><code>Bun</code> &nbsp;runtime + package manager</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider-accent" style="margin:2rem 0;">
+
+  <h3>The build order</h3>
+  <p class="text-sm text-muted" style="margin-bottom:1rem;">Each phase below shows the skill, its input, its output, and the failure mode it structurally prevents.</p>
+
+  <div class="flow-diagram">
+    <span class="flow-step flow-inception">1. Requirements</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">2. Entity model</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">3. Use cases</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-elaboration">4. Wireframe</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">5. Specs</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">6. Designs</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-construction">7. Code + Tests</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step flow-verification">8. Evaluate</span>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 6 — PHASE 1: REQUIREMENTS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 1</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/requirements</code></h2>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.25rem;">
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Input</h4>
+      <p class="text-sm">A 30-line <code>vision.md</code> &mdash; problem statement, goals, non-goals, success metrics, constraints.</p>
+    </div>
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Output</h4>
+      <p class="text-sm"><code>requirements.md</code> &mdash; 4 Functional Requirements, 11 Non-Functional Requirements, 7 Constraints. Each row: singular, measurable, testable, unique ID.</p>
+    </div>
+  </div>
+
+  <img src="../snapshots/01-requirements-catalog.png" alt="Requirements catalog showing FR, NFR, and Constraints tables" class="screenshot">
+
+  <p class="text-sm" style="margin-top:0.75rem;">Every row passes the Nexa quality gate: no prose, no ambiguity. "p95 &lt; 200ms under 100 RPS" instead of "the system should be fast." Each FR maps to a use case ID. Each NFR is measurable.</p>
+
+  <div class="callout">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure mode #1 (silent assumptions)</strong> is now structurally prevented. There is a machine-readable record of exactly what the system does and does not do. If the agent later proposes building "an analytics dashboard," the gate rejects it &mdash; there is no FR for it.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 7 — PHASE 2: ENTITY MODEL
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 2</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/entity-model</code></h2>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.25rem;">
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Input</h4>
+      <p class="text-sm"><code>requirements.md</code></p>
+    </div>
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Output</h4>
+      <p class="text-sm"><code>entity_model.md</code> &mdash; Mermaid ER diagram + attribute tables with types, lengths, and validation rules.</p>
+    </div>
+  </div>
+
+  <img src="../snapshots/02-entity-model.png" alt="Mermaid ER diagram showing USER and LINK entities" class="screenshot screenshot-sm">
+
+  <p style="margin-top:1rem;">Two entities: <strong>USER</strong> (link owners) and <strong>LINK</strong> (shortened URLs). Every attribute has a data type, max length, and validation constraints. Multi-column constraints are explicit: anonymous links must have <code>expiresAt = createdAt + 30 days</code>; owned links have <code>expiresAt = null</code>.</p>
+
+  <p>This is not a prose description. It is a structured input that the implementation phase consumes directly. When <code>/prisma-migration</code> runs, it has a single source of truth instead of inferring schema shape from "looks like there should be a User table."</p>
+
+  <div class="callout">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure mode #1 (silent assumptions)</strong> cannot leak into the data layer. The schema is locked before any code is written.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 8 — PHASE 3: USE CASE DIAGRAM
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 3</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/use-case-diagram</code></h2>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.25rem;">
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Input</h4>
+      <p class="text-sm"><code>requirements.md</code> + entity model</p>
+    </div>
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Output</h4>
+      <p class="text-sm"><code>use_cases.puml</code> &mdash; PlantUML diagram with actors, use cases, and dependencies.</p>
+    </div>
+  </div>
+
+  <img src="../snapshots/03-use-cases-diagram.png" alt="PlantUML use case diagram with 2 actors, 3 UCs, and TT-001" class="screenshot screenshot-sm">
+
+  <p style="margin-top:1rem;">Two actors (Anonymous Visitor, Link Owner), three user-facing use cases, one technical task (TT-001: auth middleware). Each use case is annotated with the FR IDs it traces to. The <code>&lt;&lt;requires&gt;&gt;</code> arrow from UC-001 to TT-001 makes the dependency explicit.</p>
+
+  <p>This diagram is the canonical registry of "what use cases exist." Every downstream skill reads it to find the next ID, detect duplicates, and reject unknown IDs.</p>
+
+  <div class="callout">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure mode #5 (scope drift)</strong> is now a structural impossibility. The agent cannot invent a UC-099 mid-sprint &mdash; the gate checks the diagram and rejects unknown IDs.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 9 — PHASE 4: WIREFRAME
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 4</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/generate-wireframe</code></h2>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.25rem;">
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Input</h4>
+      <p class="text-sm">Use case diagram + requirements + entity model</p>
+    </div>
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Output</h4>
+      <p class="text-sm"><code>wireframes/index.html</code> &mdash; a single HTML file with production-grade visual design, interactive screens, and annotated components.</p>
+    </div>
+  </div>
+
+  <img src="../snapshots/04-wireframe-overview.png" alt="Full wireframe overview with header, table of contents, and screen cards" class="screenshot" style="margin-bottom:1.25rem;">
+
+  <p>The agent committed to a bold aesthetic direction: midnight + electric lime, Bricolage Grotesque + Manrope. It built two interactive screens (UC-002 hero form + UC-001 dashboard), noted UC-003 has no UI (it's a 302 redirect), and populated realistic data from the entity model.</p>
+
+  <p>This is not a gray box-and-arrow sketch. The methodology demands a strong wireframe because weak wireframes produce weak designs. <code>/design-screens</code> inherits the typography, palette, and component vocabulary from this file.</p>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 10 — WIREFRAME DETAILS (UC-002 + UC-001)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h3 style="margin-bottom:1.25rem;">Wireframe screen cards</h3>
+
+  <div class="two-col">
+    <div class="no-break">
+      <h4 class="text-spark" style="margin-bottom:0.5rem;">UC-002 &mdash; Shorten a URL</h4>
+      <img src="../snapshots/04a-wireframe-UC-002.png" alt="Wireframe UC-002 screen card" class="screenshot">
+      <p class="text-sm text-muted" style="margin-top:0.5rem;">The hero screen. URL input, optional custom slug, six states.</p>
+    </div>
+    <div class="no-break">
+      <h4 class="text-spark" style="margin-bottom:0.5rem;">UC-001 &mdash; List my links</h4>
+      <img src="../snapshots/04b-wireframe-UC-001.png" alt="Wireframe UC-001 screen card" class="screenshot">
+      <p class="text-sm text-muted" style="margin-top:0.5rem;">Link Owner dashboard with slug, destination, click count, expiry.</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:1.5rem;">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure mode #1 (silent assumptions)</strong> on the UI axis. By committing to a visual identity early, the agent avoids the "every screen is a slightly different gray rectangle" pattern. Every downstream design inherits this vocabulary.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 11 — PHASE 5: USE CASE SPEC
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 5</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/use-case-spec</code></h2>
+  </div>
+
+  <div class="two-col" style="margin-bottom:1.25rem;">
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Input</h4>
+      <p class="text-sm">Wireframe + requirements + entity model + use case diagram</p>
+    </div>
+    <div>
+      <h4 class="text-muted" style="margin-bottom:0.25rem;">Output</h4>
+      <p class="text-sm">Three structured specs: <code>UC-001.md</code>, <code>UC-002.md</code>, <code>UC-003.md</code></p>
+    </div>
+  </div>
+
+  <img src="../snapshots/05-uc-002-spec.png" alt="UC-002 use case specification with overview, scenario steps, and alternative flows" class="screenshot">
+
+  <p style="margin-top:0.75rem;">Each spec follows the same structure: Overview &bull; Preconditions &bull; Main Success Scenario (numbered steps) &bull; Alternative Flows (trigger + step-by-step recovery) &bull; Postconditions &bull; Business Rules &bull; Non-Functional &bull; Traceability.</p>
+
+  <p>These are not "user stories" or one-paragraph blurbs. They are step-by-step, machine-checkable specifications. The implementation phase reads them line by line. Every alternative flow becomes a code path. Every code path gets a test.</p>
+
+  <div class="callout">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure mode #2 (spec amnesia)</strong> is structurally prevented. The agent re-reads the spec at every implementation step. Nothing is "remembered" &mdash; everything is referenced.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 12 — PHASE 6: DESIGN SCREENS (UC-002)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-spark">Phase 6</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/design-screens</code> &mdash; UC-002</h2>
+  </div>
+
+  <p style="margin-bottom:1rem;">Each use case spec produces a design HTML with every state annotated. UC-002 has 6 states &mdash; here are the 4 most critical:</p>
+
+  <div class="two-col" style="margin-bottom:1rem;">
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 01 &bull; Default &mdash; empty form</h4>
+      <img src="../snapshots/06a-uc-002-design-default.png" alt="UC-002 design default state" class="screenshot">
+    </div>
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 03 &bull; Success &mdash; link created</h4>
+      <img src="../snapshots/06b-uc-002-design-success.png" alt="UC-002 design success state" class="screenshot">
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 04 &bull; Error &mdash; invalid URL</h4>
+      <img src="../snapshots/06c-uc-002-design-error-invalid-url.png" alt="UC-002 design invalid URL error" class="screenshot">
+    </div>
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 06 &bull; Rejections (blocklist + rate limit)</h4>
+      <img src="../snapshots/06d-uc-002-design-error-rate-limit.png" alt="UC-002 design rate limit error" class="screenshot">
+    </div>
+  </div>
+
+  <p class="text-sm" style="margin-top:0.75rem;">Every state names the spec step it implements, the data it reads/writes, and design rationale. There is no daylight between spec and design.</p>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 13 — DESIGN SCREENS (UC-001)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h2 style="color:var(--shore-50); font-size:1.5rem; margin-bottom:1.25rem;"><code>/design-screens</code> &mdash; UC-001: List my links</h2>
+
+  <p style="margin-bottom:1.25rem;">The dashboard has three states: loaded (links visible), empty (new user), and loading (Suspense fallback). Each maps to a specific alternative flow in the spec.</p>
+
+  <div class="no-break" style="margin-bottom:1.25rem;">
+    <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 01 &bull; Loaded &mdash; owner has links</h4>
+    <img src="../snapshots/07a-uc-001-design-loaded.png" alt="UC-001 design loaded state with links" class="screenshot">
+  </div>
+
+  <div class="two-col">
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 02 &bull; Empty (A1)</h4>
+      <img src="../snapshots/07b-uc-001-design-empty.png" alt="UC-001 design empty state" class="screenshot">
+    </div>
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">State 03 &bull; Loading &mdash; Suspense fallback</h4>
+      <img src="../snapshots/07c-uc-001-design-loading.png" alt="UC-001 design loading skeleton" class="screenshot">
+    </div>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 14 — DESIGN SCREENS (UC-003)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <h2 style="color:var(--shore-50); font-size:1.5rem; margin-bottom:1.25rem;"><code>/design-screens</code> &mdash; UC-003: Redirect to destination</h2>
+
+  <p style="margin-bottom:1.25rem;">UC-003 has no UI on the success path &mdash; it's a 302 redirect. The design document captures the HTTP trace and the three failure pages.</p>
+
+  <div class="no-break" style="margin-bottom:1.25rem;">
+    <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">Path 01 &bull; Success &mdash; 302 redirect (HTTP trace, no UI)</h4>
+    <img src="../snapshots/08a-uc-003-design-302-trace.png" alt="UC-003 302 redirect HTTP trace" class="screenshot">
+  </div>
+
+  <div class="two-col">
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">Path A2 &bull; 410 Gone &mdash; expired link</h4>
+      <img src="../snapshots/08b-uc-003-design-410.png" alt="UC-003 410 Gone page" class="screenshot">
+    </div>
+    <div class="no-break">
+      <h4 class="text-dim" style="font-size:0.8rem; margin-bottom:0.5rem;">Path A3 &bull; 451 Unavailable &mdash; blocklisted</h4>
+      <img src="../snapshots/08c-uc-003-design-451.png" alt="UC-003 451 Unavailable page" class="screenshot">
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:1.5rem;">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure modes #1 and #4</strong> are constrained by structure. Every visible state has a design that names the spec step. When Playwright tests run, they assert the same set of states. The design is the contract between spec and implementation.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 15 — PHASE 7: IMPLEMENTATION
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+    <span class="badge badge-ember">Phase 7</span>
+    <h2 style="margin:0; color:var(--shore-50);"><code>/implement</code> + <code>/vitest-test</code> + <code>/playwright-test</code></h2>
+  </div>
+
+  <p style="margin-bottom:1.5rem;">The three use case specs and three design HTMLs become a working Next.js 15 application. The agent did not invent a new field, endpoint, or state. Every line traces to an artifact written upstream.</p>
+
+  <table style="margin-bottom:1.5rem;">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Files</th>
+        <th>Tied to spec</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>UC-002</strong></td>
+        <td><code>page.tsx</code> &bull; <code>ShortenForm.tsx</code> &bull; <code>shorten.ts</code></td>
+        <td>Every numbered step &rarr; code path; every alt flow &rarr; error variant</td>
+      </tr>
+      <tr>
+        <td><strong>UC-003</strong></td>
+        <td><code>[slug]/route.ts</code> &bull; <code>failure-pages.ts</code></td>
+        <td>302 success + 404/410/451 status codes (BR-003)</td>
+      </tr>
+      <tr>
+        <td><strong>UC-001</strong></td>
+        <td><code>dashboard/page.tsx</code> &bull; <code>loading.tsx</code> &bull; <code>Navbar.tsx</code></td>
+        <td>Server component, empty state, loading skeleton, redirect-to-sign-in</td>
+      </tr>
+      <tr>
+        <td><strong>TT-001</strong></td>
+        <td><code>middleware.ts</code> &bull; <code>session.ts</code></td>
+        <td>Cookie-gated dashboard; security headers</td>
+      </tr>
+      <tr>
+        <td style="border:none;"><strong>Schema</strong></td>
+        <td style="border:none;"><code>prisma/schema.prisma</code></td>
+        <td style="border:none;">Direct projection of <code>entity_model.md</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card card-accent no-break">
+    <h4 class="text-spark" style="margin-bottom:0.75rem;">Test coverage</h4>
+    <div class="two-col">
+      <div>
+        <p class="text-sm" style="margin-bottom:0.5rem;"><strong>Vitest (3 files, 40 tests)</strong></p>
+        <ul class="text-sm" style="padding-left:1rem;">
+          <li><code>slug.test.ts</code> &mdash; length, alphabet, uniqueness, custom-slug regex</li>
+          <li><code>url-validator.test.ts</code> &mdash; http/https, scheme rejection, 2048-char ceiling</li>
+          <li><code>blocklist.test.ts</code> &mdash; known-host blocking, case-insensitivity</li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-sm" style="margin-bottom:0.5rem;"><strong>Playwright E2E (2 files, 6 tests)</strong></p>
+        <ul class="text-sm" style="padding-left:1rem;">
+          <li>UC-002+003 golden path: shorten &rarr; follow &rarr; 302</li>
+          <li>UC-002 A1: invalid URL inline error</li>
+          <li>UC-002 A2: blocklist rejection (BR-04)</li>
+          <li>UC-001: auth redirect + dashboard with seed data</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:1.25rem;">
+    <div class="callout-title">What just happened</div>
+    <p><strong>Failure modes #2 (spec amnesia)</strong> and <strong>#3 (phantom abstractions)</strong> cannot occur. The spec is the source of truth at write-time. There is no <code>BaseRepository&lt;T&gt;</code>, no <code>withErrorHandler</code> decorator, no abstract Strategy pattern. <strong>Failure mode #4 (verification theater)</strong> is avoided &mdash; unit tests cover pure functions (no mocking needed), and Playwright hits a real Postgres through a real dev server.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 16 — RESULTS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-spark mb-1" style="display:inline-block;">Results</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1.5rem;">What the methodology produced</h2>
+
+  <div class="card card-accent" style="margin-bottom:1.5rem;">
+    <table>
+      <tr><td style="width:55%;"><strong>Use cases shipped</strong></td><td>3 (UC-001, UC-002, UC-003) + TT-001</td></tr>
+      <tr><td><strong>Source files</strong> (app/, lib/, components/, middleware)</td><td>19 files</td></tr>
+      <tr><td><strong>Lines of TypeScript</strong> (excl. tests)</td><td>~1,000</td></tr>
+      <tr><td><strong>Vitest specs</strong></td><td>3 files &bull; 40 tests &bull; 141 assertions</td></tr>
+      <tr><td><strong>Playwright E2E specs</strong></td><td>2 files &bull; 6 scenarios</td></tr>
+      <tr><td><strong>Design artifacts</strong></td><td>3 HTML files &bull; 13 annotated states</td></tr>
+      <tr><td><strong>Upstream documents</strong></td><td>Requirements + entity model + 3 specs + wireframe + use case diagram</td></tr>
+      <tr><td style="border:none;"><strong>Phantom abstractions</strong></td><td style="border:none;">0</td></tr>
+    </table>
+  </div>
+
+  <p style="font-size:1.1rem; line-height:1.8;">The agent did not skip a phase. It did not invent a use case. It did not add a feature flag for a hypothetical future requirement. The code looks like the spec. The spec looks like the requirements. The requirements look like the vision.</p>
+
+  <p style="font-size:1.1rem; line-height:1.8; color:var(--shore-50); font-weight:600;">That is the full claim of the methodology, demonstrated end-to-end.</p>
+
+  <hr class="divider" style="margin:2rem 0;">
+
+  <h3 style="margin-bottom:1rem;">The traceability chain</h3>
+
+  <div class="card no-break">
+    <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.875rem;">
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-spark" style="font-size:0.6rem; min-width:5rem; text-align:center;">Vision</span>
+        <span style="color:var(--shore-200);">"Privacy-respecting URL shortener with anonymous expiry"</span>
+      </div>
+      <div style="padding-left:2.5rem; color:var(--shore-400);">&darr;</div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-spark" style="font-size:0.6rem; min-width:5rem; text-align:center;">FR-004</span>
+        <span style="color:var(--shore-200);">"Anonymous visitors can create short links without authentication"</span>
+      </div>
+      <div style="padding-left:2.5rem; color:var(--shore-400);">&darr;</div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-shore" style="font-size:0.6rem; min-width:5rem; text-align:center;">UC-002</span>
+        <span style="color:var(--shore-200);">Shorten a URL &mdash; 10 steps, 5 alternative flows, 4 business rules</span>
+      </div>
+      <div style="padding-left:2.5rem; color:var(--shore-400);">&darr;</div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-shore" style="font-size:0.6rem; min-width:5rem; text-align:center;">Design</span>
+        <span style="color:var(--shore-200);">6 annotated states, each naming the spec step it implements</span>
+      </div>
+      <div style="padding-left:2.5rem; color:var(--shore-400);">&darr;</div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-ember" style="font-size:0.6rem; min-width:5rem; text-align:center;">Code</span>
+        <span style="color:var(--shore-200);"><code>shortenAction()</code> &mdash; every error variant matches a spec alternative flow</span>
+      </div>
+      <div style="padding-left:2.5rem; color:var(--shore-400);">&darr;</div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span class="badge badge-ember" style="font-size:0.6rem; min-width:5rem; text-align:center;">Tests</span>
+        <span style="color:var(--shore-200);">Playwright: shorten &rarr; follow &rarr; 302. Vitest: slug, URL, blocklist</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 17 — SCALING: SPRINTS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-spark mb-1" style="display:inline-block;">Section 3</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1rem;">Scaling: from one use case to a sprint</h2>
+
+  <p style="font-size:1.05rem; margin-bottom:1.5rem;">
+    The walkthrough showed a single use case flowing through the pipeline. In practice, you're shipping 3&ndash;8 use cases per sprint. Nexa handles this with four sprint-level skills:
+  </p>
+
+  <ol class="numbered-list" style="margin-bottom:2rem;">
+    <li>
+      <strong><code>/sprint-prepare</code></strong><br>
+      <span class="text-sm text-muted">Select use cases from the backlog. The skill checks each one for spec completeness, design readiness, and dependency satisfaction. Outputs a readiness report with a priority order.</span>
+    </li>
+    <li>
+      <strong><code>/sprint-kickoff</code></strong><br>
+      <span class="text-sm text-muted">Creates a <code>sprint-*</code> branch (code never lands on <code>main</code> directly). Verifies all selected use cases pass the readiness gate. Sets up the sprint tracking file.</span>
+    </li>
+    <li>
+      <strong><code>/sprint-deliver</code></strong><br>
+      <span class="text-sm text-muted">Executes <code>/deliver-use-case</code> for each use case in priority order. Each delivery is: implement &rarr; unit test &rarr; E2E test &rarr; evaluate. A failure on one use case does not block others.</span>
+    </li>
+    <li>
+      <strong><code>/sprint-complete</code></strong><br>
+      <span class="text-sm text-muted">Validates all use cases are delivered. Runs E2E regression. Closes GitHub issues. Generates a sprint dashboard. Archives the sprint branch.</span>
+    </li>
+  </ol>
+
+  <div class="card card-accent no-break">
+    <h4 class="text-spark" style="margin-bottom:0.75rem;">The sprint loop</h4>
+    <div class="flow-diagram" style="justify-content:center;">
+      <span class="flow-step flow-inception">/sprint-prepare</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step flow-elaboration">/sprint-kickoff</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step flow-construction">/sprint-deliver</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step flow-verification">/sprint-complete</span>
+    </div>
+    <p class="text-sm text-muted" style="text-align:center; margin-top:0.75rem;">Each sprint produces: code on a branch, passing tests, evaluation reports, closed issues, and a dashboard.</p>
+  </div>
+
+  <hr class="divider" style="margin:2rem 0;">
+
+  <h3 style="margin-bottom:1rem;">What if the PR review finds problems?</h3>
+
+  <p><code>/sprint-rework</code> resets the sprint branch to <code>main</code> and re-delivers all use cases from scratch. This sounds expensive &mdash; but because every artifact (spec, design, entity model) is already locked upstream, the re-delivery is fast and deterministic. The agent isn't "fixing" code; it's re-generating it from the same specs.</p>
+
+  <p>This is the key insight: <strong>the artifacts are the investment, not the code.</strong> Code is a projection of specs. If the projection is wrong, re-project. Don't patch.</p>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 18 — WHAT THIS MEANS FOR YOUR TEAM
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <span class="badge badge-spark mb-1" style="display:inline-block;">For your team</span>
+  <h2 style="color:var(--shore-50); font-size:2rem; margin-bottom:1.5rem;">Two questions to ask yourself</h2>
+
+  <div class="card" style="margin-bottom:1.5rem; padding:32px;">
+    <h3 style="font-size:1.15rem; margin-bottom:1rem;">1. How much of your AI-generated code can you trace back to a written, agreed-upon spec?</h3>
+    <p>If the answer is "none" or "the PR description," you have a <strong class="text-ember">Failure Mode #2</strong> problem. The agent is generating code from its own interpretation, not from a shared agreement. Every sprint, the gap between "what we meant" and "what got built" widens.</p>
+    <p style="margin-bottom:0;">Nexa fixes this by making the spec a <em>structural input</em> to implementation &mdash; not a document the agent reads once and forgets.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:2rem; padding:32px;">
+    <h3 style="font-size:1.15rem; margin-bottom:1rem;">2. How much time does your team spend reviewing AI PRs vs. shipping?</h3>
+    <p>If review is dominating, you have a <strong class="text-ember">Failure Mode #3 + #5</strong> problem. The agent is inventing abstractions and expanding scope, and your senior engineers are spending their time reverse-engineering AI decisions instead of shipping features.</p>
+    <p style="margin-bottom:0;">Nexa caps the agent's freedom. It can only build what the spec says. The reviewer's job shrinks from "understand what the agent was thinking" to "verify the spec was followed."</p>
+  </div>
+
+  <div class="callout" style="margin-bottom:2rem;">
+    <div class="callout-title">The real ROI</div>
+    <p>The methodology adds ~30 minutes of upfront work per use case (requirements, spec, design). It saves 2&ndash;4 hours of review, rework, and debugging per use case. The math works at any team size, but it gets better as the team grows &mdash; because every new engineer can read the spec instead of reverse-engineering the code.</p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     PAGE 19 — CTA
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="page" style="display:flex; flex-direction:column; justify-content:center;">
+  <h2 style="color:var(--shore-50); font-size:2.5rem; text-align:center; margin-bottom:2rem;">Try it yourself</h2>
+
+  <div class="two-col" style="margin-bottom:2.5rem;">
+    <div class="card card-accent no-break" style="text-align:center; padding:32px;">
+      <span class="badge badge-spark mb-1" style="display:inline-block;">Free</span>
+      <h3 style="font-size:1.5rem; margin:0.75rem 0 0.5rem;">nexa-claude-core</h3>
+      <p class="text-sm text-muted" style="margin-bottom:1.25rem;">13 skills &bull; Stack-agnostic</p>
+      <hr class="divider" style="margin:0 0 1rem;">
+      <ul style="list-style:none; padding:0; text-align:left; font-size:0.875rem;">
+        <li style="padding:6px 0;">&#10003; &nbsp;Requirements from vision</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Entity model with Mermaid ER</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Use case diagrams</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Production-grade wireframes</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Detailed use case specs</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Annotated screen designs</li>
+        <li style="padding:6px 0;">&#10003; &nbsp;Independent code review</li>
+      </ul>
+    </div>
+    <div class="card no-break" style="text-align:center; padding:32px; border-color:var(--ember-500);">
+      <span class="badge badge-ember mb-1" style="display:inline-block;">Paid</span>
+      <h3 style="font-size:1.5rem; margin:0.75rem 0 0.5rem;">nexa-claude-nextjs</h3>
+      <p class="text-sm text-muted" style="margin-bottom:1.25rem;">17 skills &bull; Next.js stack</p>
+      <hr class="divider" style="margin:0 0 1rem;">
+      <ul style="list-style:none; padding:0; text-align:left; font-size:0.875rem;">
+        <li style="padding:6px 0;">&#10003; &nbsp;Everything in Core, plus:</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Prisma migrations from entity model</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Implementation from spec + design</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Vitest + Testcontainers</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Playwright E2E</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Sprint delivery pipeline</li>
+        <li style="padding:6px 0; color:var(--ember-500);">&#10003; &nbsp;Evaluation against spec</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-bottom:2rem;">
+    <h3 style="margin-bottom:1rem;">Get started in 3 steps</h3>
+    <ol class="numbered-list" style="display:inline-block; text-align:left; max-width:32rem;">
+      <li><strong>Install <code>nexa-claude-core</code></strong> (free) in your Claude Code project</li>
+      <li><strong>Fork <code>nexa-starter-shortener</code></strong> and explore the artifacts</li>
+      <li><strong>Run <code>/requirements</code></strong> on your own product idea</li>
+    </ol>
+  </div>
+
+  <div class="card" style="text-align:center; background:rgba(168, 255, 96, 0.04); border-color:rgba(168, 255, 96, 0.2);">
+    <p style="font-size:1.1rem; margin-bottom:0.5rem; color:var(--shore-50);">When you hit the implementation step, you'll know what comes next.</p>
+    <p class="text-sm text-muted" style="margin:0;">Questions? Reach out at <strong>robert.sicoie@gmail.com</strong></p>
+  </div>
+
+  <div class="footer-bar"></div>
+</div>
+
+</body>
+</html>

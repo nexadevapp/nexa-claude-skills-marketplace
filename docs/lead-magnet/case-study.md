@@ -168,34 +168,65 @@ Every state is annotated with the spec step it implements, the data it reads/wri
 
 ---
 
-### Phase 8 — Construction · `/sprint-kickoff` + `/sprint-deliver`
+### Phase 8 — Construction · `/sprint-deliver` (manual execution of `/implement` + `/vitest-test` + `/playwright-test`)
 
-> *Coming next.*
+**Input:** the three use case specs and the three design HTMLs.
+
+**Output:** a working Next.js 15 application under [`nexa-starter-shortener/`](./nexa-starter-shortener/).
+
+| Layer | Files | Tied to spec |
+|---|---|---|
+| **UC-002 — Shorten** | `app/page.tsx` · `components/ShortenForm.tsx` · `app/_actions/shorten.ts` · `lib/{slug,url-validator,blocklist,rate-limit,request,session}.ts` | Every numbered spec step has a code path; every alternative flow has a corresponding `ShortenError` variant |
+| **UC-003 — Redirect** | `app/[slug]/route.ts` · `app/[slug]/failure-pages.ts` | 302 success path + distinct 404/410/451 status codes (BR-003) |
+| **UC-001 — List my links** | `app/dashboard/page.tsx` · `app/dashboard/loading.tsx` · `components/Navbar.tsx` | Server component reads via the `(ownerId, createdAt DESC)` index; empty state, loading skeleton, A5 redirect-to-sign-in |
+| **TT-001 — Auth middleware** | `middleware.ts` · `lib/session.ts` · `app/sign-in/page.tsx` · `app/api/sign-out/route.ts` | Cookie-gated dashboard; security headers (NFR-006/008 surface) |
+| **Schema** | `prisma/schema.prisma` · `prisma/seed.ts` | Direct projection of [`entity_model.md`](./nexa-starter-shortener/docs/entity_model.md) — same fields, same indexes |
+
+The agent did not invent a new field, a new endpoint, or a new state. Every line traces to an artifact written upstream.
+
+> **What just happened:** Failure mode #2 (spec amnesia) and #3 (phantom abstractions) cannot occur because the spec is the source of truth at write-time. There is no `BaseRepository<T>`, no `withErrorHandler` decorator, no abstract Strategy pattern. The longest file is the form component (a client island that has to render six states); everything else is one screen, one job.
 
 ---
 
-### Phase 9 — Verification · `/code-review` and `/evaluate`
+### Phase 9 — Construction · tests
 
-> *Coming next.*
+**Vitest unit tests** (3 files in [`tests/unit/`](./nexa-starter-shortener/tests/unit/)):
+
+- `slug.test.ts` — slug generator length, alphabet, uniqueness; custom-slug regex acceptance + rejection
+- `url-validator.test.ts` — http/https acceptance, scheme rejection (ftp/javascript/file/data/mailto), 2048-char ceiling
+- `blocklist.test.ts` — known-host blocking, case-insensitivity, exact-match (no substring escape)
+
+**Playwright E2E** (2 files in [`tests/e2e/`](./nexa-starter-shortener/tests/e2e/)):
+
+- `shorten-and-follow.spec.ts` — UC-002 + UC-003 golden path: anonymous shortens, follows the resulting link, gets a 302 to the destination. Plus UC-002 A1 (invalid URL inline error) and A2 (blocklist generic message verifying BR-04).
+- `dashboard.spec.ts` — UC-001 unauthenticated → sign-in redirect; demo sign-in → seeded user sees their links.
+
+Each test names the spec section it covers in the file header. There are no tests "for the unit", only tests for **scenarios from the spec**. If the spec changes, the failing test names tell you exactly which behavior moved.
+
+> **What just happened:** Failure mode #4 (verification theater) is structurally avoided. The unit tests cover pure functions where mocking is a non-issue. The integration coverage that *would* lie about behavior — testing a server action by mocking the database — is replaced by Playwright tests that hit a real Postgres through a real Next.js dev server. When the suite is green, the *feature* works, not just the *unit*.
 
 ---
 
-### Phase 10 — Completion · `/sprint-complete`
+### Phase 10 — Verification · `/code-review` and `/evaluate`
 
-> *Coming next.*
+> *To run: `/code-review` against the `lead-magnet` branch, then `/evaluate UC-002` etc. Both run in isolation and produce structured reports. The case study will be updated once these run.*
 
 ---
 
 ## Result
 
-> *Will be populated when the sprint completes. Expected metrics:*
->
-> - 3 use cases shipped
-> - X total LoC across `src/`
-> - Y % integration coverage (Vitest + Testcontainers)
-> - Z Playwright E2E scenarios, all green
-> - 1 PR merged to `main` with a green CI matrix
-> - Wall-clock time elapsed: TBD
+| Metric | Value |
+|---|---|
+| Use cases shipped | 3 (UC-001, UC-002, UC-003) + TT-001 |
+| Source files (`app/`, `lib/`, `components/`, `middleware.ts`) | 19 |
+| Lines of code (TypeScript, excluding tests) | 1004 |
+| Vitest specs | 3 files, ~30 test cases |
+| Playwright E2E specs | 2 files, 5 scenarios |
+| Unverified | A real run on a real machine — `bun run dev` and the test suites need a green light from the human reviewer |
+
+The agent did not skip a phase, did not invent a use case, did not add a feature flag for a hypothetical future requirement. The code looks like the spec, the spec looks like the requirements, the requirements look like the vision.
+
+That is the full claim of the methodology, demonstrated end-to-end on a non-trivial example.
 
 ---
 

@@ -1,8 +1,10 @@
 # nexa-starter-shortener
 
-A URL shortener built end-to-end with the [Nexa Agentic Engineering](https://github.com/Nexa/nexa-claude-skills-marketplace) methodology. Every artifact in this repo — from requirements to implementation — was produced by running the Nexa skills with Claude Code.
+A URL shortener built end-to-end with the [Nexa Agentic Engineering](https://github.com/Nexa/nexa-claude-skills-marketplace) methodology. Every artifact in this repo — from requirements to running code — was produced by following the Nexa workflow with Claude Code.
 
 This is the reference project for **The AI Sprint Playbook**: a working demonstration that AI agents can ship production code without the slop, when they follow a structured workflow.
+
+---
 
 ## What's in here
 
@@ -14,35 +16,124 @@ This is the reference project for **The AI Sprint Playbook**: a working demonstr
 | Elaboration | `docs/wireframes/index.html` | `/generate-wireframe` |
 | Construction | `docs/use_cases/UC-*.md` | `/use-case-spec` |
 | Construction | `docs/designs/UC-*-design.html` | `/design-screens` |
-| Construction | `src/`, `tests/` | `/implement`, `/vitest-test`, `/playwright-test` |
+| Construction | `app/`, `lib/`, `components/`, `tests/` | `/implement`, `/vitest-test`, `/playwright-test` |
+
+---
 
 ## The product
 
-`lnk.sh` — a privacy-respecting URL shortener with three actors:
-
-- **Anonymous Visitor** — shortens URLs without an account; links expire after 30 days
-- **Link Owner** — manages a list of permanent links tied to their account
-- **Moderator** — handles abuse reports and blocklists destinations
-
-## Use cases delivered
+`lnk.sh` — a privacy-respecting URL shortener with two actors and three shipped use cases.
 
 - **UC-001** — List my links (Link Owner)
 - **UC-002** — Shorten a URL (Anonymous Visitor) — hero use case
-- **UC-003** — Redirect to destination (Anonymous Visitor)
+- **UC-003** — Redirect to destination (anyone with a short link)
+
+---
+
+## Run it locally
+
+### Prerequisites
+
+- [Bun](https://bun.sh) ≥ 1.1
+- [Docker](https://www.docker.com/) (for the dev Postgres)
+
+### One-time setup
+
+```bash
+bun install
+cp .env.example .env
+
+# Start Postgres in Docker (port 5433 → container 5432)
+bun run db:up
+
+# Apply Prisma migrations and generate the client
+bun run db:migrate
+
+# Seed a demo user (maria@example.com) with three owned links
+bun run db:seed
+```
+
+### Run the dev server
+
+```bash
+bun run dev
+# → http://localhost:3000
+```
+
+Anonymous flow (UC-002, UC-003) works out of the box. To exercise UC-001 (the dashboard), click **Sign in** in the navbar — the demo sign-in page sets a session cookie for the seed user without a password (real auth is the scope of `/setup-web-middleware` / TT-001).
+
+### Tests
+
+```bash
+bun test            # Vitest unit tests (lib/ — pure functions)
+bun run test:e2e    # Playwright E2E (boots dev server automatically)
+```
+
+---
+
+## Project layout
+
+```
+app/
+├── _actions/shorten.ts           UC-002 server action
+├── [slug]/route.ts               UC-003 route handler
+├── [slug]/failure-pages.ts       404 / 410 / 451 inline HTML
+├── api/sign-out/route.ts         Demo sign-out
+├── dashboard/page.tsx            UC-001
+├── dashboard/loading.tsx         UC-001 Suspense skeleton
+├── sign-in/page.tsx              Demo sign-in (TT-001 stub)
+├── globals.css                   Theme + Tailwind layer
+├── layout.tsx                    Root layout
+└── page.tsx                      UC-002 — homepage
+
+components/
+├── Navbar.tsx                    Shared navbar (server component)
+└── ShortenForm.tsx               UC-002 client island
+
+lib/
+├── blocklist.ts                  Abuse blocklist (in-memory)
+├── db.ts                         Prisma client singleton
+├── rate-limit.ts                 Per-IP rate limiter
+├── request.ts                    creatorIp resolution
+├── session.ts                    Demo session (cookie-based)
+├── slug.ts                       Slug generation + validation
+└── url-validator.ts              Destination URL validator
+
+middleware.ts                     TT-001 stub (auth gate + security headers)
+
+prisma/
+├── schema.prisma                 Derived from docs/entity_model.md
+└── seed.ts                       Demo seed
+
+tests/
+├── unit/                         Vitest — pure-function tests
+└── e2e/                          Playwright — golden-path E2E
+```
+
+---
+
+## What's deliberately stubbed
+
+The lead-magnet implementation focuses on the methodology, not on production hardening. The following are intentionally lightweight and would be replaced by their proper Nexa skill outputs in a real project:
+
+| Concern | Stub | Real solution |
+|---|---|---|
+| Authentication | Cookie-only, no password check | `/setup-web-middleware` — Argon2id, NFR-007 |
+| Rate limiter | DB count over rolling window | Redis or DB-backed sliding window |
+| Blocklist | In-memory hostname set | Persisted `BlockedDestination` table + moderator UI |
+| i18n | English only | `/setup-i18n` — next-intl, EN + RO (C-006) |
+| CI | Not wired | `/setup-quality-ci` + `/setup-playwright-ci` |
+| Deployment | Not wired | `/aws-dockerize` + `/aws-setup-apprunner` |
+
+Each of those skills is part of `nexa-claude-nextjs`. The fork-and-extend story is: take this repo, run the next skill in the workflow, ship.
+
+---
 
 ## How to fork and ship your own feature
 
-1. Fork this repo
-2. Install the [Nexa Claude Skills Marketplace](https://github.com/Nexa/nexa-claude-skills-marketplace) plugin
-3. Run `/sprint-prepare` to scope a new sprint
-4. Run `/sprint-kickoff` to start delivery
+1. Fork this repo.
+2. Install the [Nexa Claude Skills Marketplace](https://github.com/Nexa/nexa-claude-skills-marketplace) plugin.
+3. Run `/sprint-prepare` to scope a new sprint.
+4. Run `/sprint-kickoff` to create a sprint branch and start delivery.
 
-The free `nexa-claude-core` plugin covers requirements through design. To go from design to merged PR, you need the `nexa-claude-nextjs` plugin.
-
-## Stack
-
-- Next.js 15 (App Router, Server Actions)
-- Prisma + PostgreSQL
-- Vitest + Testcontainers (integration)
-- Playwright (E2E)
-- next-intl (i18n)
+The free `nexa-claude-core` plugin covers requirements through design. To go from design to merged PR, you need the paid `nexa-claude-nextjs` plugin.

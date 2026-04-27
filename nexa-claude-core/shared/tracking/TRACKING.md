@@ -85,6 +85,16 @@ This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), and bug (`BUG
    - Extract the hash from the issue body: look for `<!-- spec-hash: <hash> -->`
    - If the hash differs from the current spec hash, update the issue body with fresh acceptance criteria and the new hash
    - If the hash matches, no update needed
+9. **Issue-origin drift reconciliation (BUG-XXX only):**
+   If the bug report's **Origin** field is a GitHub issue URL (not `human-in-the-loop`), the issue is the authoritative source. Perform this additional check:
+   a. Read the current issue body: `gh issue view <issue-number> --json body -q .body`
+   b. Compare the issue's description with the bug report's **Description** section
+   c. If the issue body has changed since the bug report was created:
+      - Update the bug report's **Description**, **Steps to Reproduce**, **Expected Behavior**, and **Actual Behavior** sections to reflect the current issue content
+      - Recompute the spec hash and update `<!-- spec-hash: -->` in the issue body
+      - Log the reconciliation: add a comment on the issue noting the bug report was updated to match
+   d. If the bug report doc changed but the issue did not:
+      - Proceed with the normal spec-hash drift check (step 8) — the doc update flows to the issue as usual
 
 ## After Implementation
 

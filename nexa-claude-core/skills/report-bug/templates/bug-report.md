@@ -10,6 +10,7 @@
 | **Status** | Open |
 | **Discovered In** | [UC-XXX / TT-XXX / Testing / Production] |
 | **Reported By** | [Source: evaluation, testing, user report, etc.] |
+| **Origin** | [Full GitHub issue URL when filed from an issue, or `human-in-the-loop` when reported directly] |
 | **GitHub Issue** | [link to the tracking issue] |
 
 ## Description

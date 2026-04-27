@@ -12,8 +12,15 @@ description: >
 ## Instructions
 
 Create a bug report document for $ARGUMENTS in `docs/bugs/`. $ARGUMENTS is a description
-of the bug, or a reference to a use case (`UC-XXX`) or technical task (`TT-XXX`) where
-the bug was discovered.
+of the bug, a reference to a use case (`UC-XXX`) or technical task (`TT-XXX`) where
+the bug was discovered, or a full GitHub issue URL.
+
+## Origin Detection
+
+Determine the **origin** of the bug report from $ARGUMENTS:
+
+- **`github-issue`** — $ARGUMENTS contains a GitHub issue URL (e.g., `https://github.com/owner/repo/issues/42`). The issue already exists and is the source of truth.
+- **`human-in-the-loop`** — $ARGUMENTS is a description or artifact reference with no issue URL. The bug report document becomes the source of truth and a new GitHub issue will be created.
 
 ## DO NOT
 
@@ -45,6 +52,7 @@ Use [templates/bug-report.md](templates/bug-report.md) as the document structure
 | **Status** | Open |
 | **Discovered In** | UC-012 (Place Order) |
 | **Reported By** | Evaluation of UC-012 |
+| **Origin** | `human-in-the-loop` |
 | **GitHub Issue** | https://github.com/acme/store/issues/47 |
 
 ## Description
@@ -86,15 +94,25 @@ and shipping. The discount is visually applied to line items but not reflected i
 ## Workflow
 
 1. Check `docs/bugs/` for existing bug reports to determine the next BUG-XXX ID and avoid duplicates
-2. Reproduce the bug or gather evidence from the user's description, logs, or test output
-3. Write clear, numbered reproduction steps that another developer can follow
-4. Document expected vs actual behavior precisely
-5. Classify severity based on impact:
+2. **If origin is `github-issue`:**
+   a. Read the issue body using `gh issue view <issue-number> --json title,body,labels`
+   b. Extract the bug description, reproduction steps, and any context from the issue
+   c. Set the **Origin** field to the full GitHub issue URL
+   d. Set the **GitHub Issue** field to the same URL — do NOT create a new issue
+3. **If origin is `human-in-the-loop`:**
+   a. Reproduce the bug or gather evidence from the user's description, logs, or test output
+   b. Set the **Origin** field to `human-in-the-loop`
+4. Write clear, numbered reproduction steps that another developer can follow
+5. Document expected vs actual behavior precisely
+6. Classify severity based on impact:
    - **Critical** — System crash, data loss, security vulnerability, or complete feature failure
    - **High** — Major feature broken, no workaround, affects many users
    - **Medium** — Feature partially broken, workaround exists, or affects limited users
    - **Low** — Cosmetic issue, minor inconvenience, or edge case
-6. Identify related artifacts (use cases, business rules, affected files)
-7. Set status to Open
-8. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
-9. Update the bug report's **GitHub Issue** field in the Overview section with the issue URL (e.g., `https://github.com/owner/repo/issues/42`)
+7. Identify related artifacts (use cases, business rules, affected files)
+8. Set status to Open
+9. **If origin is `human-in-the-loop`:**
+   a. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
+   b. Update the bug report's **GitHub Issue** field with the issue URL
+10. **If origin is `github-issue`:**
+    a. Follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md` — the issue already exists, so only the hash sync and drift reconciliation steps apply

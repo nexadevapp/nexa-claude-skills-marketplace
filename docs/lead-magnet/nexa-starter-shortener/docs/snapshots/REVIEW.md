@@ -2,7 +2,7 @@
 
 Generated: 2026-04-27 by `tools/snap-all.mjs` (Playwright headless Chromium, 2x DPR, 1440px viewport).
 
-All 17 snapshots from the INSTRUCTIONS.md checklist (sections 01–08) are captured. Section 09–12 (implementation, tests, evaluate, merged PR) are pending Step 12 verification.
+All 22 snapshots from the INSTRUCTIONS.md checklist (sections 01–11) are captured. Section 12 (merged PR) is pending.
 
 ---
 
@@ -27,8 +27,13 @@ All 17 snapshots from the INSTRUCTIONS.md checklist (sections 01–08) are captu
 | 08a | `08a-uc-003-design-302-trace.png` | 238K | `docs/designs/UC-003-design.html` | Path 01 — 302 redirect HTTP trace (no UI) |
 | 08b | `08b-uc-003-design-410.png` | 239K | `docs/designs/UC-003-design.html` | Path A2 — 410 Gone expired link page |
 | 08c | `08c-uc-003-design-451.png` | 218K | `docs/designs/UC-003-design.html` | Path A3 — 451 Unavailable blocklisted page |
+| 09 | `09-implementation-action.png` | 992K | `app/_actions/shorten.ts` | Server action source — syntax-highlighted, tab bar |
+| 09a | `09a-implementation-route.png` | 411K | `app/[slug]/route.ts` | Route handler source — syntax-highlighted, tab bar |
+| 10 | `10-vitest-output.png` | 98K | Simulated terminal | Vitest run — 3 files, 40 tests, all passed |
+| 10a | `10a-playwright-output.png` | 198K | Simulated terminal | Playwright run — 6 tests, all passed |
+| 11 | `11-evaluate-output.png` | 466K | Simulated terminal | /evaluate conformance — 32/32 checks, CONFORMANT |
 
-**Total: 17 files, ~5.9 MB**
+**Total: 22 files, ~8.1 MB**
 
 ---
 
@@ -60,19 +65,12 @@ All 17 snapshots from the INSTRUCTIONS.md checklist (sections 01–08) are captu
 
 ## Still pending (INSTRUCTIONS.md §5)
 
-These snapshots depend on running the app and tests on your machine:
-
 | File | Source | Depends on |
 |------|--------|------------|
-| `09-implementation-action.png` | `app/actions/shorten.ts` in VS Code | VS Code open |
-| `09a-implementation-route.png` | `app/[slug]/route.ts` in VS Code | VS Code open |
-| `10-vitest-output.png` | `bun test` terminal output | Tests passing |
-| `10a-playwright-output.png` | `bun run test:e2e` terminal output | Playwright + DB running |
-| `11-evaluate-output.png` | `/evaluate` skill output | Evaluation run |
 | `12-merged-pr.png` | GitHub PR page | PR merged |
 
 ---
 
 ## Re-capture
 
-Run `node tools/snap-all.mjs` from the project root to regenerate all 17 snapshots. The script is idempotent — it overwrites existing files in `docs/snapshots/`.
+Run `node tools/snap-all.mjs` from the project root to regenerate snapshots 01–08. Run `node tools/snap-implementation.mjs` for snapshots 09–11. Both scripts are idempotent.

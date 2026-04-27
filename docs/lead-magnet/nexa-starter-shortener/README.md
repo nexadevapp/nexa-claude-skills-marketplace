@@ -1,8 +1,19 @@
 # nexa-starter-shortener
 
-A URL shortener built end-to-end with the [Nexa Agentic Engineering](https://github.com/Nexa/nexa-claude-skills-marketplace) methodology. Every artifact in this repo — from requirements to running code — was produced by following the Nexa workflow with Claude Code.
+A URL shortener built end-to-end with the [Nexa Agentic Engineering](https://nexadev.app) methodology. Every artifact in this repo — from requirements to running code — was produced by following the Nexa workflow with Claude Code.
 
 This is the reference project for **The AI Sprint Playbook**: a working demonstration that AI agents can ship production code without the slop, when they follow a structured workflow.
+
+---
+
+## The AI Sprint Playbook
+
+The playbook is a 19-page PDF that walks through every phase of the methodology using this project as the proof point. Each screenshot is a real artifact — no mockups, no edits.
+
+- **Full playbook:** `docs/pdf/the-ai-sprint-playbook.html`
+- **One-pager summary:** `docs/pdf/one-pager.html`
+
+To view locally: `npx serve docs` then open `http://localhost:3000/pdf/the-ai-sprint-playbook.html`.
 
 ---
 
@@ -17,6 +28,7 @@ This is the reference project for **The AI Sprint Playbook**: a working demonstr
 | Construction | `docs/use_cases/UC-*.md` | `/use-case-spec` |
 | Construction | `docs/designs/UC-*-design.html` | `/design-screens` |
 | Construction | `app/`, `lib/`, `components/`, `tests/` | `/implement`, `/vitest-test`, `/playwright-test` |
+| Verification | `docs/snapshots/` (22 screenshots) | `tools/snap-all.mjs`, `tools/snap-implementation.mjs` |
 
 ---
 
@@ -132,7 +144,7 @@ Each of those skills is part of `nexa-claude-nextjs`. The fork-and-extend story 
 ## How to fork and ship your own feature
 
 1. Fork this repo.
-2. Install the [Nexa Claude Skills Marketplace](https://github.com/Nexa/nexa-claude-skills-marketplace) plugin.
+2. Install the [Nexa Claude Skills Marketplace](https://nexadev.app) plugin.
 3. Run `/sprint-prepare` to scope a new sprint.
 4. Run `/sprint-kickoff` to create a sprint branch and start delivery.
 

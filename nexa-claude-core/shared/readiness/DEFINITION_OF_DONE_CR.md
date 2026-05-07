@@ -42,6 +42,8 @@ post-implementation tracking until the user either fixes the issues or explicitl
   revised to reflect the new desired behavior (not the old behavior the CR replaced)
 - [ ] **Use case amended** — An `## Amendments` section is appended to the referenced UC file
   listing this CR with a one-line summary of what changed. The UC scenario body is not modified.
+- [ ] **CR status set to Done** — The `Status` field in `docs/change_requests/CR-XXX.md` is
+  updated from `Implemented` to `Done` once all live documentation gates above are satisfied
 
 ### Privacy
 

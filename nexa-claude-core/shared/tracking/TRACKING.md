@@ -116,13 +116,20 @@ This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), bug (`BUG-XXX
 ## After Implementation
 
 1. Re-read the use case specification and the implementation
-2. On the existing GitHub issue, check off acceptance criteria that are now satisfied
-3. Add a comment summarizing what was implemented:
+2. **Update the Status field** in the specification document to reflect completion:
+   - For **UC-XXX** (`docs/use_cases/UC-XXX.md`): Set `Status` to `Implemented`
+     (evaluation is still pending — the UC pipeline will advance it to `Done` upon successful evaluation)
+   - For **TT-XXX** (`docs/technical_tasks/TT-XXX.md`): Set `Status` to `Done`
+   - For **BUG-XXX** (`docs/bugs/BUG-XXX.md`): Set `Status` to `Fixed`
+   - For **CR-XXX** (`docs/change_requests/CR-XXX.md`): Set `Status` to `Implemented`
+     (live doc updates and evaluation still pending — status advances to `Done` once those are complete)
+3. On the existing GitHub issue, check off acceptance criteria that are now satisfied
+4. Add a comment summarizing what was implemented:
    - `gh issue comment <issue-number> --body "Implemented: <brief summary of what was done>"`
-4. If all acceptance criteria and definition-of-done items are checked, close the issue:
+5. If all acceptance criteria and definition-of-done items are checked, close the issue:
    - `gh issue close <issue-number>`
-5. If not all items are checked, leave the issue open and inform the user what remains
-6. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
+6. If not all items are checked, leave the issue open and inform the user what remains
+7. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
    - **UC** → `feat(UC-XXX): <description>`
    - **TT** → `chore(TT-XXX): <description>`
    - **BUG** → `fix(BUG-XXX): <description>`

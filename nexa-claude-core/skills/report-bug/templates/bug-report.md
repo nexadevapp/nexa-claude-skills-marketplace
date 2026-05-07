@@ -47,3 +47,16 @@
 ## Notes
 
 [Any additional context, workarounds, or hypotheses about the root cause]
+
+---
+
+## Reference
+
+### Status Values
+
+| Status | Description                                                  |
+|--------|--------------------------------------------------------------|
+| Open   | Reported and confirmed, awaiting implementation.             |
+| Fixed  | Implementation complete, pending verification.               |
+| Closed | Fix verified; bug no longer reproducible.                    |
+| Won't Fix | Acknowledged but will not be addressed; reason documented. |

@@ -645,7 +645,15 @@ this document.
 When the pipeline finishes successfully (E2E tests pass and the QA evaluation verdict is
 PASS), perform the following actions:
 
-### 1. Generate Traceability Report
+### 1. Update Spec Status to Done
+
+Update the **Status** field in `docs/use_cases/$ARGUMENTS.md` from `Implemented` to `Done`.
+
+This is the only point in the workflow where a UC is marked Done — it requires both a passing
+implementation (set to Implemented by TRACKING.md After Implementation) and a passing QA
+evaluation (this step).
+
+### 2. Generate Traceability Report
 
 Generate a traceability report at `docs/delivery/$ARGUMENTS-traceability.md` that maps
 functional requirements to their verified E2E tests.
@@ -663,7 +671,7 @@ Use this format:
 
 To find line numbers, grep the test file for the BR/FR annotations introduced in the tests.
 
-### 2. Terminal Summary
+### 3. Terminal Summary
 
 Display the pipeline report to the user:
 
@@ -686,7 +694,7 @@ tests, and any notable implementation details.
 Include a **Delivery log** line pointing to `docs/delivery/$ARGUMENTS-iterations.md` and a
 **Traceability report** line pointing to `docs/delivery/$ARGUMENTS-traceability.md`.
 
-### 3. GitHub Issue Report
+### 4. GitHub Issue Report
 
 Post the pipeline report as a comment on the GitHub issue for `$ARGUMENTS`:
 

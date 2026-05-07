@@ -49,6 +49,13 @@
 
 [Description of the business rule that applies to this use case]
 
+## Amendments
+
+> This section is appended by the `/change-request` workflow when a CR modifies behavior derived
+> from this use case. The scenario above is immutable — amendments are recorded here only.
+
+<!-- Append entries below when a CR is delivered. Do not edit the sections above. -->
+
 ---
 
 ## Reference

@@ -167,6 +167,7 @@ These are the subtle errors that look like productivity but create problems:
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
 | Verification | `/report-bug`         | Create structured bug report documents                             |
+| Verification | `/change-request`     | Create structured change request documents for intentional modifications to implemented use cases |
 
 ### Next.js (stack-specific)
 

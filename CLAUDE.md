@@ -120,6 +120,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run oxlint and oxfmt checks (lint, complexity, formatting)         |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
+| Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |

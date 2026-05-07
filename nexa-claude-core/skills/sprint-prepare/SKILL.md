@@ -58,12 +58,12 @@ The following rules apply to delivered use cases:
 - **NEVER** modify the delivered use case's mapped requirements in `docs/requirements.md`
 
 If sprint refinement reveals that a delivered use case needs changes (bug fix, enhancement,
-behavioral change), that change MUST be documented as a **new use case** — a change request:
+behavioral change), that change MUST be documented as a **change request** using the `/change-request` skill:
 
-- Create a new use case ID (e.g., `UC-XXX` where XXX is the next available number)
-- In the new spec, reference the original delivered UC: `"Change request for UC-YYY"`
-- The new UC describes only the delta — what changes from the delivered behavior
-- Add the new UC to `docs/use_cases.puml` with a dependency on the original
+- Run `/change-request` with a description of the needed change and the delivered UC as the reference
+- The CR-XXX document describes only the delta — what changes from the delivered behavior
+- The CR is tracked and delivered as a separate work item (not a new use case)
+- Do NOT create a new UC to represent a behavioral change to a delivered use case
 
 This rule exists because the delivered use case spec is the **as-built contract**. The implementation,
 tests, and evaluation all reference it. Changing it retroactively invalidates the entire delivery chain.
@@ -89,6 +89,7 @@ Phase 4. The sprint changelog records every change for traceability.
 - Proceed past Phase 3 without user review and approval
 - Modify any delivered use case spec, design, or diagram entry (see Immutability Rule)
 - Select delivered use cases for sprint inclusion
+- Create new use cases to represent behavioral changes to delivered use cases — use `/change-request` instead
 - Apply changes to living documents without user approval
 - Generate specs or designs using broad requirements — always use refined requirements
 - Invent use cases that have no basis in requirements or the use case diagram
@@ -129,9 +130,12 @@ use case diagram as input.
    and their mapped use cases. Cross-reference FRs to UC IDs from the diagram.
 3. Read `docs/entity_model.md` — note the current set of entities for later validation.
 4. Scan `docs/use_cases/` for existing specification files.
-6. Scan `docs/designs/` for existing design files.
-7. Check if `docs/designs/DESIGN_RULES.md` exists.
-8. Scan `docs/delivery/` for iteration logs (indicating a use case has been delivered).
+5. Scan `docs/designs/` for existing design files.
+6. Check if `docs/designs/DESIGN_RULES.md` exists.
+7. Scan `docs/delivery/` for iteration logs (indicating a use case has been delivered).
+8. Scan `docs/change_requests/` for existing CR documents — note each CR's ID, title, status
+   (Open / Implemented / Done), and referenced UC. For Done CRs, check whether the UC file has
+   an `## Amendments` section listing the CR and whether `docs/requirements.md` reflects the change.
 
 Print a status table with delivered use cases clearly separated:
 
@@ -152,6 +156,13 @@ Print a status table with delivered use cases clearly separated:
 | UC-001B| Login               | No   | No     | P2       | UC-001A (delivered)   | FR-AUTH-01..04      | Ready   |
 | UC-003 | Onboarding Wizard   | No   | No     | P3       | UC-001A (delivered)   | FR-ONB-01..09       | Ready   |
 | UC-005 | Volunteer Profile   | No   | No     | P4       | UC-003                | FR-PROF-01..09      | Blocked |
+
+### Change Requests
+
+| CR ID  | Title                          | References | Status      | Live Docs Synced |
+|--------|--------------------------------|------------|-------------|------------------|
+| CR-001 | Replace Role with Department   | UC-007     | Done        | ⚠️ UC-007 amendments missing |
+| CR-002 | Add audit log to checkout      | UC-012     | Open        | —                |
 ```
 
 - **UC IDs and names**: From `docs/use_cases.puml` (the canonical source)
@@ -161,6 +172,9 @@ Print a status table with delivered use cases clearly separated:
 - **Dependencies**: From `docs/use_cases.puml` relationships; annotate whether each is delivered
 - **Mapped FRs**: Functional requirements from `docs/requirements.md` that trace to this UC
 - **Status**: "Ready" if all dependencies are delivered or in scope, "Blocked" otherwise
+- **Live Docs Synced**: For Done CRs — ✅ if both UC amendments and requirements entry are updated; ⚠️ with detail if either is missing; — for non-Done CRs
+
+If `docs/change_requests/` does not exist or is empty, omit the Change Requests section.
 
 Also print a brief requirements coverage summary and design rules status:
 
@@ -169,6 +183,7 @@ Also print a brief requirements coverage summary and design rules status:
 
 - **Total FRs:** 80 | **Mapped to UCs:** 72 | **Unmapped:** 8 (FR-AUTH-05, FR-MSG-07, ...)
 - **Total UCs:** 15 | **Delivered:** 2 | **Remaining:** 13
+- **Change Requests:** 2 total (1 Done, 1 Open) | **Live Doc Gaps:** 1 (CR-001)
 
 ### Design Rules
 
@@ -405,11 +420,12 @@ dependencies detected."]
 
 ### Change Requests for Delivered Use Cases
 
-[If refinement reveals that a delivered UC needs changes, they become new UCs:]
+[If refinement reveals that a delivered UC needs behavioral changes, file a CR — do NOT create a new UC.
+Run `/change-request` after this sprint preparation is complete.]
 
-| Delivered UC | Issue | New UC (change request) | Description |
-|--------------|-------|-------------------------|-------------|
-| UC-001       | Missing email notification | UC-016: Registration Email | Add email trigger |
+| Delivered UC | Issue | Recommended Action |
+|--------------|-------|--------------------|
+| UC-001       | Missing email notification | Run `/change-request` — reference UC-001, describe the missing notification delta |
 
 ## Open Questions
 
@@ -715,6 +731,13 @@ Run a focused analysis on only the sprint-scoped use cases and produce the readi
 14. **Design consistency** — Across all sprint designs, check for inconsistent naming, layout
     patterns, or interaction patterns for shared concepts (e.g., the same entity displayed
     differently in two screens, inconsistent button labels for the same action).
+15. **CR live-doc sync** — Scan `docs/change_requests/` for any CR with status Done. For each:
+    - Check that the referenced UC file (`docs/use_cases/UC-XXX.md`) has an `## Amendments`
+      section that includes an entry for this CR
+    - Check that `docs/requirements.md` reflects the behavioral change described in the CR
+      (the old behavior is gone or deprecated; the new behavior is stated)
+    - Flag each unsynced CR as a **Blocker** — live docs that lag behind delivered CRs will
+      cause the next sprint's specs and designs to be generated from stale requirements
 
 #### Output
 
@@ -778,7 +801,7 @@ Recommended order for running `/deliver-use-case` on each selected use case:
 
 ### GAP-001: [Short title]
 
-- **Type:** [Entity Gap | Spec Inconsistency | Design Missing | Business Rule Conflict | Traceability Gap | Requirements Fidelity Gap | Spec-Design Mismatch | Missing Alternative Flow | Decision Provenance Gap | Design Consistency Issue]
+- **Type:** [Entity Gap | Spec Inconsistency | Design Missing | Business Rule Conflict | Traceability Gap | Requirements Fidelity Gap | Spec-Design Mismatch | Missing Alternative Flow | Decision Provenance Gap | Design Consistency Issue | CR Live-Doc Sync Gap]
 - **Severity:** Blocker | Warning
 - **Affected:** [use case IDs]
 - **Description:** [What is missing or inconsistent]

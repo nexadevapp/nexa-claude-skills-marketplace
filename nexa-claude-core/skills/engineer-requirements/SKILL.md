@@ -305,6 +305,29 @@ Execute these phases in order.
 
 For each cluster, in the order defined in Phase 1:
 
+#### Step 2a-pre: CR Context Check
+
+Before analyzing the cluster, scan `docs/change_requests/` for any CR with status Done that
+references a UC in this cluster or touches an entity used by this cluster's use cases:
+
+1. List all files in `docs/change_requests/` — read each CR document
+2. For each Done CR relevant to this cluster:
+   - Note the referenced UC and the delta (what changed)
+   - Note which entity attributes were added, removed, or renamed
+   - Note which behaviors in the UC were superseded
+3. Verify that the living docs already reflect these changes:
+   - The relevant entity attributes in `docs/entity_model.md` match the CR's delta
+   - The relevant requirement entry in `docs/requirements.md` reflects the new behavior
+4. If a Done CR's delta is **not yet reflected** in the entity model or requirements, flag it
+   as a sync gap before proceeding — do not elaborate on stale inputs. Report to the user:
+   > "CR-XXX (Done) has not been reflected in [entity_model.md / requirements.md].
+   > Resolve this before continuing cluster analysis — run `/change-request` workflow
+   > post-implementation steps, or update the live docs manually."
+5. If no relevant Done CRs exist, note "No applied CRs affect this cluster" and continue.
+
+Use the verified CR context as an additional input throughout the eight analysis techniques —
+it represents current desired behavior that supersedes the original UC for affected areas.
+
 #### Step 2a: Analyze
 
 Run all eight analysis techniques against the cluster's use cases. Produce a structured analysis

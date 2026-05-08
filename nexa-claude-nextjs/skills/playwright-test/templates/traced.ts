@@ -46,8 +46,14 @@ export type CRId = `CR-${string}`;
 export type BUGId = `BUG-${string}`;
 export type Scenario = 'MSS' | `AF-${number}` | `EX-${number}`;
 
-type TestArgs = Parameters<Parameters<typeof base>[2]>[0];
-type TestBody = (args: TestArgs) => Promise<void>;
+type FullTestArgs = Parameters<Parameters<typeof base>[2]>[0];
+// The fixtures the helper forwards explicitly. Keep in sync with the
+// destructure inside `useCase` below.
+type ForwardedFixtures = Pick<
+  FullTestArgs,
+  'page' | 'request' | 'context' | 'browser' | 'browserName' | 'baseURL'
+>;
+type TestBody = (args: ForwardedFixtures) => Promise<void>;
 
 export interface ScenarioMeta {
   scenario: Scenario;
@@ -76,18 +82,28 @@ export function useCase(
         ...(meta.fixes ?? []).map((b) => `@${b}`),
       ];
 
-      base(`${meta.scenario}: ${testTitle}`, { tag: tags }, async (args) => {
-        const a = base.info().annotations;
-        a.push({ type: 'use-case', description: id });
-        a.push({ type: 'scenario', description: meta.scenario });
-        meta.verifies?.forEach((c) =>
-          a.push({ type: 'change-request', description: c }),
-        );
-        meta.fixes?.forEach((b) =>
-          a.push({ type: 'bug-fix', description: b }),
-        );
-        await fn(args);
-      });
+      // NOTE: Playwright determines which fixtures to inject by parsing the
+      // first parameter of the test function as a string. A non-destructured
+      // parameter name like `(args)` requests zero fixtures — `page`,
+      // `request`, etc. would be undefined inside `fn`. We therefore
+      // explicitly destructure the built-in fixtures the codebase relies on.
+      // If you add a custom fixture via `test.extend()`, list it here too.
+      base(
+        `${meta.scenario}: ${testTitle}`,
+        { tag: tags },
+        async ({ page, request, context, browser, browserName, baseURL }) => {
+          const a = base.info().annotations;
+          a.push({ type: 'use-case', description: id });
+          a.push({ type: 'scenario', description: meta.scenario });
+          meta.verifies?.forEach((c) =>
+            a.push({ type: 'change-request', description: c }),
+          );
+          meta.fixes?.forEach((b) =>
+            a.push({ type: 'bug-fix', description: b }),
+          );
+          await fn({ page, request, context, browser, browserName, baseURL });
+        },
+      );
     };
     body(test);
   });
@@ -95,10 +111,14 @@ export function useCase(
 
 export function bugTest(bug: BUGId, title: string, body: TestBody): void {
   assertDocExists('bugs', bug);
-  base(`${bug}: ${title}`, { tag: [`@${bug}`] }, async (args) => {
-    base.info().annotations.push({ type: 'bug-fix', description: bug });
-    await body(args);
-  });
+  base(
+    `${bug}: ${title}`,
+    { tag: [`@${bug}`] },
+    async ({ page, request, context, browser, browserName, baseURL }) => {
+      base.info().annotations.push({ type: 'bug-fix', description: bug });
+      await body({ page, request, context, browser, browserName, baseURL });
+    },
+  );
 }
 
 const cache = new Map<string, string[]>();

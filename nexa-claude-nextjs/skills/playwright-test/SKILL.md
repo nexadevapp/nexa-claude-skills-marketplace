@@ -64,25 +64,83 @@ A typical use case produces **3–8 tests total**, not dozens.
 
 ## Traceability Convention
 
-**`test.describe`** — one describe block per use case:
+All E2E tests use the typed helper at `e2e/helpers/traced.ts`. Raw `test()` and
+`test.describe()` from `@playwright/test` are **prohibited** for use-case-anchored
+specs — the helper enforces structured links from each test to its use case,
+change requests, and bug fixes, both in the HTML report and via filterable tags
+(`npx playwright test --grep @CR-003`).
+
+**Anchor each test file to one use case using `useCase()`:**
+
 ```typescript
-test.describe('UC-XXX: [Use Case Name]', { tag: ['@UC-XXX'] }, () => { ... })
+import { useCase } from './helpers/traced';
+import { expect } from '@playwright/test';
+
+useCase('UC-XXX', '[Use Case Name]', (test) => {
+  test('[end-to-end journey description]', {
+    scenario: 'MSS',
+    verifies: ['CR-NNN'], // optional: change requests this test asserts the delta of
+    fixes: ['BUG-NNN'],   // optional: bugs this test guards against regressing
+  }, async ({ page }) => {
+    // ... test body
+  });
+
+  test('[alternative flow description]', {
+    scenario: 'AF-1',
+  }, async ({ page }) => {
+    // ... test body
+  });
+});
 ```
 
-**`test`** — one test per complete journey, including Functional Requirement (FR) tags:
+**Multiple UCs per file** (when journeys share a page or flow): call `useCase()` once
+per UC. Each call creates its own describe block.
+
+**Pure bug regression tests** (no clean UC home) — file `bug-NNN-*.spec.ts`:
+
 ```typescript
-test('MSS: [end-to-end journey description]', { tag: ['@MSS', '@FR-001', '@FR-002'] }, ...)
-test('AF[n]: [end-to-end journey description]', { tag: ['@AF[n]', '@FR-003'] }, ...)
+import { bugTest } from './helpers/traced';
+import { expect } from '@playwright/test';
+
+bugTest('BUG-NNN', '[regression description]', async ({ page }) => {
+  // ... test body
+});
 ```
 
-Each test name describes the complete journey, not an individual step.
+**Scenario types** (the `scenario` field is required on every `t(...)` call):
+- `'MSS'` — Main Success Scenario (one per UC)
+- `'AF-N'` — Alternative Flow N (e.g., `'AF-1'`, `'AF-2'`)
+- `'EX-N'` — Exception path N
 
-**Inline Annotations** — explicitly mark where Business Rules (BR) and Postconditions are verified:
+The helper validates that referenced UCs, CRs, and BUGs exist as files under
+`docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` at registration
+time. A typo'd `CR-002` fails before any browser starts.
+
+**Convention for the scoped test parameter name:** use `test`. Inside the
+`useCase()` callback, this shadows the imported `@playwright/test` `test` — that's
+intentional, since `test()` and `test.describe()` are prohibited there anyway.
+Register framework hooks (`test.beforeAll`, `test.afterEach`, `test.afterAll`)
+at module top level, **outside** any `useCase()` call, where `test` resolves to the
+imported value.
+
+**Importing from `@playwright/test`:** `expect` and types may always be
+imported. `test` may be imported when the file uses framework hooks
+(`test.beforeAll`, `test.afterEach`, `test.afterAll`) at module top level —
+but the file must NEVER call `test('...', ...)` or `test.describe('...', ...)`
+to register tests. Use `useCase()` / `bugTest()` from the helper for that.
+
+**Inline comments** — when a single line/assertion exists *because of* a CR or
+BUG, leave a one-line marker comment so a code reader sees it without reading
+tags:
+
 ```typescript
-// 1. Verifies BR-001: [Rule Name]
+// CR-003: month/year picker
+await page.locator('input[type="month"]').first().fill('2025-06');
+
+// Verifies BR-001: [Rule Name]
 await expect(page.getByText('Error')).toBeVisible();
 
-// 2. Verifies Success Postcondition: [Postcondition Name]
+// Verifies Success Postcondition: [Postcondition Name]
 await expect(page.locator('table')).toContainText(['New Item']);
 ```
 
@@ -104,6 +162,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - **Sleep or wait between test retries** — when tests fail, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate
 - **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
 - **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
+- **Import `test` or `test.describe` from `@playwright/test`** — use `useCase()` / `bugTest()` from `./helpers/traced` instead. Only `expect` and types may be imported directly. This rule has no exceptions for use-case-anchored specs (see Traceability Convention)
 
 ## Nexa Rules Gate
 
@@ -256,6 +315,7 @@ export default defineConfig({
 - Test user helper: [templates/test-user.ts](templates/test-user.ts)
 - E2E users API endpoint: [templates/e2e-users-api.ts](templates/e2e-users-api.ts)
 - Test example: [templates/example.spec.ts](templates/example.spec.ts)
+- Traceability helper: [templates/traced.ts](templates/traced.ts) — copy verbatim into the project at `e2e/helpers/traced.ts`. Do not modify; a future plugin update may bring fixes.
 
 ## Common Patterns
 
@@ -285,44 +345,48 @@ test.afterAll(async ({ request }) => {
 ### Login via UI (start of each test)
 
 ```typescript
-test('MSS: ...', async ({ page }) => {
-  // Start at login — the ONLY page.goto() allowed
-  await page.goto('/login');
-  await expect(page.getByLabel('Email')).toBeVisible();
+useCase('UC-XXX', '[Use Case Name]', (test) => {
+  test('user signs in and lands on dashboard', { scenario: 'MSS' }, async ({ page }) => {
+    // Start at login — the ONLY page.goto() allowed
+    await page.goto('/login');
+    await expect(page.getByLabel('Email')).toBeVisible();
 
-  // Log in as the suite user
-  await page.getByLabel('Email').fill(suiteUser.email);
-  await page.getByLabel('Password').fill(suiteUser.plainPassword);
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    // Log in as the suite user
+    await page.getByLabel('Email').fill(suiteUser.email);
+    await page.getByLabel('Password').fill(suiteUser.plainPassword);
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
-  // ... continue the journey
+    // ... continue the journey
+  });
 });
 ```
 
 ### Per-Test User Override
 
 ```typescript
-test('AF2: suspended user sees account-locked screen', async ({ page, request }) => {
-  // Create a custom user for this test
-  const suspendedUser = await createTestUser(request, {
-    accountType: 'BUYER',
-    status: 'SUSPENDED',
+useCase('UC-XXX', '[Use Case Name]', (test) => {
+  test('suspended user sees account-locked screen', { scenario: 'AF-2' }, async ({ page, request }) => {
+    // Create a custom user for this test
+    const suspendedUser = await createTestUser(request, {
+      accountType: 'BUYER',
+      status: 'SUSPENDED',
+    });
+
+    try {
+      await page.goto('/login');
+      await expect(page.getByLabel('Email')).toBeVisible();
+      await page.getByLabel('Email').fill(suspendedUser.email);
+      await page.getByLabel('Password').fill(suspendedUser.plainPassword);
+      await page.getByRole('button', { name: 'Sign in' }).click();
+
+      // Verify suspended user sees the locked screen
+      await expect(page.getByText('Account suspended')).toBeVisible();
+    } finally {
+      // Always clean up the per-test user
+      await deleteTestUser(request, suspendedUser.id);
+    }
   });
-
-  try {
-    await page.goto('/login');
-    await expect(page.getByLabel('Email')).toBeVisible();
-    await page.getByLabel('Email').fill(suspendedUser.email);
-    await page.getByLabel('Password').fill(suspendedUser.plainPassword);
-    await page.getByRole('button', { name: 'Sign in' }).click();
-
-    // Verify suspended user sees the locked screen
-    await expect(page.getByText('Account suspended')).toBeVisible();
-  } finally {
-    // Always clean up the per-test user
-    await deleteTestUser(request, suspendedUser.id);
-  }
 });
 ```
 
@@ -422,11 +486,13 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 6. Ensure global teardown exists (`e2e/global-teardown.ts`); create from template if missing
 7. Ensure `playwright.config.ts` references the global setup/teardown and has **only Chromium** (one project)
 8. Ensure the test user helper exists (`e2e/helpers/test-user.ts`); create from template if missing
-9. Ensure the E2E users API endpoint exists (`app/api/e2e/users/route.ts` and `app/api/e2e/users/[id]/route.ts`); create from template if missing
-10. Create test file using the template
-11. For each journey test:
+9. Ensure the traceability helper exists (`e2e/helpers/traced.ts`); create from [templates/traced.ts](templates/traced.ts) if missing. Do not modify the template.
+10. Ensure the E2E users API endpoint exists (`app/api/e2e/users/route.ts` and `app/api/e2e/users/[id]/route.ts`); create from template if missing
+11. Create test file using the template. **Wrap every test in `useCase()` from `./helpers/traced` — never use raw `test()` or `test.describe()`** (see Traceability Convention)
+12. For each journey test:
     - Set up suite-level user in `test.beforeAll` (create via test API, log in via UI)
     - For tests needing a custom user, create a per-test user override (see Common Patterns)
+    - Read the spec for the use case and identify which CR-NNN and BUG-NNN IDs (if any) the test verifies — populate the `verifies` and `fixes` arrays in the `test(...)` meta object accordingly
     - `page.goto()` to the login page (the **only** goto in the test), log in via UI
     - After every navigation or action that loads a new page, wait for a **specific UI element** (heading, table row, form field) — never `waitForLoadState('networkidle')`
     - Navigate through each screen by clicking links, buttons, and submitting forms
@@ -437,21 +503,22 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
     - Clean up per-test override users in `finally` blocks or `test.afterEach`
     - Clear cookies and storage in `test.afterEach` to prevent session leakage between tests
     - Delete suite user in `test.afterAll`
-12. Run the `/code-quality` skill
-13. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
-14. **Verify the test results — this is mandatory before declaring success:**
+13. Run the `/code-quality` skill
+14. Run **all** tests with `npx playwright test` (no filters, no `--grep`, no `--grep-invert`, no `--project` subset)
+15. **Verify the test results — this is mandatory before declaring success:**
     - The Playwright output must show **0 failed** and the exit code must be **0**
     - If the output shows failures, timeouts, or errors, the tests **did not pass** — do not claim otherwise
     - Count the number of passed tests and confirm it matches the number of tests you wrote
     - If any test is skipped, that counts as a failure — investigate and fix it
     - **If a test failure reveals a route mismatch** (e.g., test expects `/register` but app uses `/sign-up`), this means the test is not navigating through the UI — fix the test to click through the real navigation instead of hardcoding URLs
-15. If a test fails:
+    - **If a test fails at registration time with `[traced] CR-NNN not found under docs/...`** — the referenced doc does not exist. Either the ID is typo'd, the doc was renamed, or the CR/BUG was never created. Fix the reference, do not silence the helper.
+16. If a test fails:
     - Check that Docker is running (Testcontainers requires it)
     - Read the error message carefully and fix the root cause in the test or implementation
-    - Re-run `npx playwright test` and go back to step 14
+    - Re-run `npx playwright test` and go back to step 15
     - Use `await page.screenshot()` for debugging visual state if needed
     - Do NOT skip, exclude, or filter out failing tests as a "fix"
-16. Mark todos complete
+17. Mark todos complete
 
 ## Post-Implementation Tracking
 

@@ -154,6 +154,49 @@ For each screen that performs async operations (data fetching, form submissions)
 
 ---
 
+### Lens 7: E2E Traceability (file analysis — no browser)
+
+Skip if `e2e/helpers/traced.ts` does not exist (project has not adopted the
+traceability helper yet).
+
+Otherwise, for every spec under `e2e/**/*.spec.ts`:
+
+1. **Build the ignore set.** If `e2e/.tracedignore` exists, parse it as a
+   gitignore-style list (one path per line, `#` comments, blank lines skipped)
+   and exclude matching specs from the rest of the lens.
+
+2. **Check imports.** Read each remaining spec and verify:
+   - It imports `useCase` and/or `bugTest` from a `./helpers/traced` path (relative
+     paths like `'./helpers/traced'` or `'../helpers/traced'` are both fine).
+   - It does NOT import `test` from `@playwright/test`. The string
+     `import { test` (or `test,` / `, test }`) sourced from `@playwright/test`
+     is a violation. Importing `expect` and types from `@playwright/test` is
+     permitted. Importing `test` solely to use framework hooks
+     (`test.beforeAll`, `test.afterEach`, etc.) is also permitted, but in that
+     case the file must NOT contain any top-level `test(` or `test.describe(`
+     calls — those are the prohibited forms.
+
+3. **Check usage.** Verify the spec contains at least one `useCase(` or `bugTest(`
+   call at module scope. A spec under `e2e/` that imports neither is a
+   violation regardless of import shape.
+
+4. **Check references.** For every `useCase('UC-NNN', ...)`, `verifies: ['CR-NNN', ...]`,
+   and `fixes: ['BUG-NNN', ...]` literal: confirm the referenced doc exists
+   under `docs/use_cases/`, `docs/change_requests/`, or `docs/bugs/`. The
+   helper enforces this at runtime; the audit catches it before a test run.
+
+5. **Check the spec for a `BUG-NNN` referenced in `fixes:`.** If the bug file
+   shows a status of `RESOLVED` (or equivalent), this is correct. If the status
+   is still `OPEN`, the test is guarding against a regression of an unfixed bug
+   — flag as Minor and ask whether the bug should be marked resolved.
+
+For each violation, report file path, line number, and the specific rule
+broken. Severity: **Major** during rollout (advisory). Once one full sprint
+has been delivered cleanly under the helper, escalate to **Critical** and have
+the audit fail sprint completion.
+
+---
+
 ## Output Format
 
 Produce one section per lens. For each finding:

@@ -77,10 +77,10 @@ This single command orchestrates the full pipeline automatically for a use case 
 - `/evaluate` — Checks implementation against its spec and design
 - `/report-bug` — Creates structured bug reports when something's off
 
-### 14. Deploy → `/aws-dockerize` + `/aws-setup-apprunner`
+### 14. Deploy → `/aws-dockerize` + `/aws-setup-ecs`
 
 - `/aws-dockerize` — Generates a production-ready Dockerfile
-- `/aws-setup-apprunner` — Creates AWS App Runner infrastructure with CI/CD via GitHub Actions
+- `/aws-setup-ecs` — Creates ECS Express Mode Terraform infrastructure with ECR, Secrets Manager, per-product remote state, and CI/CD via GitHub Actions
 
 ---
 

@@ -1,0 +1,15 @@
+app_name       = "{{APP_NAME}}"
+product        = "{{PRODUCT}}"
+environment    = "{{ENVIRONMENT}}"
+aws_region     = "{{AWS_REGION}}"
+aws_account_id = "{{AWS_ACCOUNT_ID}}"
+owner          = "{{OWNER}}"
+container_port = {{CONTAINER_PORT}}
+cpu            = {{CPU}}
+memory         = {{MEMORY}}
+
+# Secret names discovered from .env.local.
+# IMPORTANT: Replace all "REPLACE_ME" values before running terraform apply.
+secrets = {
+  {{SECRETS_MAP}}
+}

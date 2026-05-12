@@ -1,4 +1,4 @@
-name: "Build & Push: {{APP_NAME}}"
+name: "Build & Deploy: {{APP_NAME}}"
 on:
   push:
     branches: [ "{{BRANCH}}" ]
@@ -6,15 +6,16 @@ on:
       - "{{PROJECT_PATH}}/**"
 
 permissions:
-  id-token: write         # REQUIRED for OIDC
-  contents: read          # to checkout code
+  id-token: write   # required for OIDC
+  contents: read
 
 jobs:
-  push-ecr:
+  deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: {{PROJECT_PATH}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,6 +47,16 @@ jobs:
           file: {{PROJECT_PATH}}/Dockerfile
           push: true
           platforms: linux/amd64
-          tags: {{AWS_ACCOUNT_ID}}.dkr.ecr.{{AWS_REGION}}.amazonaws.com/{{ECR_REPO_NAME}}:latest
+          tags: |
+            {{AWS_ACCOUNT_ID}}.dkr.ecr.{{AWS_REGION}}.amazonaws.com/{{ECR_REPO_NAME}}:latest
+            {{AWS_ACCOUNT_ID}}.dkr.ecr.{{AWS_REGION}}.amazonaws.com/{{ECR_REPO_NAME}}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Force ECS redeployment
+        run: |
+          aws ecs update-service \
+            --cluster {{APP_NAME}}-cluster \
+            --service {{APP_NAME}}-service \
+            --force-new-deployment \
+            --no-cli-pager

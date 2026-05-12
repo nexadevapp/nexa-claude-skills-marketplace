@@ -54,7 +54,7 @@ nexa-claude-marketplace/
 │       ├── setup-playwright-ci/
 │       ├── setup-quality-ci/
 │       ├── aws-dockerize/
-│       └── aws-setup-apprunner/
+│       └── aws-setup-ecs/
 └── README.md
 ```
 
@@ -190,4 +190,4 @@ These are the subtle errors that look like productivity but create problems:
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
 | Completion   | `/sprint-rework`        | Reset sprint branch to main and re-deliver after PR review           |
 | Infrastructure | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
-| Infrastructure | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |
+| Infrastructure | `/aws-setup-ecs`        | Generate ECS Express Mode Terraform infrastructure with ECR, Secrets Manager, and CI/CD |

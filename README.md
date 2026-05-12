@@ -44,7 +44,7 @@ Adds implementation, testing, and deployment skills specific to Next.js. Require
 | **Delivery** | `/sprint-kickoff` | Kick off a sprint |
 | **Delivery** | `/sprint-deliver` | Deliver a sprint |
 | **Transition** | `/aws-dockerize` | Create production-ready Dockerfiles |
-| **Transition** | `/aws-setup-apprunner` | Generate AWS App Runner deployment infrastructure |
+| **Transition** | `/aws-setup-ecs` | Generate ECS Express Mode Terraform infrastructure with ECR, Secrets Manager, and CI/CD |
 
 Uses the **Playwright** MCP server for browser-based testing.
 
@@ -77,6 +77,6 @@ Add the plugins to your project's Claude Code settings (`.claude/settings.json`)
    - `/implement` (Next.js) to build it
    - `/vitest-test` / `/playwright-test` to test it
    - `/code-review` / `/evaluate` to verify quality
-   - `/aws-dockerize` / `/aws-setup-apprunner` to deploy
+   - `/aws-dockerize` / `/aws-setup-ecs` to deploy
 
 Each skill produces structured output (typically under a `docs/` folder in your project).

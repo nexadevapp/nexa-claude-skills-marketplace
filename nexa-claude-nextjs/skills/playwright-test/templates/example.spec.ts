@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { useCase, meta, bug } from './helpers/traced';
+import { uc, meta, bug } from './helpers/traced';
 import { createTestUser, deleteTestUser, type TestUser } from './helpers/test-user';
 
 // ── Test rules (enforced for every test in this file) ───────────────────
@@ -11,9 +11,12 @@ import { createTestUser, deleteTestUser, type TestUser } from './helpers/test-us
 // 3. Wait for specific UI elements (heading, table row, form field). Never
 //    use `page.waitForLoadState('networkidle')` — see the DO NOT list in
 //    the playwright-test SKILL.
-// 4. Every test passes either `meta(scenario, ...)` (inside a useCase()) or
-//    `bug(id)` (pure regression) as its second arg, so the test inherits the
-//    right tags and the helper validates referenced docs at registration.
+// 4. Every UC group is `test.describe('UC-NNN: ...', uc('UC-NNN'), () => {...})`
+//    so IDE plugins (WebStorm/IntelliJ, VSCode Playwright) can walk into the
+//    block and show gutter run icons for each test inside.
+// 5. Every test passes either `meta('UC-NNN', { scenario, ... })` (inside the
+//    describe) or `bug('BUG-NNN')` (pure regression at module scope) as its
+//    second arg. The helper validates referenced docs at registration time.
 
 // ── Suite-level user (shared across all tests in this file) ─────────────
 
@@ -53,15 +56,12 @@ async function logoutViaUI(page: Page) {
 }
 
 // ── Tests for UC-001 ────────────────────────────────────────────────────
-//
-// Inside useCase(), `test` is the imported `@playwright/test` test (not a
-// callback parameter), so IDE plugins can run each test from the gutter.
 
-useCase('UC-001', 'Manage Items', () => {
+test.describe('UC-001: Manage Items', uc('UC-001'), () => {
 
   // MSS: the full happy path as one test — entry point to final outcome.
   test('user logs in, navigates to items, creates item, and sees it in the list',
-    meta({ scenario: 'MSS' }),
+    meta('UC-001', { scenario: 'MSS' }),
     async ({ page }) => {
       // 1. Log in (the only page.goto in this test, inside the helper)
       await loginViaUI(page, suiteUser);
@@ -103,7 +103,7 @@ useCase('UC-001', 'Manage Items', () => {
 
   // AF-1: alternative flow — empty state.
   test('user logs in, navigates to items, and sees empty state when no items exist',
-    meta({ scenario: 'AF-1' }),
+    meta('UC-001', { scenario: 'AF-1' }),
     async ({ page }) => {
       // Login first so subsequent page.request calls share the auth cookie.
       await loginViaUI(page, suiteUser);
@@ -128,7 +128,7 @@ useCase('UC-001', 'Manage Items', () => {
   // Reuses loginViaUI: the helper just performs the form flow, so it works
   // for both success and failure paths. The test owns the failure assertion.
   test('suspended user sees account-locked screen after login',
-    meta({ scenario: 'AF-2' }),
+    meta('UC-001', { scenario: 'AF-2' }),
     async ({ page, request }) => {
       const suspendedUser = await createTestUser(request, {
         accountType: 'BUYER',
@@ -151,7 +151,7 @@ useCase('UC-001', 'Manage Items', () => {
   //   BUG-001: submitting the form with an empty Category previously crashed
   //            the API with a 500; post-fix it must surface a validation error.
   test('user creates a categorized item; empty Category is rejected',
-    meta({ scenario: 'AF-3', verifies: ['CR-001'], fixes: ['BUG-001'] }),
+    meta('UC-001', { scenario: 'AF-3', verifies: ['CR-001'], fixes: ['BUG-001'] }),
     async ({ page }) => {
       await loginViaUI(page, suiteUser);
 

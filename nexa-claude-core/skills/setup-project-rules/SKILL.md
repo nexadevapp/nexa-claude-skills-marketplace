@@ -83,20 +83,22 @@ redirect them to `/sprint-kickoff` first.
 
 ### Rule 7: E2E tests must be tagged via the traceability helper
 
-Every Playwright `test(...)` call in `e2e/**/*.spec.ts` must pass a `meta(...)`
-or `bug(...)` call (from `e2e/helpers/traced.ts`) as its second argument:
+Every Playwright spec under `e2e/**/*.spec.ts` must use the helpers from
+`e2e/helpers/traced.ts`:
 
-- Tests grouped under a use case live inside `useCase('UC-NNN', '...', () => { ... })`
-  and use `meta({ scenario, verifies?, fixes? })` as their second arg.
-- Pure bug regression tests (no UC home) live at module scope and use
-  `bug('BUG-NNN')` as their second arg.
-- `test.describe(...)` is not used directly — `useCase()` is the canonical
-  group wrapper.
+- UC groups are declared with raw `test.describe('UC-NNN: <title>', uc('UC-NNN'), () => { ... })`.
+- Each `test(...)` inside the describe passes `meta('UC-NNN', { scenario, verifies?, fixes? })`
+  as its second arg.
+- Pure bug regression tests (no UC home) live at module scope as
+  `test('<title>', bug('BUG-NNN'), async (...) => ...)`.
 
 `test` and `expect` are imported normally from `@playwright/test`. The reason
-`useCase()` takes a no-arg callback (not `(test) => {...}`) is to keep `test`
-resolving to the imported symbol so IDE plugins (WebStorm/IntelliJ, VSCode
-Playwright) can statically discover each test and run it from the gutter.
+the helper exposes `uc()` / `meta()` / `bug()` rather than wrapping
+`test.describe(...)` in a custom function is that IDE plugins
+(WebStorm/IntelliJ, VSCode Playwright) only walk `test()` and `test.describe()`
+calls in the source — they do not enter callbacks of arbitrary helpers.
+Keeping `test.describe(...)` literally in source is what makes gutter
+run/debug icons appear for each test.
 
 The helper validates at registration time that referenced UC/CR/BUG docs exist
 under `docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` — a typo'd
@@ -133,7 +135,7 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
    4. Never ask for a preferred use case number
    5. Always use the next available sequential number
    6. Never write code on main/master — use a sprint branch
-   7. E2E tests must be tagged via the traceability helper (meta({...}) / bug() inside useCase())
+   7. E2E tests must be tagged via the traceability helper (uc() on test.describe, meta() on test, bug() for pure regressions)
 
    These rules are enforced by the Nexa Rules Gate on every skill invocation.
    ```

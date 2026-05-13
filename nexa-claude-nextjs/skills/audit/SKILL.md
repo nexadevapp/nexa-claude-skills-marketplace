@@ -166,28 +166,30 @@ Otherwise, for every spec under `e2e/**/*.spec.ts`:
    and exclude matching specs from the rest of the lens.
 
 2. **Check imports.** Read each remaining spec and verify it imports at least
-   one of `useCase`, `meta`, or `bug` from a `./helpers/traced` path (relative
-   forms like `'./helpers/traced'` or `'../helpers/traced'` are both fine).
-   `test` and `expect` imported from `@playwright/test` are expected and
-   required — they are not violations.
+   one of `uc`, `meta`, or `bug` from a `./helpers/traced` path (relative forms
+   like `'./helpers/traced'` or `'../helpers/traced'` are both fine). `test`
+   and `expect` imported from `@playwright/test` are expected and required —
+   they are not violations.
 
-3. **Check `test(...)` calls.** Walk every `test('...', ..., async (...) => ...)`
+3. **Check `test.describe(...)` calls.** Every UC group is declared with
+   `test.describe('UC-NNN: ...', uc('UC-NNN'), () => { ... })`. A
+   `test.describe(...)` call whose second arg is not a `uc('UC-NNN')` literal
+   (e.g., raw `{ tag: [...] }`, or only two args — title and body) is a
+   violation. Lift it to `uc()` so the UC doc is validated at registration.
+
+4. **Check `test(...)` calls.** Walk every `test('...', ..., async (...) => ...)`
    call in the file (excluding framework hooks like `test.beforeAll`,
    `test.afterEach`, `test.afterAll`). Each one must pass a `meta(...)` or
    `bug(...)` call as its second argument:
-   - Inside a `useCase('UC-NNN', '...', () => { ... })` body, each `test()`
-     must use `meta({ scenario, verifies?, fixes? })`.
-   - At module scope (outside any `useCase()`), each `test()` must use
+   - Inside a `test.describe('UC-NNN: ...', uc('UC-NNN'), () => { ... })`
+     body, each `test()` must use `meta('UC-NNN', { scenario, verifies?, fixes? })`,
+     with the first arg matching the enclosing describe's UC id.
+   - At module scope (outside any `test.describe()`), each `test()` must use
      `bug('BUG-NNN')`.
    A `test()` call whose second arg is a plain object literal, a non-helper
    function call, or absent is a violation.
 
-4. **Check `test.describe(...)` is not used.** The helper's `useCase()` is the
-   canonical group wrapper. A raw `test.describe(...)` call is a violation —
-   convert it to `useCase()` (or, if the group has no UC, lift the tests to
-   module scope).
-
-5. **Check references.** For every `useCase('UC-NNN', ...)`, `meta({ scenario: '...', verifies: ['CR-NNN', ...], fixes: ['BUG-NNN', ...] })`,
+5. **Check references.** For every `uc('UC-NNN')`, `meta('UC-NNN', { scenario: '...', verifies: ['CR-NNN', ...], fixes: ['BUG-NNN', ...] })`,
    and `bug('BUG-NNN')` literal: confirm the referenced doc exists under
    `docs/use_cases/`, `docs/change_requests/`, or `docs/bugs/`. The helper
    enforces this at runtime; the audit catches it before a test run.

@@ -65,30 +65,30 @@ A typical use case produces **3–8 tests total**, not dozens.
 ## Traceability Convention
 
 E2E tests use the helper at `e2e/helpers/traced.ts` to link each test to its
-use case, change requests, and bug fixes. Tests are registered with the
-**imported** `test` from `@playwright/test` — never a callback-scoped
-parameter — so IDE plugins (WebStorm/IntelliJ, VSCode Playwright) can
-statically discover and run each test from the gutter.
+use case, change requests, and bug fixes. Use Cases are grouped with raw
+`test.describe(...)` (not a custom wrapper) so IDE plugins (WebStorm/IntelliJ,
+VSCode Playwright) can walk into the block and show gutter run icons for each
+test inside.
 
 The helper exports three functions:
 
-- **`useCase(id, title, body)`** wraps a group of tests in a UC-tagged
-  `test.describe()` block and validates the UC doc exists.
-- **`meta({ scenario, verifies?, fixes? })`** returns Playwright's
-  `{ tag, annotation }` second-arg object for a test inside `useCase()`.
+- **`uc(id)`** — returns the `{ tag }` options object for `test.describe()`.
+  Validates the UC doc exists.
+- **`meta(uc, { scenario, verifies?, fixes? })`** — returns Playwright's
+  `{ tag, annotation }` second-arg object for a test inside the describe.
   Validates referenced CR/BUG docs exist.
-- **`bug(id)`** returns the same shape for a pure bug regression test that has
-  no clean UC home. Validates the BUG doc exists.
+- **`bug(id)`** — same shape, for a pure bug regression test that has no clean
+  UC home. Validates the BUG doc exists.
 
-**Anchor each test file to one or more use cases using `useCase()`:**
+**Anchor each UC group with `test.describe(...)` and `uc(...)`:**
 
 ```typescript
 import { test, expect } from '@playwright/test';
-import { useCase, meta } from './helpers/traced';
+import { uc, meta } from './helpers/traced';
 
-useCase('UC-XXX', '[Use Case Name]', () => {
+test.describe('UC-XXX: [Use Case Name]', uc('UC-XXX'), () => {
   test('[end-to-end journey description]',
-    meta({
+    meta('UC-XXX', {
       scenario: 'MSS',
       verifies: ['CR-NNN'], // optional: change requests this test asserts the delta of
       fixes: ['BUG-NNN'],   // optional: bugs this test guards against regressing
@@ -98,15 +98,15 @@ useCase('UC-XXX', '[Use Case Name]', () => {
     });
 
   test('[alternative flow description]',
-    meta({ scenario: 'AF-1' }),
+    meta('UC-XXX', { scenario: 'AF-1' }),
     async ({ page }) => {
       // ... test body
     });
 });
 ```
 
-**Multiple UCs per file** (when journeys share a page or flow): call `useCase()`
-once per UC. Each call creates its own describe block.
+**Multiple UCs per file** (when journeys share a page or flow): one top-level
+`test.describe(...)` block per UC.
 
 **Pure bug regression tests** (no clean UC home) — file `bug-NNN-*.spec.ts`:
 
@@ -119,7 +119,7 @@ test('[regression description]', bug('BUG-NNN'), async ({ page }) => {
 });
 ```
 
-**Scenario types** (the required `scenario` field on `meta({...})`):
+**Scenario types** (the required `scenario` field on `meta('UC-NNN', {...})`):
 - `'MSS'` — Main Success Scenario (one per UC)
 - `'AF-N'` — Alternative Flow N (e.g., `'AF-1'`, `'AF-2'`)
 - `'EX-N'` — Exception path N
@@ -128,12 +128,17 @@ The helper validates that referenced UCs, CRs, and BUGs exist as files under
 `docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` at registration
 time. A typo'd `CR-002` fails before any browser starts.
 
-**Why the imported `test` (not a callback parameter):** IDE plugins detect
-runnable tests by AST-resolving the `test` identifier back to the
-`@playwright/test` import. A callback-scoped `test` parameter looks identical
-in source but resolves to a different binding, breaking gutter run/debug.
-`useCase()`'s body takes no parameters — call `test()` directly inside it,
-exactly the same way you would at module scope.
+**Why raw `test.describe()` instead of a custom wrapper:** JetBrains'
+Playwright plugin (and the VSCode equivalent) only walks `test()` and
+`test.describe()` calls — it does not enter callbacks of arbitrary helper
+functions. A `useCase()` wrapper that calls `test.describe()` internally
+works at runtime but hides the inner tests from the IDE's AST walker. Keeping
+`test.describe(...)` literally in source is what makes gutter run/debug icons
+appear for each test.
+
+The UC id is repeated three times per describe (title, `uc()`, each `meta()`).
+This is intentional: a single source of truth would require either fragile
+module-level state or a wrapper the IDE can't see into.
 
 **Inline comments** — when a single line/assertion exists *because of* a CR or
 BUG, leave a one-line marker comment so a code reader sees it without reading
@@ -168,7 +173,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - **Sleep or wait between test retries** — when tests fail, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate
 - **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
 - **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
-- **Register a test without `meta(...)` or `bug(...)` as its second arg** — every `test(...)` call in an E2E spec must be tagged via the helper, either with `meta({ scenario, verifies?, fixes? })` (when inside a `useCase()` body) or `bug(id)` (for a pure bug regression). Raw `test('title', async (...) => ...)` with no meta object is a violation — it loses the traceability link, the HTML report annotation, and the registration-time doc validation
+- **Register a test or describe without the helper** — every `test(...)` call in an E2E spec must be tagged via `meta('UC-NNN', { scenario, ... })` (inside a `test.describe`) or `bug('BUG-NNN')` (pure regression, module scope). Every UC `test.describe(...)` must pass `uc('UC-NNN')` as its second arg. Raw `test('title', async (...) => ...)` or `test.describe('title', () => {...})` with no helper metadata is a violation — it loses the traceability link, the HTML report annotation, and the registration-time doc validation
 
 ## Nexa Rules Gate
 
@@ -351,9 +356,9 @@ test.afterAll(async ({ request }) => {
 ### Login via UI (start of each test)
 
 ```typescript
-useCase('UC-XXX', '[Use Case Name]', () => {
+test.describe('UC-XXX: [Use Case Name]', uc('UC-XXX'), () => {
   test('user signs in and lands on dashboard',
-    meta({ scenario: 'MSS' }),
+    meta('UC-XXX', { scenario: 'MSS' }),
     async ({ page }) => {
       // Start at login — the ONLY page.goto() allowed
       await page.goto('/login');
@@ -373,9 +378,9 @@ useCase('UC-XXX', '[Use Case Name]', () => {
 ### Per-Test User Override
 
 ```typescript
-useCase('UC-XXX', '[Use Case Name]', () => {
+test.describe('UC-XXX: [Use Case Name]', uc('UC-XXX'), () => {
   test('suspended user sees account-locked screen',
-    meta({ scenario: 'AF-2' }),
+    meta('UC-XXX', { scenario: 'AF-2' }),
     async ({ page, request }) => {
       // Create a custom user for this test
       const suspendedUser = await createTestUser(request, {
@@ -498,7 +503,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 8. Ensure the test user helper exists (`e2e/helpers/test-user.ts`); create from template if missing
 9. Ensure the traceability helper exists (`e2e/helpers/traced.ts`); create from [templates/traced.ts](templates/traced.ts) if missing. Do not modify the template.
 10. Ensure the E2E users API endpoint exists (`app/api/e2e/users/route.ts` and `app/api/e2e/users/[id]/route.ts`); create from template if missing
-11. Create test file using the template. **Group every UC's tests inside `useCase()` from `./helpers/traced`, and pass `meta({ scenario, ... })` (or `bug(id)` for pure regressions) as each test's second arg** (see Traceability Convention)
+11. Create test file using the template. **Group every UC's tests in a top-level `test.describe('UC-NNN: ...', uc('UC-NNN'), () => {...})`, and pass `meta('UC-NNN', { scenario, ... })` (or `bug('BUG-NNN')` for pure regressions) as each test's second arg** (see Traceability Convention)
 12. For each journey test:
     - Set up suite-level user in `test.beforeAll` (create via test API, log in via UI)
     - For tests needing a custom user, create a per-test user override (see Common Patterns)

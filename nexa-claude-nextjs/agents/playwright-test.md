@@ -39,8 +39,9 @@ the correct outcome.
 - Never use `test.skip()`, `test.fixme()`, `expect(true).toBe(true)`, or any
   mechanism to avoid running tests or to make them trivially green.
 - Every test must contain assertions that would fail if the feature broke.
-- Wrap every test in `useCase()` from `./helpers/traced` — never use raw
-  `test()` or `test.describe()` for use-case-anchored specs.
+- Anchor every UC group with raw `test.describe('UC-NNN: ...', uc('UC-NNN'), () => {...})`
+  and pass `meta('UC-NNN', { scenario, ... })` (or `bug('BUG-NNN')` for pure
+  regressions) as each test's second arg — see Traceability Convention in SKILL.md.
 
 ## What to return
 

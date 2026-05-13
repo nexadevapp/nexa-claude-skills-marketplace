@@ -147,26 +147,24 @@ verifies them. The main agent is the only authority that can declare tests as pa
 
 #### Phase 1: Write Tests (Isolated Agent)
 
-Launch an **isolated agent** to write E2E tests from a clean context — it must not have
-access to implementation reasoning from earlier steps, so tests validate what was *designed*,
-not what was *built*:
+Spawn a **typed `playwright-test` subagent** (not general-purpose). The agent's system
+prompt is its operating manual — the `playwright-test` SKILL is loaded as identity, not
+as a referenced doc. The agent runs in a cold context: it has not seen the implementation
+reasoning from earlier steps, so tests validate what was *designed*, not what was *built*.
 
-> You are an independent E2E test author. Read and follow
-> `${CLAUDE_PLUGIN_ROOT}/skills/playwright-test/SKILL.md`.
+Invoke via the Agent tool with `subagent_type: "playwright-test"`. Prompt:
+
 > Write Playwright end-to-end tests for $ARGUMENTS.
-> Inputs: `docs/use_cases/$ARGUMENTS.md` and `docs/designs/$ARGUMENTS-design.html`.
-> Test scenarios derive from the use case flows; selectors and assertions derive from the
-> frontend design's screens, components, and states.
 >
-> **CRITICAL RULES:**
-> - Run ALL tests with `npx playwright test` — no filters, no `--grep`, no `--grep-invert`, no project subsets
-> - Testcontainers provides the database — if Docker is not running, STOP and report it
-> - 0 failed and exit code 0 means passing — anything else means the tests DID NOT PASS, fix them
-> - Never use `test.skip()`, `test.fixme()`, or any mechanism to avoid running tests
-> - Every test must have meaningful assertions that fail if the feature breaks
+> Inputs:
+> - `docs/use_cases/$ARGUMENTS.md`
+> - `docs/designs/$ARGUMENTS-design.html`
+> - `docs/delivery/$ARGUMENTS-iterations.md` (prior fix attempts — do NOT repeat fixes
+>   that already failed)
 >
-> Return: each test file created, test count, and whether your run showed pass or fail
-> (with full error output if failing).
+> Follow your operating manual (`playwright-test/SKILL.md`) to the letter. Return each
+> test file created, test count, and whether your final `npx playwright test` run showed
+> pass or fail (with full error output if failing).
 
 #### Phase 2: Independent Verification (Main Context)
 
@@ -187,11 +185,12 @@ If Phase 2 fails, classify each failure:
 
 Log the iteration to the delivery log (see Delivery Log), then act:
 
-1. **Test bugs:** Re-launch the E2E agent with the error context and iteration history.
-   Return to Phase 2.
+1. **Test bugs:** Re-launch the `playwright-test` subagent with the error context and
+   iteration history. Return to Phase 2.
 2. **Implementation bugs:** Fix in main context. Re-run `npx next build` and
    `npx vitest run` to confirm the fix doesn't break anything. Return to Phase 2.
-3. **Mixed:** Fix implementation bugs first, then re-launch the E2E agent for test bugs.
+3. **Mixed:** Fix implementation bugs first, then re-launch the `playwright-test`
+   subagent for test bugs.
 
 After 2 iterations with tests still failing, stop and follow **Failure Recovery**.
 
@@ -203,10 +202,14 @@ After E2E tests pass, evaluate coverage against the spec. Up to 2 iterations.
 
 #### Phase 1: QA Evaluation (Isolated Agent)
 
-Launch an **isolated agent**:
+Spawn a **typed `evaluate` subagent** (not general-purpose). The agent's system prompt
+is its operating manual — the `evaluate` SKILL is loaded as identity, not as a referenced
+doc. The agent runs in a cold context: it has not seen the implementation reasoning.
 
-> You are a QA specialist. Review the Playwright tests for $ARGUMENTS against
-> `docs/use_cases/$ARGUMENTS.md` and `docs/requirements.md`.
+Invoke via the Agent tool with `subagent_type: "evaluate"`. Prompt:
+
+> Review the Playwright tests for $ARGUMENTS against `docs/use_cases/$ARGUMENTS.md`
+> and `docs/requirements.md`.
 >
 > Your report must include:
 >
@@ -249,8 +252,9 @@ Launch an **isolated agent**:
 
 Log the QA evaluation result to the delivery log under `## Coverage Evaluation Iterations`.
 
-If there are **Missing** items, launch the E2E agent with the gap analysis and iteration
-history as input. After it returns, independently verify tests pass (same as Step 3 Phase 2).
+If there are **Missing** items, re-launch the `playwright-test` subagent with the gap
+analysis and iteration history as input. After it returns, independently verify tests pass
+(same as Step 3 Phase 2).
 
 Then return to Phase 1 for re-evaluation.
 

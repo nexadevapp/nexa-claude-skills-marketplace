@@ -1,40 +1,41 @@
 /**
  * Traceability helper for Playwright E2E tests.
  *
- * Wraps Playwright's test() with structured metadata that links each test to:
- *   - exactly one Use Case (UC-NNN)
- *   - one scenario (MSS, AF-N, EX-N)
- *   - zero or more Change Requests (CR-NNN) the test verifies
- *   - zero or more Bugs (BUG-NNN) the test guards against regressing
+ * Provides three helpers that compose with the imported `@playwright/test`
+ * `test` to link each test to its use case, change requests, and bug fixes:
  *
- * Metadata is emitted as both Playwright tags (filterable via --grep) and
- * structured annotations (visible in the HTML report). Referenced docs are
- * validated at registration time — typo'd IDs fail before any browser starts.
+ *   - useCase(id, title, body)  — wraps tests in a UC-tagged describe block
+ *   - meta(scenario, opts)      — returns Playwright's `{ tag, annotation }`
+ *                                 second-arg object for a test inside useCase()
+ *   - bug(id)                   — same, for a pure bug regression test that
+ *                                 has no UC home
+ *
+ * Tests are still registered with the imported `test()` — never a
+ * callback-scoped parameter — so IDE plugins (WebStorm/IntelliJ, VSCode
+ * Playwright extension) can statically discover and run each test from the
+ * gutter.
+ *
+ * Referenced UC/CR/BUG docs are validated at registration time: a typo'd
+ * 'CR-002' throws before any browser starts.
  *
  * Usage:
  *
- *   import { useCase } from './helpers/traced';
- *   import { expect } from '@playwright/test';
+ *   import { test, expect } from '@playwright/test';
+ *   import { useCase, meta, bug } from './helpers/traced';
  *
- *   useCase('UC-007', 'Manage Social Resume', (test) => {
- *     test('volunteer adds an entry via the modal', {
- *       scenario: 'MSS',
- *       verifies: ['CR-002', 'CR-003'],
- *     }, async ({ page }) => {
- *       // ...
- *     });
+ *   useCase('UC-007', 'Manage Social Resume', () => {
+ *     test('volunteer adds an entry via the modal',
+ *       meta({ scenario: 'MSS', verifies: ['CR-002'] }),
+ *       async ({ page }) => { ... });
  *
- *     test('ongoing checkbox disables end date', {
- *       scenario: 'AF-1',
- *       verifies: ['CR-003'],
- *     }, async ({ page }) => {
- *       // ...
- *     });
+ *     test('ongoing checkbox disables end date',
+ *       meta({ scenario: 'AF-1', verifies: ['CR-003'] }),
+ *       async ({ page }) => { ... });
  *   });
  *
- * The callback parameter `test` shadows the imported `@playwright/test` `test`
- * inside the callback body. Register framework hooks (test.beforeAll,
- * test.afterEach, test.afterAll) at module top level, outside this call.
+ *   test('login does not crash on Unicode emails',
+ *     bug('BUG-002'),
+ *     async ({ page }) => { ... });
  */
 
 import { test as base } from '@playwright/test';
@@ -46,14 +47,38 @@ export type CRId = `CR-${string}`;
 export type BUGId = `BUG-${string}`;
 export type Scenario = 'MSS' | `AF-${number}` | `EX-${number}`;
 
-type FullTestArgs = Parameters<Parameters<typeof base>[2]>[0];
-// The fixtures the helper forwards explicitly. Keep in sync with the
-// destructure inside `useCase` below.
-type ForwardedFixtures = Pick<
-  FullTestArgs,
-  'page' | 'request' | 'context' | 'browser' | 'browserName' | 'baseURL'
->;
-type TestBody = (args: ForwardedFixtures) => Promise<void>;
+interface Annotation {
+  type: string;
+  description: string;
+}
+
+interface PlaywrightMeta {
+  tag: string[];
+  annotation: Annotation[];
+}
+
+// Playwright invokes a describe block's body synchronously during test
+// collection, so this module-level slot is set throughout the body and
+// cleared before any other test registers. Sufficient for the synchronous
+// registration model — no async-context plumbing needed.
+let currentUC: UCId | null = null;
+
+export function useCase(
+  id: UCId,
+  title: string,
+  body: () => void,
+): void {
+  assertDocExists('use_cases', id);
+  base.describe(`${id}: ${title}`, { tag: [`@${id}`] }, () => {
+    const prev = currentUC;
+    currentUC = id;
+    try {
+      body();
+    } finally {
+      currentUC = prev;
+    }
+  });
+}
 
 export interface ScenarioMeta {
   scenario: Scenario;
@@ -61,64 +86,37 @@ export interface ScenarioMeta {
   fixes?: BUGId[];
 }
 
-type ScopedTest = (title: string, meta: ScenarioMeta, body: TestBody) => void;
+export function meta(input: ScenarioMeta): PlaywrightMeta {
+  if (!currentUC) {
+    throw new Error(
+      `[traced] meta() must be called inside a useCase() body — use bug() for pure-bug tests`,
+    );
+  }
+  const { scenario, verifies, fixes } = input;
+  verifies?.forEach((cr) => assertDocExists('change_requests', cr));
+  fixes?.forEach((b) => assertDocExists('bugs', b));
 
-export function useCase(
-  id: UCId,
-  title: string,
-  body: (test: ScopedTest) => void,
-): void {
-  assertDocExists('use_cases', id);
-
-  base.describe(`${id}: ${title}`, { tag: [`@${id}`] }, () => {
-    const test: ScopedTest = (testTitle, meta, fn) => {
-      meta.verifies?.forEach((cr) => assertDocExists('change_requests', cr));
-      meta.fixes?.forEach((bug) => assertDocExists('bugs', bug));
-
-      const tags = [
-        `@${id}`,
-        `@${meta.scenario}`,
-        ...(meta.verifies ?? []).map((c) => `@${c}`),
-        ...(meta.fixes ?? []).map((b) => `@${b}`),
-      ];
-
-      // NOTE: Playwright determines which fixtures to inject by parsing the
-      // first parameter of the test function as a string. A non-destructured
-      // parameter name like `(args)` requests zero fixtures — `page`,
-      // `request`, etc. would be undefined inside `fn`. We therefore
-      // explicitly destructure the built-in fixtures the codebase relies on.
-      // If you add a custom fixture via `test.extend()`, list it here too.
-      base(
-        `${meta.scenario}: ${testTitle}`,
-        { tag: tags },
-        async ({ page, request, context, browser, browserName, baseURL }) => {
-          const a = base.info().annotations;
-          a.push({ type: 'use-case', description: id });
-          a.push({ type: 'scenario', description: meta.scenario });
-          meta.verifies?.forEach((c) =>
-            a.push({ type: 'change-request', description: c }),
-          );
-          meta.fixes?.forEach((b) =>
-            a.push({ type: 'bug-fix', description: b }),
-          );
-          await fn({ page, request, context, browser, browserName, baseURL });
-        },
-      );
-    };
-    body(test);
-  });
+  return {
+    tag: [
+      `@${scenario}`,
+      ...(verifies ?? []).map((c) => `@${c}`),
+      ...(fixes ?? []).map((b) => `@${b}`),
+    ],
+    annotation: [
+      { type: 'use-case', description: currentUC },
+      { type: 'scenario', description: scenario },
+      ...(verifies ?? []).map((c) => ({ type: 'change-request', description: c })),
+      ...(fixes ?? []).map((b) => ({ type: 'bug-fix', description: b })),
+    ],
+  };
 }
 
-export function bugTest(bug: BUGId, title: string, body: TestBody): void {
-  assertDocExists('bugs', bug);
-  base(
-    `${bug}: ${title}`,
-    { tag: [`@${bug}`] },
-    async ({ page, request, context, browser, browserName, baseURL }) => {
-      base.info().annotations.push({ type: 'bug-fix', description: bug });
-      await body({ page, request, context, browser, browserName, baseURL });
-    },
-  );
+export function bug(id: BUGId): PlaywrightMeta {
+  assertDocExists('bugs', id);
+  return {
+    tag: [`@${id}`],
+    annotation: [{ type: 'bug-fix', description: id }],
+  };
 }
 
 const cache = new Map<string, string[]>();

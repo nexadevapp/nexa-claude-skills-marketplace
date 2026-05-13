@@ -165,30 +165,38 @@ Otherwise, for every spec under `e2e/**/*.spec.ts`:
    gitignore-style list (one path per line, `#` comments, blank lines skipped)
    and exclude matching specs from the rest of the lens.
 
-2. **Check imports.** Read each remaining spec and verify:
-   - It imports `useCase` and/or `bugTest` from a `./helpers/traced` path (relative
-     paths like `'./helpers/traced'` or `'../helpers/traced'` are both fine).
-   - It does NOT import `test` from `@playwright/test`. The string
-     `import { test` (or `test,` / `, test }`) sourced from `@playwright/test`
-     is a violation. Importing `expect` and types from `@playwright/test` is
-     permitted. Importing `test` solely to use framework hooks
-     (`test.beforeAll`, `test.afterEach`, etc.) is also permitted, but in that
-     case the file must NOT contain any top-level `test(` or `test.describe(`
-     calls — those are the prohibited forms.
+2. **Check imports.** Read each remaining spec and verify it imports at least
+   one of `useCase`, `meta`, or `bug` from a `./helpers/traced` path (relative
+   forms like `'./helpers/traced'` or `'../helpers/traced'` are both fine).
+   `test` and `expect` imported from `@playwright/test` are expected and
+   required — they are not violations.
 
-3. **Check usage.** Verify the spec contains at least one `useCase(` or `bugTest(`
-   call at module scope. A spec under `e2e/` that imports neither is a
-   violation regardless of import shape.
+3. **Check `test(...)` calls.** Walk every `test('...', ..., async (...) => ...)`
+   call in the file (excluding framework hooks like `test.beforeAll`,
+   `test.afterEach`, `test.afterAll`). Each one must pass a `meta(...)` or
+   `bug(...)` call as its second argument:
+   - Inside a `useCase('UC-NNN', '...', () => { ... })` body, each `test()`
+     must use `meta({ scenario, verifies?, fixes? })`.
+   - At module scope (outside any `useCase()`), each `test()` must use
+     `bug('BUG-NNN')`.
+   A `test()` call whose second arg is a plain object literal, a non-helper
+   function call, or absent is a violation.
 
-4. **Check references.** For every `useCase('UC-NNN', ...)`, `verifies: ['CR-NNN', ...]`,
-   and `fixes: ['BUG-NNN', ...]` literal: confirm the referenced doc exists
-   under `docs/use_cases/`, `docs/change_requests/`, or `docs/bugs/`. The
-   helper enforces this at runtime; the audit catches it before a test run.
+4. **Check `test.describe(...)` is not used.** The helper's `useCase()` is the
+   canonical group wrapper. A raw `test.describe(...)` call is a violation —
+   convert it to `useCase()` (or, if the group has no UC, lift the tests to
+   module scope).
 
-5. **Check the spec for a `BUG-NNN` referenced in `fixes:`.** If the bug file
-   shows a status of `RESOLVED` (or equivalent), this is correct. If the status
-   is still `OPEN`, the test is guarding against a regression of an unfixed bug
-   — flag as Minor and ask whether the bug should be marked resolved.
+5. **Check references.** For every `useCase('UC-NNN', ...)`, `meta({ scenario: '...', verifies: ['CR-NNN', ...], fixes: ['BUG-NNN', ...] })`,
+   and `bug('BUG-NNN')` literal: confirm the referenced doc exists under
+   `docs/use_cases/`, `docs/change_requests/`, or `docs/bugs/`. The helper
+   enforces this at runtime; the audit catches it before a test run.
+
+6. **Check the spec for a `BUG-NNN` referenced in `fixes:` or via `bug()`.**
+   If the bug file shows a status of `RESOLVED` (or equivalent), this is
+   correct. If the status is still `OPEN`, the test is guarding against a
+   regression of an unfixed bug — flag as Minor and ask whether the bug should
+   be marked resolved.
 
 For each violation, report file path, line number, and the specific rule
 broken. Severity: **Major** during rollout (advisory). Once one full sprint

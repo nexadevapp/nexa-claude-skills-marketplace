@@ -64,50 +64,62 @@ A typical use case produces **3–8 tests total**, not dozens.
 
 ## Traceability Convention
 
-All E2E tests use the typed helper at `e2e/helpers/traced.ts`. Raw `test()` and
-`test.describe()` from `@playwright/test` are **prohibited** for use-case-anchored
-specs — the helper enforces structured links from each test to its use case,
-change requests, and bug fixes, both in the HTML report and via filterable tags
-(`npx playwright test --grep @CR-003`).
+E2E tests use the helper at `e2e/helpers/traced.ts` to link each test to its
+use case, change requests, and bug fixes. Tests are registered with the
+**imported** `test` from `@playwright/test` — never a callback-scoped
+parameter — so IDE plugins (WebStorm/IntelliJ, VSCode Playwright) can
+statically discover and run each test from the gutter.
 
-**Anchor each test file to one use case using `useCase()`:**
+The helper exports three functions:
+
+- **`useCase(id, title, body)`** wraps a group of tests in a UC-tagged
+  `test.describe()` block and validates the UC doc exists.
+- **`meta({ scenario, verifies?, fixes? })`** returns Playwright's
+  `{ tag, annotation }` second-arg object for a test inside `useCase()`.
+  Validates referenced CR/BUG docs exist.
+- **`bug(id)`** returns the same shape for a pure bug regression test that has
+  no clean UC home. Validates the BUG doc exists.
+
+**Anchor each test file to one or more use cases using `useCase()`:**
 
 ```typescript
-import { useCase } from './helpers/traced';
-import { expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { useCase, meta } from './helpers/traced';
 
-useCase('UC-XXX', '[Use Case Name]', (test) => {
-  test('[end-to-end journey description]', {
-    scenario: 'MSS',
-    verifies: ['CR-NNN'], // optional: change requests this test asserts the delta of
-    fixes: ['BUG-NNN'],   // optional: bugs this test guards against regressing
-  }, async ({ page }) => {
-    // ... test body
-  });
+useCase('UC-XXX', '[Use Case Name]', () => {
+  test('[end-to-end journey description]',
+    meta({
+      scenario: 'MSS',
+      verifies: ['CR-NNN'], // optional: change requests this test asserts the delta of
+      fixes: ['BUG-NNN'],   // optional: bugs this test guards against regressing
+    }),
+    async ({ page }) => {
+      // ... test body
+    });
 
-  test('[alternative flow description]', {
-    scenario: 'AF-1',
-  }, async ({ page }) => {
-    // ... test body
-  });
+  test('[alternative flow description]',
+    meta({ scenario: 'AF-1' }),
+    async ({ page }) => {
+      // ... test body
+    });
 });
 ```
 
-**Multiple UCs per file** (when journeys share a page or flow): call `useCase()` once
-per UC. Each call creates its own describe block.
+**Multiple UCs per file** (when journeys share a page or flow): call `useCase()`
+once per UC. Each call creates its own describe block.
 
 **Pure bug regression tests** (no clean UC home) — file `bug-NNN-*.spec.ts`:
 
 ```typescript
-import { bugTest } from './helpers/traced';
-import { expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { bug } from './helpers/traced';
 
-bugTest('BUG-NNN', '[regression description]', async ({ page }) => {
+test('[regression description]', bug('BUG-NNN'), async ({ page }) => {
   // ... test body
 });
 ```
 
-**Scenario types** (the `scenario` field is required on every `t(...)` call):
+**Scenario types** (the required `scenario` field on `meta({...})`):
 - `'MSS'` — Main Success Scenario (one per UC)
 - `'AF-N'` — Alternative Flow N (e.g., `'AF-1'`, `'AF-2'`)
 - `'EX-N'` — Exception path N
@@ -116,18 +128,12 @@ The helper validates that referenced UCs, CRs, and BUGs exist as files under
 `docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` at registration
 time. A typo'd `CR-002` fails before any browser starts.
 
-**Convention for the scoped test parameter name:** use `test`. Inside the
-`useCase()` callback, this shadows the imported `@playwright/test` `test` — that's
-intentional, since `test()` and `test.describe()` are prohibited there anyway.
-Register framework hooks (`test.beforeAll`, `test.afterEach`, `test.afterAll`)
-at module top level, **outside** any `useCase()` call, where `test` resolves to the
-imported value.
-
-**Importing from `@playwright/test`:** `expect` and types may always be
-imported. `test` may be imported when the file uses framework hooks
-(`test.beforeAll`, `test.afterEach`, `test.afterAll`) at module top level —
-but the file must NEVER call `test('...', ...)` or `test.describe('...', ...)`
-to register tests. Use `useCase()` / `bugTest()` from the helper for that.
+**Why the imported `test` (not a callback parameter):** IDE plugins detect
+runnable tests by AST-resolving the `test` identifier back to the
+`@playwright/test` import. A callback-scoped `test` parameter looks identical
+in source but resolves to a different binding, breaking gutter run/debug.
+`useCase()`'s body takes no parameters — call `test()` directly inside it,
+exactly the same way you would at module scope.
 
 **Inline comments** — when a single line/assertion exists *because of* a CR or
 BUG, leave a one-line marker comment so a code reader sees it without reading
@@ -162,7 +168,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - **Sleep or wait between test retries** — when tests fail, diagnose and fix the root cause immediately, then re-run. Never use `sleep`, `setTimeout`, or any delay between retry attempts. The fix-then-rerun cycle must be immediate
 - **Ignore or work around database-dependent tests** — Testcontainers provides the database; if Docker is not running, stop and tell the user instead of skipping DB tests
 - **Write no-op or trivially-true tests** — every test must contain meaningful assertions that would fail if the feature were broken (e.g., never assert `expect(true).toBe(true)` or assert only that a page loads without checking content)
-- **Import `test` or `test.describe` from `@playwright/test`** — use `useCase()` / `bugTest()` from `./helpers/traced` instead. Only `expect` and types may be imported directly. This rule has no exceptions for use-case-anchored specs (see Traceability Convention)
+- **Register a test without `meta(...)` or `bug(...)` as its second arg** — every `test(...)` call in an E2E spec must be tagged via the helper, either with `meta({ scenario, verifies?, fixes? })` (when inside a `useCase()` body) or `bug(id)` (for a pure bug regression). Raw `test('title', async (...) => ...)` with no meta object is a violation — it loses the traceability link, the HTML report annotation, and the registration-time doc validation
 
 ## Nexa Rules Gate
 
@@ -345,48 +351,52 @@ test.afterAll(async ({ request }) => {
 ### Login via UI (start of each test)
 
 ```typescript
-useCase('UC-XXX', '[Use Case Name]', (test) => {
-  test('user signs in and lands on dashboard', { scenario: 'MSS' }, async ({ page }) => {
-    // Start at login — the ONLY page.goto() allowed
-    await page.goto('/login');
-    await expect(page.getByLabel('Email')).toBeVisible();
+useCase('UC-XXX', '[Use Case Name]', () => {
+  test('user signs in and lands on dashboard',
+    meta({ scenario: 'MSS' }),
+    async ({ page }) => {
+      // Start at login — the ONLY page.goto() allowed
+      await page.goto('/login');
+      await expect(page.getByLabel('Email')).toBeVisible();
 
-    // Log in as the suite user
-    await page.getByLabel('Email').fill(suiteUser.email);
-    await page.getByLabel('Password').fill(suiteUser.plainPassword);
-    await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+      // Log in as the suite user
+      await page.getByLabel('Email').fill(suiteUser.email);
+      await page.getByLabel('Password').fill(suiteUser.plainPassword);
+      await page.getByRole('button', { name: 'Sign in' }).click();
+      await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
-    // ... continue the journey
-  });
+      // ... continue the journey
+    });
 });
 ```
 
 ### Per-Test User Override
 
 ```typescript
-useCase('UC-XXX', '[Use Case Name]', (test) => {
-  test('suspended user sees account-locked screen', { scenario: 'AF-2' }, async ({ page, request }) => {
-    // Create a custom user for this test
-    const suspendedUser = await createTestUser(request, {
-      accountType: 'BUYER',
-      status: 'SUSPENDED',
+useCase('UC-XXX', '[Use Case Name]', () => {
+  test('suspended user sees account-locked screen',
+    meta({ scenario: 'AF-2' }),
+    async ({ page, request }) => {
+      // Create a custom user for this test
+      const suspendedUser = await createTestUser(request, {
+        accountType: 'BUYER',
+        status: 'SUSPENDED',
+      });
+
+      try {
+        await page.goto('/login');
+        await expect(page.getByLabel('Email')).toBeVisible();
+        await page.getByLabel('Email').fill(suspendedUser.email);
+        await page.getByLabel('Password').fill(suspendedUser.plainPassword);
+        await page.getByRole('button', { name: 'Sign in' }).click();
+
+        // Verify suspended user sees the locked screen
+        await expect(page.getByText('Account suspended')).toBeVisible();
+      } finally {
+        // Always clean up the per-test user
+        await deleteTestUser(request, suspendedUser.id);
+      }
     });
-
-    try {
-      await page.goto('/login');
-      await expect(page.getByLabel('Email')).toBeVisible();
-      await page.getByLabel('Email').fill(suspendedUser.email);
-      await page.getByLabel('Password').fill(suspendedUser.plainPassword);
-      await page.getByRole('button', { name: 'Sign in' }).click();
-
-      // Verify suspended user sees the locked screen
-      await expect(page.getByText('Account suspended')).toBeVisible();
-    } finally {
-      // Always clean up the per-test user
-      await deleteTestUser(request, suspendedUser.id);
-    }
-  });
 });
 ```
 
@@ -488,11 +498,11 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 8. Ensure the test user helper exists (`e2e/helpers/test-user.ts`); create from template if missing
 9. Ensure the traceability helper exists (`e2e/helpers/traced.ts`); create from [templates/traced.ts](templates/traced.ts) if missing. Do not modify the template.
 10. Ensure the E2E users API endpoint exists (`app/api/e2e/users/route.ts` and `app/api/e2e/users/[id]/route.ts`); create from template if missing
-11. Create test file using the template. **Wrap every test in `useCase()` from `./helpers/traced` — never use raw `test()` or `test.describe()`** (see Traceability Convention)
+11. Create test file using the template. **Group every UC's tests inside `useCase()` from `./helpers/traced`, and pass `meta({ scenario, ... })` (or `bug(id)` for pure regressions) as each test's second arg** (see Traceability Convention)
 12. For each journey test:
     - Set up suite-level user in `test.beforeAll` (create via test API, log in via UI)
     - For tests needing a custom user, create a per-test user override (see Common Patterns)
-    - Read the spec for the use case and identify which CR-NNN and BUG-NNN IDs (if any) the test verifies — populate the `verifies` and `fixes` arrays in the `test(...)` meta object accordingly
+    - Read the spec for the use case and identify which CR-NNN and BUG-NNN IDs (if any) the test verifies — populate the `verifies` and `fixes` arrays in the `meta(...)` call accordingly
     - `page.goto()` to the login page (the **only** goto in the test), log in via UI
     - After every navigation or action that loads a new page, wait for a **specific UI element** (heading, table row, form field) — never `waitForLoadState('networkidle')`
     - Navigate through each screen by clicking links, buttons, and submitting forms

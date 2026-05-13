@@ -81,20 +81,26 @@ All code changes must happen on a sprint branch (`sprint-*`) created by `/sprint
 If the current branch is `main` or `master` and the user asks to implement something,
 redirect them to `/sprint-kickoff` first.
 
-### Rule 7: E2E tests must use the traceability helper
+### Rule 7: E2E tests must be tagged via the traceability helper
 
-Never write Playwright E2E tests with raw `test()` or `test.describe()` from
-`@playwright/test`. All use-case-anchored E2E specs must use `useCase()` from
-`e2e/helpers/traced.ts`; pure bug regression specs must use `bugTest()` from the
-same helper. Only `expect` and types may be imported directly from
-`@playwright/test`. Framework hooks (`test.beforeAll`, `test.afterEach`, etc.)
-remain on the imported `test` object — the prohibition is specifically on
-defining tests with `test(...)` or `test.describe(...)`.
+Every Playwright `test(...)` call in `e2e/**/*.spec.ts` must pass a `meta(...)`
+or `bug(...)` call (from `e2e/helpers/traced.ts`) as its second argument:
 
-The helper enforces structured links from each test to its use case, change
-requests (CR-NNN), and bug fixes (BUG-NNN), and validates at registration time
-that referenced docs exist under `docs/use_cases/`, `docs/change_requests/`,
-and `docs/bugs/`.
+- Tests grouped under a use case live inside `useCase('UC-NNN', '...', () => { ... })`
+  and use `meta({ scenario, verifies?, fixes? })` as their second arg.
+- Pure bug regression tests (no UC home) live at module scope and use
+  `bug('BUG-NNN')` as their second arg.
+- `test.describe(...)` is not used directly — `useCase()` is the canonical
+  group wrapper.
+
+`test` and `expect` are imported normally from `@playwright/test`. The reason
+`useCase()` takes a no-arg callback (not `(test) => {...}`) is to keep `test`
+resolving to the imported symbol so IDE plugins (WebStorm/IntelliJ, VSCode
+Playwright) can statically discover each test and run it from the gutter.
+
+The helper validates at registration time that referenced UC/CR/BUG docs exist
+under `docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` — a typo'd
+`CR-002` fails before any browser starts.
 
 Legacy specs predating helper adoption may be listed in `e2e/.tracedignore`
 (gitignore-style, one path per line) to opt out of enforcement; new specs must
@@ -127,7 +133,7 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
    4. Never ask for a preferred use case number
    5. Always use the next available sequential number
    6. Never write code on main/master — use a sprint branch
-   7. E2E tests must use the traceability helper (useCase() / bugTest())
+   7. E2E tests must be tagged via the traceability helper (meta({...}) / bug() inside useCase())
 
    These rules are enforced by the Nexa Rules Gate on every skill invocation.
    ```

@@ -53,7 +53,10 @@ nexa-claude-marketplace/
 │       ├── setup-playwright-ci/
 │       ├── setup-quality-ci/
 │       ├── aws-dockerize/
-│       └── aws-setup-apprunner/
+│       ├── aws-setup-apprunner/
+│       ├── tdd-playwright-test/    # TDD: RED-author E2E tests before implementation
+│       ├── tdd-implement/          # TDD: inner Vitest RED-GREEN-REFACTOR loop
+│       └── tdd-deliver-use-case/   # TDD: test-first delivery orchestrator
 └── README.md
 ```
 
@@ -127,6 +130,18 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Completion   | `/sprint-rework`        | Reset sprint branch to main and re-deliver after PR review           |
 | Infrastructure | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
 | Infrastructure | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |
+
+### Next.js — TDD mode (double-loop test-driven development)
+
+Parallel pipeline that flips the construction order: tests are authored **before**
+implementation. Outer loop = Playwright E2E (ATDD); inner loop = Vitest unit TDD per
+component. The non-TDD skills above remain untouched — these are siblings, not replacements.
+
+| Phase        | Skill (slash command)        | Description                                                                |
+|--------------|------------------------------|----------------------------------------------------------------------------|
+| Construction | `/tdd-playwright-test`       | Author RED Playwright E2E tests from spec + design before implementation exists |
+| Construction | `/tdd-implement`             | Drive implementation from failing tests via inner Vitest RED-GREEN-REFACTOR loop |
+| Construction | `/tdd-deliver-use-case`      | Test-first delivery pipeline: RED authoring → RED verification → GREEN drive → coverage sanity |
 
 ## Git
 

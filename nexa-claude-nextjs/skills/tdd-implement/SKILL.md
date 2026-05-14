@@ -76,6 +76,12 @@ All "DO NOT" items from `/implement/SKILL.md` apply. In addition:
   refactor with the unit test as a safety net.
 - **Do not skip the REFACTOR step silently.** Even a one-line cleanup (rename, extract
   constant, dedupe) counts — but the loop must visit the refactor phase explicitly.
+- **Do not group RED, GREEN, and REFACTOR changes into a single commit.** Each phase is
+  its own commit (see *Per-Cycle Commit Discipline*).
+- **Do not stage production code in a RED commit.** The RED commit must contain only the
+  new failing unit test (and an empty file stub if needed to make the import resolve).
+- **Do not use `--no-verify` or amend prior cycle commits.** The git log is the audit
+  trail — keep it linear and honest.
 
 ## Inner Loop Discipline (per component)
 
@@ -84,12 +90,55 @@ For every component, hook, action, or route discovered from a failing E2E:
 1. **RED** — write the smallest Vitest test that names the next behaviour the E2E needs.
    Run `npx vitest run <path>`. Confirm it fails for the right reason (not a missing
    import — make the file exist as an empty export if needed; fail on the assertion).
+   **Commit** the test file (and the empty stub, if created):
+   `test($ARGUMENTS): [RED] <component> — <behaviour>`. Record the SHA.
 2. **GREEN** — write the minimum implementation that makes the unit test pass. Resist
-   adding anything the test does not demand.
-3. **REFACTOR** — improve clarity, naming, structure. Re-run the unit test. Must stay
-   green. If a refactor breaks the test, revert.
+   adding anything the test does not demand. Re-run `npx vitest run <path>`; must pass.
+   **Commit** the production change:
+   `feat($ARGUMENTS): [GREEN] <component> — <behaviour>` (use `fix` for `BUG-XXX`).
+   Record the SHA.
+3. **REFACTOR** — improve clarity, naming, structure. Re-run the unit test; must stay
+   green. If a refactor breaks the test, revert. **Commit** the cleanup:
+   `refactor($ARGUMENTS): [REFACTOR] <description>`. Record the SHA. If the code is
+   already clean, write a no-op refactor commit with `--allow-empty` and the body
+   `no cleanup needed — code already minimal` — this proves the phase was visited.
 4. Move to the next behaviour. Re-run the outer E2E periodically (every 2-3 inner cycles,
    or whenever you suspect the next E2E assertion is reachable).
+
+## Per-Cycle Commit Discipline
+
+The inner loop is self-reported, so the git log is the **only externally observable proof**
+that RED → GREEN → REFACTOR happened in order. The orchestrator (`/tdd-deliver-use-case`)
+inspects the log via `git log --oneline <rollback-checkpoint>..HEAD` and expects to see
+the pattern:
+
+```
+[RED]      test($ARGUMENTS): ...
+[GREEN]    feat($ARGUMENTS): ...
+[REFACTOR] refactor($ARGUMENTS): ...   ← may be --allow-empty
+[RED]      test($ARGUMENTS): ...
+[GREEN]    feat($ARGUMENTS): ...
+...
+```
+
+Rules:
+
+- Three commits per cycle, in order RED → GREEN → REFACTOR. Never reorder, never merge.
+- Each commit touches **only** the files relevant to that phase. A RED commit with a
+  production file in it is a discipline failure; revert and re-stage.
+- The subject line MUST carry the `[RED]`, `[GREEN]`, or `[REFACTOR]` tag so the
+  orchestrator can grep for it.
+- The use case ID in the scope (`$ARGUMENTS`) is mandatory — it ties every cycle commit
+  to the use case being delivered.
+- Cross-cycle bookkeeping (DECISIONS.md additions, lint fixes from `/code-quality`,
+  i18n key additions) belongs in a separate housekeeping commit at the end —
+  `chore($ARGUMENTS): housekeeping` — not folded into a cycle commit.
+- No `--no-verify`. No `--amend` of an earlier cycle commit. No squashing.
+
+If the pre-commit hook fails on a RED commit because the new test fails (some projects
+gate commits on `vitest run`), `--no-verify` is still forbidden. Configure the hook to
+allow `[RED]` commits instead, or surface the conflict to the orchestrator — do not
+bypass.
 
 ## Component Discovery from a Failing E2E
 
@@ -114,20 +163,29 @@ Each row is one inner-TDD pass. Build *only* what the failure demands.
    `npx playwright test` to confirm they are still in valid RED. If they pass, stop —
    either the feature is already implemented (run `/deliver-use-case`, not this skill) or
    the RED phase is broken (re-spawn `/tdd-playwright-test`).
-6. From the **first failing E2E assertion**, identify the smallest missing component. Add
+6. Record the starting commit: `git rev-parse HEAD` — this is the cycle-log baseline. The
+   orchestrator already has a rollback checkpoint; this one is for verifying inner-loop
+   commits.
+7. From the **first failing E2E assertion**, identify the smallest missing component. Add
    it to a working list of "components to TDD-build."
-7. For that component, run the **Inner Loop Discipline** above (RED → GREEN → REFACTOR).
-8. Re-run the outer E2E. One of three outcomes:
+8. For that component, run the **Inner Loop Discipline** above (RED → GREEN → REFACTOR),
+   committing after each phase per *Per-Cycle Commit Discipline*.
+9. Re-run the outer E2E. One of three outcomes:
    - **Same assertion still fails** — inner work was incomplete or wrong. Diagnose and
-     continue at step 7 for the same component.
-   - **Different assertion fails** — progress. Go back to step 6 with the new failure.
-   - **All outer tests pass** — the outer loop is GREEN. Continue to step 9.
-9. Run `npx vitest run` (full unit suite) — must pass. Run `npx next build` — must
-   succeed.
-10. Run `/code-quality`.
-11. Record DECISIONS.md entries — same as `/implement` step 13. INFERRED decisions get
-    flagged for review.
-12. Report back (see "What to Return").
+     continue at step 8 for the same component.
+   - **Different assertion fails** — progress. Go back to step 7 with the new failure.
+   - **All outer tests pass** — the outer loop is GREEN. Continue to step 10.
+10. Run `npx vitest run` (full unit suite) — must pass. Run `npx next build` — must
+    succeed.
+11. Run `/code-quality`. Commit any auto-fixes as
+    `chore($ARGUMENTS): housekeeping — lint/format`.
+12. Record DECISIONS.md entries — same as `/implement` step 13. INFERRED decisions get
+    flagged for review. Commit as `chore($ARGUMENTS): housekeeping — decisions`.
+13. Run `git log --oneline <baseline-from-step-6>..HEAD` and confirm the
+    `[RED] → [GREEN] → [REFACTOR]` pattern appears once per component built. If a phase
+    is missing, the inner loop was skipped — surface it; do not fabricate a backfill
+    commit.
+14. Report back (see "What to Return").
 
 ## Iteration Limits
 
@@ -145,10 +203,26 @@ A structured report with:
 2. Test files created or extended (paths) — both inner unit tests and any integration
    tests if the use case demanded them.
 3. Production files created or modified (paths).
-4. Final `npx playwright test` output (must show all outer tests passing).
-5. Final `npx vitest run` output (must show all unit tests passing).
-6. `npx next build` exit status.
-7. DECISIONS.md additions, with EXPLICIT vs INFERRED provenance.
+4. **Cycle Log** — per component, the three commit SHAs (RED, GREEN, REFACTOR) and
+   their subject lines. Empty REFACTOR commits are explicitly marked `--allow-empty`.
+
+   ```
+   ## Cycle Log
+
+   ### Component: LoginForm
+   - RED      a1b2c3d  test(UC-005): [RED] LoginForm — renders labelled email input
+   - GREEN    e4f5g6h  feat(UC-005): [GREEN] LoginForm — renders labelled email input
+   - REFACTOR i7j8k9l  refactor(UC-005): [REFACTOR] LoginForm — extract field component
+
+   ### Component: authenticate (server action)
+   - RED      m0n1o2p  test(UC-005): [RED] authenticate — rejects invalid credentials
+   - GREEN    q3r4s5t  feat(UC-005): [GREEN] authenticate — rejects invalid credentials
+   - REFACTOR u6v7w8x  refactor(UC-005): [REFACTOR] no cleanup needed (--allow-empty)
+   ```
+5. Final `npx playwright test` output (must show all outer tests passing).
+6. Final `npx vitest run` output (must show all unit tests passing).
+7. `npx next build` exit status.
+8. DECISIONS.md additions, with EXPLICIT vs INFERRED provenance.
 
 ## Nexa Rules Gate
 

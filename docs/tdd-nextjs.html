@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDD in Next.js: Vitest & Playwright</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Slate and Indigo with warm neutral backgrounds (slate-50, slate-800, indigo-600) -->
+    <!-- Application Structure Plan: The SPA uses a dashboard format. It starts with an executive summary answering the core question. Then, it features an interactive 'Double Loop' HTML diagram explaining the relationship between E2E (Playwright) and Unit (Vitest) TDD. Finally, it uses a Chart.js visualization to compare the tools' characteristics within the TDD cycle. This guides the user from high-level philosophy to practical application. -->
+    <!-- Visualization & Content Choices: 1. Core Answer: Styled text blocks for immediate clarity. 2. Double Loop Diagram: Interactive HTML/Tailwind grid (NO SVG) to teach ATDD vs Unit TDD flow. 3. Tool Comparison: Chart.js Radar chart comparing Vitest/Playwright characteristics to inform tool expectations. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+        .step-card { transition: all 0.2s ease-in-out; cursor: pointer; }
+        .step-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .step-active { border-color: #4f46e5; background-color: #e0e7ff; }
+    </style>
+</head>
+<body class="antialiased">
+
+<div class="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+
+    <header class="mb-12 text-center">
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4">
+            TDD in Next.js Architecture
+        </h1>
+        <p class="text-xl text-slate-600 max-w-3xl mx-auto">
+            An interactive guide to applying Test-Driven Development using <span class="font-semibold text-indigo-600">Vitest</span> for unit tests and <span class="font-semibold text-indigo-600">Playwright</span> for end-to-end tests.
+        </p>
+    </header>
+
+    <section class="mb-16 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-8">
+            <h2 class="text-2xl font-bold mb-4 flex items-center">
+                <span class="text-3xl mr-3">💡</span> The Core Question
+            </h2>
+            <p class="text-lg text-slate-700 leading-relaxed mb-6">
+                <strong>Does TDD make sense for both Vitest (Unit) and Playwright (E2E)?</strong><br><br>
+                Yes, but they operate on entirely different feedback loops. TDD is famously associated with the rapid, millisecond feedback of Unit Tests (Vitest). However, TDD also applies to E2E tests (Playwright) through a methodology known as <strong>Acceptance Test-Driven Development (ATDD)</strong> or Behavior-Driven Development (BDD).
+            </p>
+            <div class="grid md:grid-cols-2 gap-6 mt-8">
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-indigo-700 mb-2">🧪 Vitest (The Inner Loop)</h3>
+                    <p class="text-slate-600">
+                        Highly granular. You write a failing test for a specific Next.js component, hook, or utility function. You make it pass, then refactor. The feedback loop is almost instantaneous.
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                    <h3 class="text-xl font-bold text-indigo-700 mb-2">🎭 Playwright (The Outer Loop)</h3>
+                    <p class="text-slate-600">
+                        Broad scope. You write a failing E2E test defining a complete user journey (e.g., "User logs in"). It drives the overarching feature requirements. The feedback loop is slower but guarantees actual business value.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-16">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2">The Double-Loop TDD Workflow</h2>
+            <p class="text-slate-600">Interact with the phases below to understand how Playwright and Vitest interact during feature development in a Next.js application.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-5 gap-8 items-start">
+
+            <div class="lg:col-span-2 space-y-4">
+                <div class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Outer Loop (ATDD)</div>
+
+                <div id="btn-step1" class="step-card border-2 border-slate-200 rounded-xl p-4 bg-white" onclick="updateStep('step1')">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-800">1. Failing E2E Test</span>
+                        <span class="text-red-500 text-xl">🔴</span>
+                    </div>
+                    <div class="text-sm text-slate-500 mt-1">Playwright</div>
+                </div>
+
+                <div class="pl-8 border-l-2 border-dashed border-slate-300 ml-4 py-2 space-y-4">
+                    <div class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-2">Inner Loop (Unit TDD)</div>
+
+                    <div id="btn-step2" class="step-card border-2 border-slate-200 rounded-xl p-4 bg-white" onclick="updateStep('step2')">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800">2. Failing Unit Test</span>
+                            <span class="text-red-500 text-xl">🔴</span>
+                        </div>
+                        <div class="text-sm text-slate-500 mt-1">Vitest</div>
+                    </div>
+
+                    <div id="btn-step3" class="step-card border-2 border-slate-200 rounded-xl p-4 bg-white" onclick="updateStep('step3')">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800">3. Pass Unit Test</span>
+                            <span class="text-green-500 text-xl">🟢</span>
+                        </div>
+                        <div class="text-sm text-slate-500 mt-1">Vitest / Next.js</div>
+                    </div>
+
+                    <div id="btn-step4" class="step-card border-2 border-slate-200 rounded-xl p-4 bg-white" onclick="updateStep('step4')">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800">4. Refactor Code</span>
+                            <span class="text-yellow-500 text-xl">🟡</span>
+                        </div>
+                        <div class="text-sm text-slate-500 mt-1">Vitest</div>
+                    </div>
+                    <div class="text-xs text-slate-400 italic mt-2 text-center">↻ Repeat until component is complete</div>
+                </div>
+
+                <div id="btn-step5" class="step-card border-2 border-slate-200 rounded-xl p-4 bg-white" onclick="updateStep('step5')">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-800">5. Passing E2E Test</span>
+                        <span class="text-green-500 text-xl">🟢</span>
+                    </div>
+                    <div class="text-sm text-slate-500 mt-1">Playwright</div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 bg-slate-800 rounded-2xl p-8 text-white shadow-xl h-full flex flex-col justify-center min-h-[300px]">
+                <div id="detail-panel">
+                    <div class="text-5xl mb-4">👈</div>
+                    <h3 class="text-2xl font-bold mb-4 text-indigo-300">Select a Step</h3>
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        Click on any step in the TDD cycle on the left to see what happens under the hood during Next.js development.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="mb-16">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">Metrics & Characteristics</h2>
+                <p class="text-slate-600">Comparing the testing layers to understand their roles and constraints in a TDD environment.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="chart-container">
+                    <canvas id="tddChart"></canvas>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Key Takeaways</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2 mt-1">■</span>
+                            <div>
+                                <strong class="block text-slate-900">Execution Speed</strong>
+                                <span class="text-slate-600 text-sm">Vitest runs in milliseconds, making it ideal for the rapid Red-Green-Refactor loop. Playwright launches browsers, making it too slow for minute-by-minute TDD.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-500 mr-2 mt-1">■</span>
+                            <div>
+                                <strong class="block text-slate-900">Confidence Level</strong>
+                                <span class="text-slate-600 text-sm">Playwright gives maximum confidence that the application actually works for the user. Vitest only proves isolated components work technically.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-slate-400 mr-2 mt-1">■</span>
+                            <div>
+                                <strong class="block text-slate-900">TDD Iteration Suitability</strong>
+                                <span class="text-slate-600 text-sm">You should spend 80% of your TDD time in Vitest (Inner Loop) building the blocks, and 20% in Playwright (Outer Loop) verifying the assembled blocks.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    const stepData = {
+        step1: {
+            icon: "🎭",
+            title: "1. The Acceptance Test",
+            text: "Before writing any Next.js code, you write a Playwright test based on a user story. <br><br>Example: <code>await page.goto('/login'); await page.fill('#email', 'user@test.com');</code><br><br>This test <b>fails</b> immediately because the /login page doesn't exist yet. This failure is good; it sets your target.",
+            color: "text-red-400"
+        },
+        step2: {
+            icon: "🧪",
+            title: "2. The Unit Test",
+            text: "You drop down to Vitest. You need a LoginForm component. You write a test: <br><br><code>expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();</code><br><br>It <b>fails</b> because the component isn't created.",
+            color: "text-red-400"
+        },
+        step3: {
+            icon: "💻",
+            title: "3. Implementation",
+            text: "You write the minimal Next.js/React code to make the Vitest test pass. You create the LoginForm.tsx, add the button, and wire up the basic state.<br><br>The Vitest test goes <b>Green</b>. You have working, isolated code.",
+            color: "text-green-400"
+        },
+        step4: {
+            icon: "🛠️",
+            title: "4. Refactoring",
+            text: "Now that tests pass, you refactor. You style with Tailwind, extract custom hooks, or optimize rendering. Because Vitest is constantly running in watch mode, you instantly know if you break anything. <br><br><b>Yellow phase</b> complete.",
+            color: "text-yellow-400"
+        },
+        step5: {
+            icon: "🚀",
+            title: "5. Feature Complete",
+            text: "After building all necessary components via the inner loop, you assemble them on the Next.js page. <br><br>You run your initial Playwright test again. The browser automation completes successfully. The outer loop goes <b>Green</b>. The feature is truly done.",
+            color: "text-green-400"
+        }
+    };
+
+    function updateStep(stepId) {
+        document.querySelectorAll('.step-card').forEach(el => {
+            el.classList.remove('step-active');
+        });
+        document.getElementById('btn-' + stepId).classList.add('step-active');
+
+        const data = stepData[stepId];
+        const panel = document.getElementById('detail-panel');
+
+        panel.innerHTML = `
+                <div class="text-5xl mb-4">${data.icon}</div>
+                <h3 class="text-2xl font-bold mb-4 ${data.color}">${data.title}</h3>
+                <p class="text-slate-300 text-lg leading-relaxed">${data.text}</p>
+            `;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('tddChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: [
+                    'Execution Speed',
+                    'TDD Loop Suitability',
+                    'User Confidence',
+                    'Setup Simplicity',
+                    'Isolation / Debugging'
+                ],
+                datasets: [{
+                    label: 'Vitest (Unit)',
+                    data: [95, 100, 30, 85, 90],
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 2
+                }, {
+                    label: 'Playwright (E2E)',
+                    data: [20, 30, 95, 50, 40],
+                    backgroundColor: 'rgba(20, 184, 166, 0.2)',
+                    borderColor: 'rgba(20, 184, 166, 1)',
+                    pointBackgroundColor: 'rgba(20, 184, 166, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0,0,0,0.1)' },
+                        grid: { color: 'rgba(0,0,0,0.1)' },
+                        pointLabels: {
+                            font: { size: 12, family: "'Segoe UI', sans-serif" },
+                            color: '#475569'
+                        },
+                        ticks: { display: false, min: 0, max: 100 }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) { label += context.parsed.r + '%'; }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

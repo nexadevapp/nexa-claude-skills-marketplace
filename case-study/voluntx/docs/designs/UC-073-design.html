@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-073 — View Company Subscription Plans — VoluntX Design</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="current-tailwind-config.js"></script>
+<link rel="stylesheet" href="current-theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&subset=latin-ext&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Outfit', sans-serif; }
+
+  /* ── Design Artifact Chrome (sibling of UC-068) ─────────────────────────────── */
+  .design-header { background: linear-gradient(135deg, #18432a 0%, #2c7a4b 55%, #d4a853 130%); color: white; padding: 2rem; border-radius: 1.5rem; margin-bottom: 2rem; }
+  .design-header h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif; }
+  .design-header p { font-size: 0.95rem; opacity: 0.92; margin-bottom: 1rem; line-height: 1.55; font-family: 'Lora', serif; }
+  .design-meta { display: flex; flex-wrap: wrap; gap: 0.55rem; font-size: 0.78rem; }
+  .design-meta span { background: rgba(255,255,255,0.16); padding: 0.3rem 0.85rem; border-radius: 9999px; backdrop-filter: blur(4px); }
+  .design-section-divider { border-top: 2px dashed #d6cebc; margin: 2.5rem 0 1rem; }
+  .design-section-title { font-size: 1.1rem; font-weight: 700; color: #18432a; margin-bottom: 1rem; }
+  .design-annotation { background: #fbf7ef; border-left: 4px solid #2c7a4b; padding: 1rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #1f3a2a; line-height: 1.6; }
+  .design-annotation code { background: rgba(44,122,75,0.10); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #18432a; }
+  .design-annotation ul { margin-top: 0.5rem; }
+  .design-screen { border: 2px solid #d6cebc; border-radius: 1rem; overflow: hidden; margin-bottom: 2rem; background: #f7f1e3; }
+  .screen-label { background: #18432a; color: #ecdfc1; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; padding: 0.4rem 1rem; letter-spacing: 0.04em; display: flex; justify-content: space-between; align-items: center; }
+  .screen-label .right { color: #d4a853; }
+
+  /* ── State / Alt badges ─────────────────────────────────────────────────────── */
+  .state-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.65rem; border-radius: 9999px; vertical-align: middle; }
+  .state-mss { background: #d4ead9; color: #18432a; }
+  .state-alt { background: #f9f0d4; color: #5e3e20; }
+  .state-err { background: #fde2e2; color: #b91c1c; }
+  .state-ok  { background: #d1f0d8; color: #166534; }
+  .state-info{ background: #ecdfc1; color: #5e3e20; }
+
+  /* ── Animations ─────────────────────────────────────────────────────────────── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-fade-up { animation: fadeUp 0.4s ease both; }
+  @keyframes shimmer { 0%,100%{background-position:200% 0} 50%{background-position:-200% 0} }
+  .shimmer { background: linear-gradient(90deg, #ecdfc1 25%, #fbf7ef 50%, #ecdfc1 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+  @keyframes priceFade { from { opacity:0; transform: translateY(-4px); } to { opacity:1; transform: translateY(0); } }
+  .price-anim { animation: priceFade 0.35s ease both; }
+  @keyframes wgShimmer { 0%,100% { background-position: 200% 0; } 50% { background-position: -200% 0; } }
+  .wg-shimmer-overlay { position: relative; overflow: hidden; }
+  .wg-shimmer-overlay::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(212,168,83,0.10), transparent);
+    background-size: 200% 100%; animation: wgShimmer 6s linear infinite;
+    border-radius: inherit;
+  }
+
+  /* ── Grain overlay (premium feel) ───────────────────────────────────────────── */
+  .grain { position: relative; }
+  .grain::after {
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:0.04;
+    background-image: radial-gradient(rgba(0,0,0,0.6) 1px, transparent 1px);
+    background-size: 3px 3px; border-radius: inherit;
+  }
+
+  /* ── Plan card hover lift ───────────────────────────────────────────────────── */
+  .plan-card { transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+  .plan-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px -16px rgba(24,67,42,0.20); }
+  .plan-card[data-current="true"] { box-shadow: 0 0 0 4px rgba(44,122,75,0.16), 0 18px 36px -16px rgba(24,67,42,0.22); }
+
+  /* ── States panel (designer chrome) ─────────────────────────────────────────── */
+  .states-panel {
+    position: sticky; top: 0.75rem; z-index: 40; background: white;
+    border: 2px solid #d6cebc; border-radius: 1rem; padding: 1rem 1.25rem;
+    box-shadow: 0 10px 28px -10px rgba(24,67,42,0.18); margin-bottom: 2rem;
+  }
+  .states-panel h3 { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #18432a; margin-bottom: 0.6rem; }
+  .state-btn {
+    font-size: 0.78rem; font-weight: 500; padding: 0.35rem 0.85rem; border-radius: 9999px;
+    background: #f7f1e3; color: #18432a; border: 1px solid transparent; cursor: pointer;
+    font-family: 'Outfit', sans-serif; transition: all 0.18s ease;
+  }
+  .state-btn:hover { background: #ecdfc1; }
+  .state-btn.active { background: #2c7a4b; color: white; box-shadow: 0 4px 12px -4px rgba(44,122,75,0.45); }
+  .state-btn:focus-visible { outline: 2px solid #d4a853; outline-offset: 2px; }
+  .state-btn .grp { font-size: 0.65rem; opacity: 0.65; margin-left: 0.25rem; }
+
+  /* ── HP cycle toggle (segmented inside HP card) ────────────────────────────── */
+  .cycle-btn { transition: all 0.2s ease; position: relative; font-family: 'Outfit', sans-serif; }
+  .cycle-btn.active {
+    background: white; color: #18432a;
+    box-shadow: 0 2px 8px -2px rgba(24,67,42,0.20);
+  }
+  .cycle-btn:not(.active) { color: #4f6f55; }
+  .cycle-btn:not(.active):hover { color: #18432a; }
+  .cycle-btn:focus-visible { outline: 2px solid #2c7a4b; outline-offset: 2px; border-radius: 9999px; }
+  .cycle-btn:active { transform: scale(0.96); }
+
+  /* ── CTA click feedback ─────────────────────────────────────────────────────── */
+  .cta-press:active { transform: scale(0.98); }
+  .cta-press { transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease; }
+
+  /* ── State-driven visibility (data-state on <body>) ─────────────────────────── */
+  /* `body [data-show]` (specificity 0,1,1) beats any single-class rule (0,1,0) so
+     gated elements stay hidden by default; state rules below (0,2,1) reveal them. */
+  body [data-show] { display: none; }
+
+  body[data-state="default"]            [data-show~="default"],
+  body[data-state="default"]            [data-show~="no-sub"],
+  body[data-state="default"]            [data-show~="pilot-available"],
+  body[data-state="default"]            [data-show~="any"] { display: revert; }
+
+  body[data-state="hp-annual"]          [data-show~="hp-annual"],
+  body[data-state="hp-annual"]          [data-show~="no-sub"],
+  body[data-state="hp-annual"]          [data-show~="pilot-available"],
+  body[data-state="hp-annual"]          [data-show~="any"] { display: revert; }
+
+  body[data-state="active-hp-monthly"]  [data-show~="active-hp-monthly"],
+  body[data-state="active-hp-monthly"]  [data-show~="has-sub"],
+  body[data-state="active-hp-monthly"]  [data-show~="pilot-available"],
+  body[data-state="active-hp-monthly"]  [data-show~="any"] { display: revert; }
+
+  body[data-state="active-ip-annual"]   [data-show~="active-ip-annual"],
+  body[data-state="active-ip-annual"]   [data-show~="has-sub"],
+  body[data-state="active-ip-annual"]   [data-show~="any"] { display: revert; }
+
+  body[data-state="founding-invited"]   [data-show~="founding-invited"],
+  body[data-state="founding-invited"]   [data-show~="no-sub"],
+  body[data-state="founding-invited"]   [data-show~="pilot-available"],
+  body[data-state="founding-invited"]   [data-show~="any"] { display: revert; }
+
+  body[data-state="founding-closed"]    [data-show~="founding-closed"],
+  body[data-state="founding-closed"]    [data-show~="no-sub"],
+  body[data-state="founding-closed"]    [data-show~="pilot-available"],
+  body[data-state="founding-closed"]    [data-show~="any"] { display: revert; }
+
+  body[data-state="past-due"]           [data-show~="past-due"],
+  body[data-state="past-due"]           [data-show~="has-sub"],
+  body[data-state="past-due"]           [data-show~="any"] { display: revert; }
+
+  body[data-state="cancel-pending"]     [data-show~="cancel-pending"],
+  body[data-state="cancel-pending"]     [data-show~="has-sub"],
+  body[data-state="cancel-pending"]     [data-show~="any"] { display: revert; }
+
+  body[data-state="pilot-active"]       [data-show~="pilot-active"],
+  body[data-state="pilot-active"]       [data-show~="has-sub"],
+  body[data-state="pilot-active"]       [data-show~="any"] { display: revert; }
+
+  body[data-state="pilot-expiring"]     [data-show~="pilot-expiring"],
+  body[data-state="pilot-expiring"]     [data-show~="has-sub"],
+  body[data-state="pilot-expiring"]     [data-show~="any"] { display: revert; }
+
+  body[data-state="pilot-expired"]      [data-show~="pilot-expired"],
+  body[data-state="pilot-expired"]      [data-show~="any"] { display: revert; }
+
+  body[data-state="loading"]            [data-show~="loading"] { display: revert; }
+  body[data-state="catalog-miss"]       [data-show~="catalog-miss"],
+  body[data-state="catalog-miss"]       [data-show~="any"] { display: revert; }
+
+  /* HP card cycle: monthly vs annual price spans (driven by inner toggle) */
+  body[data-hp-cycle="monthly"] [data-hp-cycle-show="monthly"] { display: inline-block; }
+  body[data-hp-cycle="monthly"] [data-hp-cycle-show="annual"]  { display: none; }
+  body[data-hp-cycle="annual"]  [data-hp-cycle-show="monthly"] { display: none; }
+  body[data-hp-cycle="annual"]  [data-hp-cycle-show="annual"]  { display: inline-block; }
+
+  /* Past-due warning border on current card */
+  body[data-state="past-due"] .plan-card[data-current="true"] {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 4px rgba(239,68,68,0.12), 0 18px 36px -16px rgba(239,68,68,0.18);
+  }
+
+  /* Pilot active — HP card grayed out */
+  body[data-state="pilot-active"] .plan-card[data-tier="hp"] {
+    opacity: 0.45; filter: saturate(0.7);
+    pointer-events: none;
+  }
+
+  /* Skeleton placeholder for loading state */
+  .skeleton { background: linear-gradient(90deg, #ecdfc1 25%, #fbf7ef 50%, #ecdfc1 75%); background-size: 200% 100%; animation: shimmer 2s infinite; border-radius: 0.5rem; }
+
+  /* Catalog-miss disabled card */
+  .plan-card.disabled-card { opacity: 0.55; pointer-events: none; }
+
+  /* Frames */
+  .mobile-frame { max-width: 375px; margin: 0 auto; border: 8px solid #18432a; border-radius: 2rem; overflow: hidden; background: #f7f1e3; box-shadow: 0 24px 50px -24px rgba(24,67,42,0.4); }
+  .tablet-frame { max-width: 768px; margin: 0 auto; border: 8px solid #18432a; border-radius: 1.5rem; overflow: hidden; background: #f7f1e3; box-shadow: 0 24px 50px -24px rgba(24,67,42,0.4); }
+
+  /* Founding pill — canonical gold-100/gold-300 + ★ */
+  .founding-pill {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--gold-100, #f9f0d4); border: 1px solid var(--gold-300, #e8c96e);
+    color: var(--gold-900, #5e3e20);
+    padding: 0.4rem 0.75rem; border-radius: 0.625rem;
+    font-family: 'Outfit', sans-serif; font-size: 0.78rem; font-weight: 600;
+  }
+  .founding-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: linear-gradient(135deg, #e8c96e 0%, #c49338 100%);
+    color: white;
+    padding: 0.25rem 0.7rem; border-radius: 9999px;
+    font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    box-shadow: 0 4px 10px -3px rgba(196,147,56,0.45);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .price-anim, .animate-fade-up, .shimmer, .wg-shimmer-overlay::before { animation: none !important; }
+  }
+</style>
+</head>
+<body class="p-6 md:p-10 max-w-[1440px] mx-auto bg-cream-100" data-state="default" data-hp-cycle="monthly" data-lang="ro">
+
+<!-- ════════════════════════════════════════════════════════════════════
+     DESIGN HEADER
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-header">
+  <h1>UC-073 — View Company Subscription Plans</h1>
+  <p>Company subscription plans page at <code>/company/settings/subscription</code>. Two side-by-side plan cards (Hiring Partner / Impact Partner), HP-local monthly↔annual toggle, conditional founding-rate surfacing, conditional 3-month Impact Partner pilot CTA, lifecycle banners (past-due, cancel-pending, pilot-expiring), and a Manage Subscription entry to UC-076. Read-only (BR-073-11); all CTAs route to UC-074 / UC-075 / UC-076. Prices read from TT-024 catalog at render time (BR-073-10).</p>
+  <div class="design-meta">
+    <span>Actor: <strong>Company Recruiter</strong></span>
+    <span>Route: <strong>/company/settings/subscription</strong></span>
+    <span>Layout: <strong>(company) — sidebar shell via (company)/layout.tsx</strong></span>
+    <span>Priority: <strong>Must</strong></span>
+    <span>Currency: <strong>EUR</strong></span>
+    <span>i18n: <strong>companysubscription.*  (ro + en)</strong></span>
+    <span>Sprint: <strong>TBD (Cluster 2)</strong></span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     DESIGNER CHROME — STATES + LANGUAGE TOGGLE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="states-panel" role="region" aria-label="Designer state preview controls">
+  <div class="flex flex-wrap items-start gap-x-8 gap-y-3">
+    <div class="flex-1 min-w-[320px]">
+      <h3>State preview <span class="text-forest-500 font-normal normal-case tracking-normal">(designer only — toggles the rendered state below)</span></h3>
+      <div class="flex flex-wrap gap-2" id="states-bar">
+        <button class="state-btn active" data-set-state="default">1 · Default · no-sub<span class="grp">MSS</span></button>
+        <button class="state-btn" data-set-state="hp-annual">2 · HP annual cycle<span class="grp">MSS</span></button>
+        <button class="state-btn" data-set-state="active-hp-monthly">3 · Active · HP Monthly<span class="grp">MSS</span></button>
+        <button class="state-btn" data-set-state="active-ip-annual">4 · Active · IP Annual<span class="grp">MSS</span></button>
+        <button class="state-btn" data-set-state="founding-invited">5 · Founding invited<span class="grp">A1</span></button>
+        <button class="state-btn" data-set-state="founding-closed">6 · Founding closed<span class="grp">A2</span></button>
+        <button class="state-btn" data-set-state="past-due">7 · Past-due<span class="grp">A4</span></button>
+        <button class="state-btn" data-set-state="cancel-pending">8 · Cancel-pending<span class="grp">A5</span></button>
+        <button class="state-btn" data-set-state="pilot-active">9 · Pilot active<span class="grp">A6</span></button>
+        <button class="state-btn" data-set-state="pilot-expiring">10 · Pilot expiring<span class="grp">A7</span></button>
+        <button class="state-btn" data-set-state="pilot-expired">11 · Pilot expired<span class="grp">A8</span></button>
+        <button class="state-btn" data-set-state="loading">Loading skeleton</button>
+        <button class="state-btn" data-set-state="catalog-miss">Catalog miss</button>
+      </div>
+    </div>
+    <div>
+      <h3>Language</h3>
+      <div class="flex gap-2" id="lang-bar">
+        <button class="state-btn active" data-set-lang="ro">RO</button>
+        <button class="state-btn" data-set-lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     LAYOUT NOTE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-annotation mb-6">
+  <strong>Layout rule (DESIGN_RULES §1 — Company group):</strong> This page lives in the <code>(company)</code> route group. The sidebar — Company shell, cream surface, gold-gradient brand mark, pinned Company card — is provided by <code>(company)/layout.tsx</code> and is rendered here only as context. Implementation never re-declares it in the page file.<br><br>
+  <strong>Read-only (BR-073-11):</strong> No DB writes happen in this UC. Every CTA navigates to a separate UC (UC-074 Subscribe / UC-075 Start Pilot / UC-076 Manage). The page is server-rendered (RSC) with the catalog read at render time (BR-073-10) and the COMPANY_SUBSCRIPTION row read once.<br><br>
+  <strong>Currency (BR-073-09):</strong> All Company Prices are EUR. We render <em>"EUR 1,000"</em>, not <em>"€1,000"</em> or <em>"1.000 EUR"</em> — matches the wireframe.<br><br>
+  <strong>i18n (BR-073-12):</strong> All copy lives under <code>companysubscription.*</code>. Both <code>ro</code> and <code>en</code> required at delivery. RO is the default reflected below; toggle the chrome to compare.
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCREEN 1 — MAIN INTERACTIVE PREVIEW (state-driven)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Screen 1 — Subscription Plans Page (state-driven preview) <span class="state-badge state-mss ml-2">MSS Steps 1–8</span></div>
+
+<div class="design-annotation" data-uc-step="1-8">
+  <strong>UC-073 MSS Steps 1–8:</strong> The page resolves the Company's effective state from <code>COMPANY_SUBSCRIPTION</code>, checks for an open <code>FOUNDING_PARTNER_INVITATION</code>, evaluates pilot lifetime uniqueness (<code>COUNT(COMPANY_SUBSCRIPTION WHERE company_id = :id AND cycle = 'PILOT_ONE_TIME') = 0</code> — BR-073-04), then renders two cards (HP / IP) with conditional founding rates, pilot CTA, banners, and current-plan affordances. The state chrome above swaps all 11 documented states without re-fetching.
+  <ul class="ml-4 mt-1 list-disc">
+    <li><strong>Header</strong> — page title + Manage Subscription button (visible only when an ACTIVE / PILOT_ACTIVE / PAST_DUE / CANCEL_PENDING row exists)</li>
+    <li><strong>Banners</strong> — no-active (gold info, BR-073-08), past-due (red, A4), cancel-pending (amber, A5), pilot-expiring (amber, A6) render above the cards</li>
+    <li><strong>HP card</strong> — local monthly/annual toggle, EUR 120/mo or EUR 1,000/yr; founding row visible only on A1</li>
+    <li><strong>IP card</strong> — annual-only EUR 3,600/yr (Premium gradient + wg-shimmer); founding row + 3-month Pilot CTA EUR 540 conditional</li>
+    <li><strong>Founding rates (BR-073-02)</strong> — surfaced ONLY when an open invitation matches the tier; never on the non-invited tier</li>
+    <li><strong>Pilot CTA (BR-073-04)</strong> — surfaced only when the Company has zero PILOT_ONE_TIME history rows</li>
+    <li><strong>Mid-cycle restriction note (BR-073-05)</strong> — surfaced inline on the off-tier upgrade/switch CTA when on annual</li>
+  </ul>
+</div>
+
+<div class="design-screen" data-uc-step="1-8">
+  <div class="screen-label">
+    <span>/company/settings/subscription — TechCorp SRL</span>
+    <span class="right" id="screen-state-label">state: default · hp-cycle: monthly · lang: ro</span>
+  </div>
+
+  <!-- Full (company) shell — sidebar + main -->
+  <div class="flex min-h-[920px] bg-cream-100 relative">
+
+    <!-- ─── Sidebar (provided by (company)/layout.tsx — shown for context) ─── -->
+    <aside class="w-64 bg-white border-r border-forest-100 p-6 hidden lg:block flex-shrink-0">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-700 flex items-center justify-center text-white font-display font-bold">TC</div>
+        <div>
+          <p class="font-display font-semibold text-sm text-forest-800">TechCorp SRL</p>
+          <p class="text-xs text-forest-500">
+            <span class="lang-ro">Cont companie</span><span class="lang-en hidden">Company account</span>
+          </p>
+        </div>
+      </div>
+      <nav class="space-y-1 text-sm font-display">
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-500 hover:bg-cream-100">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="lang-ro">Privire de ansamblu</span><span class="lang-en hidden">Overview</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-500 hover:bg-cream-100">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 13.255A23.931 23.931 0 0112 15a23.931 23.931 0 01-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+          <span class="lang-ro">Anunțuri de joburi</span><span class="lang-en hidden">Job postings</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-500 hover:bg-cream-100">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span class="lang-ro">Grădina îngrădită</span><span class="lang-en hidden">Walled Garden</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-500 hover:bg-cream-100">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          <span class="lang-ro">Candidați</span><span class="lang-en hidden">Candidates</span>
+        </a>
+        <div class="pt-4 mt-4 border-t border-forest-100">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-forest-400 px-4 mb-2">
+            <span class="lang-ro">Setări</span><span class="lang-en hidden">Settings</span>
+          </p>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-800 bg-cream-100" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span class="lang-ro">Abonament</span><span class="lang-en hidden">Subscription</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium text-forest-500 hover:bg-cream-100">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+            <span class="lang-ro">Profil companie</span><span class="lang-en hidden">Company profile</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ─── Main pane ─── -->
+    <main class="flex-1 p-8 overflow-auto bg-cream-50 animate-fade-up">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-xs font-display text-forest-500 mb-4" aria-label="Breadcrumb">
+        <span class="lang-ro">Setări</span><span class="lang-en hidden">Settings</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="text-forest-800 font-medium lang-ro">Abonament</span>
+        <span class="text-forest-800 font-medium lang-en hidden">Subscription</span>
+      </nav>
+
+      <!-- Header + Manage Subscription -->
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <h1 class="font-display text-3xl font-bold text-forest-900 lang-ro">Alege planul tău</h1>
+          <h1 class="font-display text-3xl font-bold text-forest-900 lang-en hidden">Choose your plan</h1>
+          <p class="text-sm font-body text-forest-500 mt-1 lang-ro">Două niveluri. O singură misiune. Atragi talente și/sau raportezi CSR măsurabil.</p>
+          <p class="text-sm font-body text-forest-500 mt-1 lang-en hidden">Two tiers. One mission. Hire talent and/or report measurable CSR.</p>
+        </div>
+        <button
+          data-show="has-sub"
+          class="cta-press font-display text-sm font-semibold bg-cream-200 hover:bg-cream-300 text-forest-700 px-5 py-2.5 rounded-xl flex items-center gap-2"
+          data-uc-target="UC-076"
+          aria-label="Manage subscription">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="lang-ro">Gestionează abonamentul</span><span class="lang-en hidden">Manage Subscription</span>
+        </button>
+      </div>
+
+      <!-- ── Banner: no-active subscription (default, BR-073-08) ── -->
+      <div data-show="no-sub" class="bg-gold-50 border-2 border-gold-200 rounded-xl p-4 mb-6 flex items-start gap-3" role="status" data-uc-step="5">
+        <svg class="w-5 h-5 text-gold-700 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="flex-1">
+          <p class="font-display text-sm font-semibold text-gold-900 lang-ro">Este necesar un abonament activ pentru a posta joburi</p>
+          <p class="font-display text-sm font-semibold text-gold-900 lang-en hidden">Active subscription required to post jobs</p>
+          <p class="text-xs text-gold-800 mt-1 lang-ro">VoluntX nu oferă plan gratuit companiilor. Alege Hiring Partner sau Impact Partner pentru a începe să publici oportunități.</p>
+          <p class="text-xs text-gold-800 mt-1 lang-en hidden">VoluntX Companies do not have a free tier. Pick Hiring Partner or Impact Partner to start posting opportunities.</p>
+        </div>
+      </div>
+
+      <!-- ── Banner: past-due (A4) ── -->
+      <div data-show="past-due" data-uc-step="A4" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 flex items-start gap-3" role="alert">
+        <svg class="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="flex-1">
+          <p class="font-display text-sm font-semibold text-red-800 lang-ro">Plata a eșuat. Actualizați metoda de plată pentru a continua să postați joburi.</p>
+          <p class="font-display text-sm font-semibold text-red-800 lang-en hidden">Payment failed. Update your payment method to keep posting jobs.</p>
+          <p class="text-xs text-red-700 mt-1 lang-ro">Abonamentul tău Hiring Partner va fi suspendat dacă plata nu este reușită în 7 zile. Postarea joburilor este blocată până la rezolvare.</p>
+          <p class="text-xs text-red-700 mt-1 lang-en hidden">Your Hiring Partner subscription will be suspended if payment is not successful within 7 days. Job-posting is blocked until resolved.</p>
+        </div>
+        <button class="cta-press font-display text-xs font-semibold bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg whitespace-nowrap" data-uc-target="UC-076">
+          <span class="lang-ro">Actualizează plata</span><span class="lang-en hidden">Update Payment Method</span>
+        </button>
+      </div>
+
+      <!-- ── Banner: cancel-pending (A5) ── -->
+      <div data-show="cancel-pending" data-uc-step="A5" class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mb-6" role="status">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="flex-1">
+            <p class="font-display text-sm font-semibold text-amber-900 lang-ro">Activ până la 12 august 2026. Postarea joburilor va fi dezactivată după această dată.</p>
+            <p class="font-display text-sm font-semibold text-amber-900 lang-en hidden">Active until 12 August 2026. Job-posting will be disabled after this date.</p>
+            <p class="text-xs text-amber-800 mt-1 lang-ro">Ai anulat reînnoirea automată. Reia abonamentul pentru a păstra accesul la postarea de joburi.</p>
+            <p class="text-xs text-amber-800 mt-1 lang-en hidden">You cancelled auto-renewal. Resume your subscription to keep posting jobs.</p>
+          </div>
+          <button class="cta-press font-display text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg whitespace-nowrap" data-uc-target="UC-076">
+            <span class="lang-ro">Reia abonamentul</span><span class="lang-en hidden">Resume Subscription</span>
+          </button>
+        </div>
+
+        <!-- Founding-partner cancellation extra warning (BR-073-06) -->
+        <div class="mt-3 ml-8 bg-gold-50 border border-gold-300 rounded-lg p-3 flex items-start gap-2">
+          <svg class="w-4 h-4 text-gold-700 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <div>
+            <p class="font-display text-xs font-semibold text-gold-900 lang-ro">Atenție: anulezi tariful Founding Partner</p>
+            <p class="font-display text-xs font-semibold text-gold-900 lang-en hidden">Heads up: you are cancelling your Founding Partner rate</p>
+            <p class="text-[11px] text-gold-800 mt-0.5 lang-ro">Renunțând la abonament, pierzi blocajul de 24 de luni la tariful Founding. Abonamentele viitoare vor folosi tarifele standard.</p>
+            <p class="text-[11px] text-gold-800 mt-0.5 lang-en hidden">Cancelling forfeits your 24-month founding rate lock. Future subscriptions use standard rates.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Banner: pilot expiring (A6) ── -->
+      <div data-show="pilot-expiring" data-uc-step="A6" class="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 mb-6 flex items-start gap-3" role="alert">
+        <svg class="w-5 h-5 text-amber-700 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="flex-1">
+          <p class="font-display text-sm font-semibold text-amber-900 lang-ro">Pilotul tău se încheie în 14 zile</p>
+          <p class="font-display text-sm font-semibold text-amber-900 lang-en hidden">Your pilot ends in 14 days</p>
+          <p class="text-xs text-amber-800 mt-1 lang-ro">Convertește la abonament anual pentru a păstra accesul — taxa de pilot de EUR 540 este creditată integral către prețul anual.</p>
+          <p class="text-xs text-amber-800 mt-1 lang-en hidden">Convert to annual to retain access — your EUR 540 pilot fee credits in full toward the annual price.</p>
+        </div>
+        <button class="cta-press font-display text-xs font-semibold bg-coral-500 hover:bg-coral-600 text-white px-4 py-2 rounded-lg whitespace-nowrap shadow-md shadow-coral-500/25" data-uc-target="UC-075">
+          <span class="lang-ro">Convertește la anual</span><span class="lang-en hidden">Convert to Annual</span>
+        </button>
+      </div>
+
+      <!-- ── Banner: catalog miss (graceful) ── -->
+      <div data-show="catalog-miss" class="bg-cream-50 border border-forest-200 rounded-xl p-4 mb-6 flex items-start gap-3" role="status">
+        <svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+        <div>
+          <p class="font-display text-sm font-semibold text-forest-800 lang-ro">Prețul este temporar indisponibil pentru unul dintre planuri.</p>
+          <p class="font-display text-sm font-semibold text-forest-800 lang-en hidden">Pricing is temporarily unavailable for one of the plans.</p>
+          <p class="text-xs text-forest-600 mt-1 lang-ro">Reîncărcați pagina peste un minut. Echipa noastră a fost notificată.</p>
+          <p class="text-xs text-forest-600 mt-1 lang-en hidden">Please refresh in a minute. Our team has been notified.</p>
+        </div>
+      </div>
+
+      <!-- ── 2 Plan Cards ── -->
+      <div class="grid lg:grid-cols-2 gap-6">
+
+        <!-- ╔═════════════ HIRING PARTNER ═════════════╗ -->
+        <article
+          class="plan-card grain bg-white rounded-3xl p-7 border-2 border-forest-100 relative flex flex-col"
+          data-tier="hp"
+          data-current="false"
+          aria-label="Hiring Partner plan"
+          data-uc-step="4">
+
+          <!-- "Current plan" badge -->
+          <span data-show="active-hp-monthly" class="absolute -top-3 left-7 inline-flex items-center gap-1 font-display text-xs font-bold uppercase tracking-wider bg-forest-700 text-white px-3 py-1 rounded-full">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="lang-ro">Planul curent</span><span class="lang-en hidden">Current plan</span>
+          </span>
+
+          <!-- Founding badge (top-right) -->
+          <span data-show="founding-invited" class="absolute -top-3 right-7 founding-badge">
+            <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <span class="lang-ro">Founding Partner</span><span class="lang-en hidden">Founding Partner</span>
+          </span>
+
+          <!-- Header row -->
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500">Hiring Partner</p>
+              <p class="text-xs text-forest-500 italic mt-1 lang-ro">Talent pipeline · lunar sau anual</p>
+              <p class="text-xs text-forest-500 italic mt-1 lang-en hidden">Talent pipeline · monthly or annual</p>
+            </div>
+            <!-- HP-local cycle toggle -->
+            <div class="inline-flex bg-cream-200 rounded-full p-1 text-xs" role="tablist" aria-label="Hiring Partner billing cycle">
+              <button id="hp-cycle-monthly" class="cycle-btn active px-3 py-1 rounded-full font-display font-semibold" role="tab" aria-selected="true" data-hp-cycle-set="monthly">
+                <span class="lang-ro">Lunar</span><span class="lang-en hidden">Monthly</span>
+              </button>
+              <button id="hp-cycle-annual" class="cycle-btn px-3 py-1 rounded-full font-display font-medium" role="tab" aria-selected="false" data-hp-cycle-set="annual">
+                <span class="lang-ro">Anual</span><span class="lang-en hidden">Annual</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <p class="font-display text-4xl font-bold text-forest-900 mt-5">
+            <span data-hp-cycle-show="monthly" class="price-anim" data-entity="Catalog.company_hp_monthly_v1.amount">EUR 120</span>
+            <span data-hp-cycle-show="annual"  class="price-anim hidden" data-entity="Catalog.company_hp_annual_v1.amount">EUR 1,000</span>
+          </p>
+          <p class="text-xs font-display text-forest-500 mt-1">
+            <span data-hp-cycle-show="monthly">
+              <span class="lang-ro">/ lună · sau EUR 1,000 / an (economisești EUR 440)</span>
+              <span class="lang-en hidden">/ month · or EUR 1,000 / year (save EUR 440)</span>
+            </span>
+            <span data-hp-cycle-show="annual" class="hidden">
+              <span class="lang-ro">/ an · </span><span class="lang-en hidden">/ year · </span>
+              <span class="inline-flex items-center gap-1 bg-forest-100 text-forest-800 px-2 py-0.5 rounded-full font-semibold ml-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                <span class="lang-ro">economisești EUR 440</span><span class="lang-en hidden">save EUR 440</span>
+              </span>
+            </span>
+          </p>
+
+          <!-- Founding rate row (only when invited to HP) -->
+          <div data-show="founding-invited" class="mt-4 founding-pill">
+            <svg class="w-4 h-4 text-gold-700" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <span class="lang-ro">EUR 1,000 standard · sau <strong data-entity="Catalog.company_hp_annual_founding_v1.amount">EUR 700 / an</strong> Founding (lock 24 luni)</span>
+            <span class="lang-en hidden">EUR 1,000 standard · or <strong data-entity="Catalog.company_hp_annual_founding_v1.amount">EUR 700 / year</strong> Founding (24-month lock)</span>
+          </div>
+
+          <!-- Feature list (BR-073-01) -->
+          <ul class="text-sm font-body text-forest-700 space-y-2.5 mt-6 flex-1">
+            <li class="flex items-start gap-2"><span class="text-forest-700 mt-0.5">✓</span><span class="lang-ro">Postări nelimitate de joburi + internship-uri</span><span class="lang-en hidden">Unlimited job + internship postings</span></li>
+            <li class="flex items-start gap-2"><span class="text-forest-700 mt-0.5">✓</span><span class="lang-ro">Walled Garden — răsfoiește profiluri</span><span class="lang-en hidden">Walled Garden — browse profiles</span></li>
+            <li class="flex items-start gap-2"><span class="text-forest-700 mt-0.5">✓</span><span class="lang-ro">Verificare angajator (domeniu email)</span><span class="lang-en hidden">Employer verification (work email domain)</span></li>
+            <li class="flex items-start gap-2"><span class="text-forest-700 mt-0.5">✓</span><span class="lang-ro">Insignă Hiring Partner pe profilul companiei</span><span class="lang-en hidden">Hiring Partner badge on company profile</span></li>
+            <li class="flex items-start gap-2"><span class="text-forest-700 mt-0.5">✓</span><span class="lang-ro">Suport prin email</span><span class="lang-en hidden">Email support</span></li>
+            <li class="flex items-start gap-2 text-forest-400"><span class="mt-0.5">—</span><span class="lang-ro">Fără contact direct cu voluntarii</span><span class="lang-en hidden">No direct volunteer contact</span></li>
+            <li class="flex items-start gap-2 text-forest-400"><span class="mt-0.5">—</span><span class="lang-ro">Fără raport trimestrial de impact</span><span class="lang-en hidden">No Quarterly Impact Report</span></li>
+          </ul>
+
+          <!-- CTA — Subscribe (default) -->
+          <button data-show="default hp-annual founding-closed" class="cta-press w-full mt-6 font-display text-sm font-semibold bg-forest-700 hover:bg-forest-800 text-white py-3 rounded-xl shadow-md shadow-forest-700/15" data-uc-target="UC-074">
+            <span class="lang-ro">Abonează-te</span><span class="lang-en hidden">Subscribe</span>
+          </button>
+
+          <!-- CTA — Subscribe at founding rate (A1) -->
+          <button data-show="founding-invited" class="cta-press w-full mt-6 font-display text-sm font-semibold bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-800 text-white py-3 rounded-xl shadow-md shadow-gold-500/30" data-uc-target="UC-074" data-uc-step="A1.2">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="inline -mt-0.5 mr-1"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <span class="lang-ro">Abonează-te ca Founding · EUR 700 / an</span>
+            <span class="lang-en hidden">Subscribe as Founding · EUR 700 / year</span>
+          </button>
+
+          <!-- CTA — Disabled (current plan) -->
+          <button data-show="active-hp-monthly" class="w-full mt-6 font-display text-sm font-semibold bg-cream-200 text-forest-500 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">
+            <span class="lang-ro">Planul tău curent</span><span class="lang-en hidden">Your current plan</span>
+          </button>
+
+          <!-- CTA — Switch to HP (when on IP Annual) -->
+          <div data-show="active-ip-annual">
+            <button class="w-full mt-6 font-display text-sm font-medium bg-cream-100 text-forest-500 py-3 rounded-xl border border-forest-200 cursor-not-allowed" disabled aria-disabled="true">
+              <span class="lang-ro">Schimbă la Hiring Partner</span><span class="lang-en hidden">Switch to Hiring Partner</span>
+            </button>
+            <p class="text-[11px] text-forest-500 mt-2 leading-snug">
+              <span class="lang-ro">Trecerile la nivel inferior pe contracte anuale se aplică la reînnoire (BR-073-05).</span>
+              <span class="lang-en hidden">Tier downgrades on annual contracts take effect at renewal (BR-073-05).</span>
+            </p>
+          </div>
+
+          <!-- CTA — Past-due disabled -->
+          <button data-show="past-due" class="w-full mt-6 font-display text-sm font-semibold bg-cream-200 text-forest-500 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">
+            <span class="lang-ro">Rezolvă plata pentru a schimba planul</span><span class="lang-en hidden">Resolve payment to change plan</span>
+          </button>
+
+          <!-- CTA — Cancel-pending: HP card grays out (re-subscribe via portal) -->
+          <button data-show="cancel-pending" class="cta-press w-full mt-6 font-display text-sm font-medium bg-cream-100 text-forest-600 py-3 rounded-xl border border-forest-200" data-uc-target="UC-076">
+            <span class="lang-ro">Reia Hiring Partner</span><span class="lang-en hidden">Resume Hiring Partner</span>
+          </button>
+
+          <!-- CTA — Pilot active (HP grayed out, info-only) -->
+          <button data-show="pilot-active" class="w-full mt-6 font-display text-sm font-medium bg-cream-100 text-forest-500 py-3 rounded-xl border border-forest-200 cursor-not-allowed" disabled aria-disabled="true">
+            <span class="lang-ro">Indisponibil pe durata pilotului</span><span class="lang-en hidden">Unavailable during pilot</span>
+          </button>
+
+          <!-- CTA — Pilot expired -->
+          <button data-show="pilot-expired" class="cta-press w-full mt-6 font-display text-sm font-semibold bg-forest-700 hover:bg-forest-800 text-white py-3 rounded-xl" data-uc-target="UC-074">
+            <span class="lang-ro">Abonează-te</span><span class="lang-en hidden">Subscribe</span>
+          </button>
+
+          <p class="text-xs text-forest-400 mt-3 italic text-center lang-ro">Pentru companii care vor un canal de recrutare constant</p>
+          <p class="text-xs text-forest-400 mt-3 italic text-center lang-en hidden">For companies seeking a steady recruiting channel</p>
+        </article>
+
+        <!-- ╔═════════════ IMPACT PARTNER (premium gradient + wg-shimmer) ═════════════╗ -->
+        <article
+          class="plan-card grain wg-shimmer-overlay bg-gradient-to-br from-coral-50 via-cream-100 to-gold-50 rounded-3xl p-7 border-2 border-coral-300 relative flex flex-col"
+          data-tier="ip"
+          data-current="false"
+          aria-label="Impact Partner plan"
+          data-uc-step="4">
+
+          <!-- "Premium · CSR-Ready" top-left badge -->
+          <span data-show="default hp-annual founding-closed past-due cancel-pending pilot-expired" class="absolute -top-3 left-7 inline-flex items-center gap-1 font-display text-xs font-bold uppercase tracking-wider bg-coral-500 text-white px-3 py-1 rounded-full shadow-md shadow-coral-500/30">
+            ★ <span class="lang-ro">Premium · pregătit CSR</span><span class="lang-en hidden">Premium · CSR-Ready</span>
+          </span>
+
+          <!-- "Current plan" badge -->
+          <span data-show="active-ip-annual" class="absolute -top-3 right-7 inline-flex items-center gap-1 font-display text-xs font-bold uppercase tracking-wider bg-forest-700 text-white px-3 py-1 rounded-full">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="lang-ro">Planul curent</span><span class="lang-en hidden">Current plan</span>
+          </span>
+
+          <!-- Founding badge (top-right; conflicts with "Current" not possible) -->
+          <span data-show="founding-invited" class="absolute -top-3 right-7 founding-badge">
+            <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <span class="lang-ro">Founding Partner</span><span class="lang-en hidden">Founding Partner</span>
+          </span>
+
+          <!-- ═════ Default IP body (price + features + CTAs) — hidden in pilot-active ═════ -->
+          <div data-show="default hp-annual active-hp-monthly active-ip-annual founding-invited founding-closed past-due cancel-pending pilot-expired catalog-miss">
+            <div class="flex items-start justify-between mt-1">
+              <div>
+                <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600">Impact Partner</p>
+                <p class="text-xs text-coral-700 italic mt-1 lang-ro">Talent + raportare CSR · doar anual</p>
+                <p class="text-xs text-coral-700 italic mt-1 lang-en hidden">Talent + CSR reporting · annual only</p>
+              </div>
+              <span class="font-display text-[10px] font-bold uppercase tracking-wider bg-coral-200 text-coral-800 px-2.5 py-1 rounded-full">
+                <span class="lang-ro">Doar anual</span><span class="lang-en hidden">Annual only</span>
+              </span>
+            </div>
+
+            <p class="font-display text-4xl font-bold text-forest-900 mt-5" data-entity="Catalog.company_ip_annual_v1.amount">EUR 3,600</p>
+            <p class="text-xs text-coral-700 mt-1 font-display font-medium lang-ro">/ an · factură anuală în avans</p>
+            <p class="text-xs text-coral-700 mt-1 font-display font-medium lang-en hidden">/ year · upfront annual invoice</p>
+
+            <!-- Founding rate row -->
+            <div data-show="founding-invited" class="mt-4 founding-pill">
+              <svg class="w-4 h-4 text-gold-700" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span class="lang-ro">EUR 3,600 standard · sau <strong data-entity="Catalog.company_ip_annual_founding_v1.amount">EUR 2,520 / an</strong> Founding (lock 24 luni)</span>
+              <span class="lang-en hidden">EUR 3,600 standard · or <strong data-entity="Catalog.company_ip_annual_founding_v1.amount">EUR 2,520 / year</strong> Founding (24-month lock)</span>
+            </div>
+
+            <!-- Feature list -->
+            <ul class="text-sm font-body text-forest-800 space-y-2.5 mt-6">
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Tot din Hiring Partner</span><span class="lang-en hidden">Everything in Hiring Partner</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">★</span><span class="lang-ro">Walled Garden — contact direct cu voluntarii</span><span class="lang-en hidden">Walled Garden — direct contact with volunteers</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">★</span><span class="lang-ro">Raport trimestrial de impact (aliniat CSRD)</span><span class="lang-en hidden">Quarterly Impact Report (CSRD-aligned)</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Potrivire cu parteneri ONG (până la 2)</span><span class="lang-en hidden">NGO partner matching (up to 2 NGOs)</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Campanie social media co-branded (1 / an)</span><span class="lang-en hidden">Co-branded social campaign (1/year)</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Metrici sociali aliniați CSRD + mapare UN SDG</span><span class="lang-en hidden">CSRD-aligned social metrics + UN SDG mapping</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Call trimestrial de cont</span><span class="lang-en hidden">Quarterly account call</span></li>
+              <li data-show="founding-invited" class="flex items-start gap-2"><span class="text-gold-700 mt-0.5">★</span><span class="lang-ro">Drepturi de co-creare roadmap produs (doar Founding)</span><span class="lang-en hidden">Product roadmap co-creation rights (Founding only)</span></li>
+            </ul>
+
+            <!-- CTAs — default state (Subscribe annual + Pilot) -->
+            <div data-show="default hp-annual founding-closed" class="flex flex-col gap-2 mt-6">
+              <button class="cta-press w-full font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3 rounded-xl shadow-md shadow-coral-500/25" data-uc-target="UC-074">
+                <span class="lang-ro">Abonează-te anual</span><span class="lang-en hidden">Subscribe annually</span>
+              </button>
+              <!-- Pilot CTA — lighter weight, "3-month" prominent (BR-073-04) -->
+              <button data-show="pilot-available" class="cta-press w-full font-display text-sm font-medium bg-white hover:bg-cream-50 text-coral-700 border border-coral-300 py-3 rounded-xl" data-uc-target="UC-075">
+                <span class="lang-ro">Începe pilot <strong>3 luni</strong> · <strong>EUR 540</strong></span>
+                <span class="lang-en hidden">Start <strong>3-month</strong> Pilot · <strong>EUR 540</strong></span>
+              </button>
+              <p class="text-xs text-coral-700 mt-1 italic text-center lang-ro">Taxa de pilot se creditează spre anual la conversie · plată unică</p>
+              <p class="text-xs text-coral-700 mt-1 italic text-center lang-en hidden">Pilot fee credits toward annual on conversion · one-time payment</p>
+            </div>
+
+            <!-- CTAs — founding-invited (use founding rate; pilot still optional but secondary) -->
+            <div data-show="founding-invited" class="flex flex-col gap-2 mt-6">
+              <button class="cta-press w-full font-display text-sm font-semibold bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-600 hover:to-gold-800 text-white py-3 rounded-xl shadow-md shadow-gold-500/30" data-uc-target="UC-074" data-uc-step="A1.2">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="inline -mt-0.5 mr-1"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <span class="lang-ro">Abonează-te ca Founding · EUR 2,520 / an</span>
+                <span class="lang-en hidden">Subscribe as Founding · EUR 2,520 / year</span>
+              </button>
+              <button class="cta-press w-full font-display text-sm font-medium bg-white hover:bg-cream-50 text-coral-700 border border-coral-300 py-3 rounded-xl" data-uc-target="UC-075">
+                <span class="lang-ro">Începe pilot <strong>3 luni</strong> · <strong>EUR 540</strong></span>
+                <span class="lang-en hidden">Start <strong>3-month</strong> Pilot · <strong>EUR 540</strong></span>
+              </button>
+            </div>
+
+            <!-- CTA — Active IP Annual (current plan, disabled) -->
+            <button data-show="active-ip-annual" class="w-full mt-6 font-display text-sm font-semibold bg-cream-200 text-forest-500 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">
+              <span class="lang-ro">Planul tău curent</span><span class="lang-en hidden">Your current plan</span>
+            </button>
+
+            <!-- CTA — Upgrade from HP Monthly to IP (BR-073-05 inline note) -->
+            <div data-show="active-hp-monthly" class="mt-6">
+              <button class="cta-press w-full font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3 rounded-xl shadow-md shadow-coral-500/25" data-uc-target="UC-076">
+                <span class="lang-ro">Upgrade la Impact Partner</span><span class="lang-en hidden">Upgrade to Impact Partner</span>
+              </button>
+              <p class="text-[11px] text-forest-600 mt-2 leading-snug bg-cream-100 border border-forest-200 rounded-md px-2 py-1.5">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline -mt-0.5 mr-1 text-forest-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+                <span class="lang-ro">Pe contracte anuale, upgrade-ul de nivel se aplică la reînnoire (BR-076-03). Pe Lunar (planul curent), schimbi imediat prin anulare + abonare nouă.</span>
+                <span class="lang-en hidden">Tier upgrades on annual contracts apply at renewal (BR-076-03). On Monthly (your current plan), switch immediately via cancel + new subscription.</span>
+              </p>
+            </div>
+
+            <!-- CTA — Past-due disabled -->
+            <button data-show="past-due" class="w-full mt-6 font-display text-sm font-semibold bg-cream-200 text-forest-500 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">
+              <span class="lang-ro">Rezolvă plata pentru a continua</span><span class="lang-en hidden">Resolve payment to continue</span>
+            </button>
+
+            <!-- CTA — Cancel-pending: re-subscribe -->
+            <button data-show="cancel-pending" class="cta-press w-full mt-6 font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3 rounded-xl" data-uc-target="UC-076">
+              <span class="lang-ro">Reia Impact Partner</span><span class="lang-en hidden">Resume Impact Partner</span>
+            </button>
+
+            <!-- CTA — Pilot expired -->
+            <div data-show="pilot-expired" class="mt-6">
+              <button class="cta-press w-full font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3 rounded-xl shadow-md shadow-coral-500/25" data-uc-target="UC-074">
+                <span class="lang-ro">Abonează-te anual</span><span class="lang-en hidden">Subscribe annually</span>
+              </button>
+              <p class="text-[11px] mt-2 leading-snug bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-md px-2.5 py-1.5">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="inline -mt-0.5 mr-1 text-emerald-700"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+                <span class="lang-ro">Credit <strong>EUR 540</strong> disponibil până la <strong>11 noiembrie 2026</strong> (BR-073-07)</span>
+                <span class="lang-en hidden">EUR 540 credit available until <strong>11 November 2026</strong> (BR-073-07)</span>
+              </p>
+              <p class="text-[11px] text-coral-700 mt-1.5 italic text-center lang-ro">Oferta de pilot nu mai este disponibilă (unicitate pe viață · BR-073-04)</p>
+              <p class="text-[11px] text-coral-700 mt-1.5 italic text-center lang-en hidden">Pilot offer no longer available (lifetime uniqueness · BR-073-04)</p>
+            </div>
+          </div>
+
+          <!-- ═════ Pilot ACTIVE replacement body ═════ -->
+          <div data-show="pilot-active" class="mt-1">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600">Impact Partner</p>
+                <p class="text-xs text-coral-700 italic mt-1 lang-ro">Pilot activ · 3 luni</p>
+                <p class="text-xs text-coral-700 italic mt-1 lang-en hidden">Pilot active · 3 months</p>
+              </div>
+              <span class="font-display text-[10px] font-bold uppercase tracking-wider bg-coral-200 text-coral-800 px-2.5 py-1 rounded-full">
+                <span class="lang-ro">Pilot</span><span class="lang-en hidden">Pilot</span>
+              </span>
+            </div>
+
+            <div class="mt-5 bg-white/70 backdrop-blur rounded-2xl p-5 border border-coral-200">
+              <p class="text-xs font-display font-semibold text-coral-700 uppercase tracking-wider lang-ro">Timp rămas</p>
+              <p class="text-xs font-display font-semibold text-coral-700 uppercase tracking-wider lang-en hidden">Time remaining</p>
+              <p class="font-display text-3xl font-bold text-forest-900 mt-2 lang-ro">52 zile</p>
+              <p class="font-display text-3xl font-bold text-forest-900 mt-2 lang-en hidden">52 days</p>
+              <p class="text-xs text-forest-500 mt-1 lang-ro">Pilotul tău se încheie pe <strong>12 august 2026</strong></p>
+              <p class="text-xs text-forest-500 mt-1 lang-en hidden">Your pilot ends on <strong>12 August 2026</strong></p>
+
+              <!-- Progress bar -->
+              <div class="mt-4 w-full bg-cream-200 rounded-full h-2 overflow-hidden" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" aria-label="Pilot progress">
+                <div class="h-full bg-gradient-to-r from-coral-400 to-coral-600" style="width: 42%"></div>
+              </div>
+              <p class="text-[10px] text-forest-500 mt-1 font-display lang-ro">42% utilizat · 38 zile parcurse din 90</p>
+              <p class="text-[10px] text-forest-500 mt-1 font-display lang-en hidden">42% used · 38 of 90 days elapsed</p>
+            </div>
+
+            <ul class="text-sm font-body text-forest-800 space-y-2 mt-5">
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Acces complet la toate funcțiile Impact Partner</span><span class="lang-en hidden">Full access to all Impact Partner features</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">✓</span><span class="lang-ro">Postare nelimitată de joburi pe durata pilotului</span><span class="lang-en hidden">Unlimited job posting during the pilot</span></li>
+              <li class="flex items-start gap-2"><span class="text-coral-500 mt-0.5">★</span><span class="lang-ro">EUR 540 se creditează integral spre anual la conversie</span><span class="lang-en hidden">EUR 540 credits in full toward annual on conversion</span></li>
+            </ul>
+
+            <button class="cta-press w-full mt-6 font-display text-sm font-semibold bg-coral-500 hover:bg-coral-600 text-white py-3 rounded-xl shadow-md shadow-coral-500/25" data-uc-target="UC-075" data-uc-step="A6.2">
+              <span class="lang-ro">Convertește la anual · credit EUR 540</span>
+              <span class="lang-en hidden">Convert to Annual · EUR 540 credit</span>
+            </button>
+            <p class="text-[11px] text-coral-700 mt-2 italic text-center lang-ro">Nu poți schimba nivelul pe durata pilotului — Impact Partner doar.</p>
+            <p class="text-[11px] text-coral-700 mt-2 italic text-center lang-en hidden">Tier switching is disabled during the pilot — Impact Partner only.</p>
+          </div>
+
+          <!-- Pilot CTA NOT shown going forward (BR-073-04, pilot-expired ensures this through state) -->
+        </article>
+
+      </div>
+
+      <!-- ── Founding-closed badge clarifier (A2 — informational, no founding UI elsewhere) ── -->
+      <div data-show="founding-closed" class="mt-6 bg-cream-50 border border-forest-200 rounded-xl p-4 flex items-start gap-3" role="status" data-uc-step="A2">
+        <svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div>
+          <p class="font-display text-sm font-semibold text-forest-800 lang-ro">Programul Founding Partner este închis</p>
+          <p class="font-display text-sm font-semibold text-forest-800 lang-en hidden">The Founding Partner programme is closed</p>
+          <p class="text-xs text-forest-600 mt-1 lang-ro">Tarifele Founding nu mai sunt expuse pe această pagină. Founding Partners existenți își păstrează tariful până la sfârșitul perioadei de lock.</p>
+          <p class="text-xs text-forest-600 mt-1 lang-en hidden">Founding rates are no longer surfaced. Existing Founding Partners keep their locked rate until <code>founding_lock_until</code>.</p>
+        </div>
+      </div>
+
+      <!-- ── Footer note ── -->
+      <p class="text-center text-xs text-forest-400 mt-8 font-display lang-ro">Plată securizată prin Stripe · Facturare în EUR · Facturile anuale sunt disponibile la cerere · Prețurile provin din <code class="bg-cream-200 px-1.5 py-0.5 rounded">lib/stripe/catalog.ts</code></p>
+      <p class="text-center text-xs text-forest-400 mt-8 font-display lang-en hidden">Secure payment via Stripe · EUR billing · Annual invoices on request · Prices sourced from <code class="bg-cream-200 px-1.5 py-0.5 rounded">lib/stripe/catalog.ts</code></p>
+
+    </main>
+  </div>
+</div>
+
+<div class="design-annotation">
+  <strong>Data mapping:</strong>
+  <ul class="ml-4 list-disc">
+    <li><code>data-entity="Catalog.company_hp_monthly_v1.amount"</code> → TT-024 lookup_key · 12000 EUR cents · <code>formatPrice(amountMinor, currency, locale)</code> → "EUR 120"</li>
+    <li><code>data-entity="Catalog.company_hp_annual_v1.amount"</code> → 100000 cents → "EUR 1,000"</li>
+    <li><code>data-entity="Catalog.company_hp_annual_founding_v1.amount"</code> → 70000 cents → "EUR 700" (founding · BR-073-02)</li>
+    <li><code>data-entity="Catalog.company_ip_annual_v1.amount"</code> → 360000 cents → "EUR 3,600"</li>
+    <li><code>data-entity="Catalog.company_ip_annual_founding_v1.amount"</code> → 252000 cents → "EUR 2,520" (founding)</li>
+    <li><code>data-entity="Catalog.company_ip_pilot_v1.amount"</code> → 54000 cents · one-time → "EUR 540"</li>
+    <li><code>COMPANY_SUBSCRIPTION.tier</code> → drives "Current plan" badge placement</li>
+    <li><code>COMPANY_SUBSCRIPTION.status</code> → drives banner + CTA repurposing (ACTIVE / PAST_DUE / CANCEL_PENDING / PILOT_ACTIVE / PILOT_EXPIRED)</li>
+    <li><code>COMPANY_SUBSCRIPTION.pilot_end</code> → A6 banner + A7 expired-credit window calc (<code>pilot_end + 30 days</code>)</li>
+    <li><code>COMPANY_SUBSCRIPTION.current_period_end</code> → A5 banner date</li>
+    <li><code>FOUNDING_PARTNER_INVITATION.tier</code> → which card surfaces founding row</li>
+    <li><code>FOUNDING_PARTNER_INVITATION.invite_token</code> → passed to UC-074 via founding CTA query param (BR-073-03)</li>
+    <li><code>PLATFORM_CONFIG.founding_partner_program_open_until</code> → A2 gate</li>
+  </ul>
+  <strong>Navigation targets:</strong> Subscribe → <code>UC-074</code> · Start Pilot / Convert → <code>UC-075</code> · Manage / Resume / Update Payment / Switch / Upgrade-on-renewal → <code>UC-076</code> (Stripe Customer Portal).
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCREEN 2 — STATE-BY-STATE STACKED VARIATIONS (frozen, for reference)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Screen 2 — All 11 states side-by-side (frozen reference) <span class="state-badge state-alt ml-2">A1–A8</span></div>
+
+<div class="design-annotation">
+  <strong>Purpose:</strong> The interactive screen above uses a single rendering and swaps state via the chrome toggle. The cards below are <em>frozen</em> mini-cards summarising what the live page shows in each state — useful as a stakeholder review document or when the live preview isn't available.
+</div>
+
+<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+  <div class="bg-white rounded-2xl border border-forest-100 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500 mb-1">State 1</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Default · no active subscription</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• Top banner: <span class="font-semibold text-gold-700">gold info "Active subscription required to post jobs"</span></li>
+      <li>• Manage button: hidden</li>
+      <li>• HP card: Subscribe CTA + local Mo toggle</li>
+      <li>• IP card: Subscribe annually + <em>Start 3-month Pilot · EUR 540</em></li>
+      <li>• No founding rates surfaced</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-forest-100 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500 mb-1">State 2</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">HP annual cycle toggled</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• HP card: <span class="font-semibold text-forest-700">EUR 1,000 / year · save EUR 440 (highlighted pill)</span></li>
+      <li>• HP cycle toggle: Annual active</li>
+      <li>• IP card: identical to State 1</li>
+      <li>• Banner + everything else: identical to State 1</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-forest-100 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500 mb-1">State 3</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Active · Hiring Partner Monthly</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• Manage Subscription button: <span class="font-semibold text-forest-700">visible</span></li>
+      <li>• HP card: "Current plan" badge · Subscribe CTA disabled</li>
+      <li>• IP card: "Upgrade to Impact Partner" + inline note about BR-076-03 (mid-cycle on annual = at renewal; HP Monthly = immediate via cancel+resubscribe)</li>
+      <li>• No-active banner: hidden</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-forest-100 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500 mb-1">State 4</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Active · Impact Partner Annual</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• IP card: <span class="font-semibold text-coral-600">"Current plan" badge · premium gradient kept</span></li>
+      <li>• HP card: "Switch to Hiring Partner" <span class="font-semibold">disabled</span> · note "Tier downgrades take effect at renewal"</li>
+      <li>• Manage Subscription button: visible</li>
+      <li>• Pilot CTA: hidden (already on IP)</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gold-300 bg-gold-50/40 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-gold-700 mb-1">State 5 · A1</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Founding invited (HP-tier)</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• HP card: <span class="font-semibold text-gold-700">"★ Founding Partner" badge top-right</span></li>
+      <li>• Founding pill row: "EUR 1,000 standard — or EUR 700 / year (24-month lock)"</li>
+      <li>• HP CTA: gold gradient "Subscribe as Founding · EUR 700 / year" (invite_token attached · BR-073-03)</li>
+      <li>• IP card: <span class="font-semibold">unchanged · no founding row</span></li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-forest-100 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500 mb-1">State 6 · A2</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Founding programme closed</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• <span class="font-semibold">Identical to State 1 visually</span></li>
+      <li>• Verifies founding UI is gated by <code>founding_partner_program_open_until</code></li>
+      <li>• Existing Founding Partners keep their locked rate (not surfaced here)</li>
+      <li>• Optional info card: "Founding programme is closed"</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-red-200 bg-red-50/30 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-red-700 mb-1">State 7 · A4</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Past-due</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• Red banner: "Plata a eșuat..." + <strong>Update Payment Method</strong> CTA → UC-076</li>
+      <li>• Current tier card: <span class="font-semibold text-red-700">red warning border</span></li>
+      <li>• All other CTAs: disabled until payment resolves</li>
+      <li>• Manage button: visible</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-amber-200 bg-amber-50/30 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">State 8 · A5</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Cancel-pending</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• Amber banner: "Active until 12 August 2026..." + Resume CTA → UC-076</li>
+      <li>• Founding Partner extra warning: gold sub-callout (BR-073-06)</li>
+      <li>• Current card: still highlighted</li>
+      <li>• Manage button: visible</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-coral-200 bg-coral-50/30 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600 mb-1">State 9 · A6 (current)</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Pilot active</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• IP card body replaced: countdown "52 zile / ends 12 Aug 2026" + progress bar</li>
+      <li>• Primary CTA: "Convert to Annual · EUR 540 credit" → UC-075</li>
+      <li>• HP card: <span class="font-semibold">grayed out 45% + disabled</span> (can't switch tier during pilot)</li>
+      <li>• Manage button: visible</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-amber-200 bg-amber-50/30 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">State 10 · A6 banner</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Pilot about to expire (14 days)</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• Prominent amber banner: "Pilot ends in 14 days. Convert to annual to retain access — EUR 540 credits..."</li>
+      <li>• IP body: same as State 9 (active countdown)</li>
+      <li>• Banner CTA + card CTA both → UC-075</li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-emerald-200 bg-emerald-50/20 p-5">
+    <p class="font-display text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">State 11 · A7/A8</p>
+    <p class="font-display text-sm font-bold text-forest-900 mb-3">Pilot expired without conversion</p>
+    <ul class="text-xs font-body text-forest-700 space-y-1">
+      <li>• IP card: standard "Subscribe annually" CTA</li>
+      <li>• If within 30-day window: green note "EUR 540 credit available until 11 Nov 2026"</li>
+      <li>• Pilot CTA: <span class="font-semibold text-red-600">permanently hidden</span> (BR-073-04 lifetime uniqueness)</li>
+      <li>• HP card: normal Subscribe CTA</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCREEN 3 — LOADING STATE
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Screen 3 — Loading state (catalog fetch in flight) <span class="state-badge state-info ml-2">RSC Suspense fallback</span></div>
+
+<div class="design-annotation">
+  <strong>Loading:</strong> While the page is server-rendered, the wrapping layout's <code>&lt;Suspense&gt;</code> shows skeleton placeholders for the price values and feature lists. Header, breadcrumb, and the no-active banner (if applicable) render immediately (they don't depend on price data).
+</div>
+
+<div class="design-screen">
+  <div class="screen-label"><span>/company/settings/subscription · loading</span><span class="right">Suspense fallback</span></div>
+  <div class="bg-cream-50 p-8">
+    <!-- Skeleton for header -->
+    <div class="skeleton h-7 w-56 mb-2"></div>
+    <div class="skeleton h-3 w-80 mb-6"></div>
+    <div class="grid lg:grid-cols-2 gap-6">
+      <!-- 2 skeleton cards -->
+      <div class="bg-white rounded-3xl p-7 border-2 border-forest-100">
+        <div class="skeleton h-3 w-20 rounded mb-3"></div>
+        <div class="skeleton h-3 w-32 rounded mb-5"></div>
+        <div class="skeleton h-10 w-32 rounded mb-2"></div>
+        <div class="skeleton h-3 w-44 rounded mb-6"></div>
+        <div class="space-y-2.5">
+          <div class="skeleton h-3 w-full rounded"></div>
+          <div class="skeleton h-3 w-5/6 rounded"></div>
+          <div class="skeleton h-3 w-4/6 rounded"></div>
+          <div class="skeleton h-3 w-5/6 rounded"></div>
+          <div class="skeleton h-3 w-3/4 rounded"></div>
+        </div>
+        <div class="skeleton h-11 w-full rounded-xl mt-6"></div>
+      </div>
+      <div class="bg-gradient-to-br from-coral-50 via-cream-100 to-gold-50 rounded-3xl p-7 border-2 border-coral-200 wg-shimmer-overlay">
+        <div class="skeleton h-3 w-20 rounded mb-3"></div>
+        <div class="skeleton h-3 w-36 rounded mb-5"></div>
+        <div class="skeleton h-10 w-36 rounded mb-2"></div>
+        <div class="skeleton h-3 w-48 rounded mb-6"></div>
+        <div class="space-y-2.5">
+          <div class="skeleton h-3 w-full rounded"></div>
+          <div class="skeleton h-3 w-5/6 rounded"></div>
+          <div class="skeleton h-3 w-4/6 rounded"></div>
+          <div class="skeleton h-3 w-5/6 rounded"></div>
+          <div class="skeleton h-3 w-3/4 rounded"></div>
+          <div class="skeleton h-3 w-2/3 rounded"></div>
+        </div>
+        <div class="skeleton h-11 w-full rounded-xl mt-6"></div>
+        <div class="skeleton h-11 w-full rounded-xl mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCREEN 4 — CATALOG MISS (graceful degradation per UC-068 A5)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Screen 4 — Catalog miss (A8 · operational error) <span class="state-badge state-err ml-2">A8</span></div>
+
+<div class="design-annotation" data-uc-step="A8">
+  <strong>A8 — Pricing Catalog Mismatch:</strong> One or more Company <code>lookup_key</code>s in <code>lib/stripe/catalog.ts</code> have no <code>price_id</code> in Stripe (deployment desync). The affected card renders without a price, CTA disabled, with an inline notice. The other card degrades gracefully and remains subscribe-able. The missing key is logged at error level; an admin email alert is queued.
+</div>
+
+<div class="design-screen">
+  <div class="screen-label"><span>/company/settings/subscription · catalog miss on company_ip_annual_v1</span><span class="right">graceful degradation</span></div>
+  <div class="bg-cream-50 p-8">
+    <!-- Soft info banner -->
+    <div class="bg-cream-100 border border-forest-200 rounded-xl p-3 mb-6 flex items-start gap-3 text-xs">
+      <svg class="w-4 h-4 text-forest-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+      <div>
+        <p class="font-display font-semibold text-forest-800">Prețul este temporar indisponibil pentru unul dintre planuri.</p>
+        <p class="text-forest-600">Reîncărcați pagina peste un minut. Echipa noastră a fost notificată.</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-6">
+      <!-- HP — normal -->
+      <div class="bg-white rounded-3xl p-7 border-2 border-forest-100">
+        <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500">Hiring Partner</p>
+        <p class="font-display text-4xl font-bold text-forest-900 mt-3">EUR 120</p>
+        <p class="text-xs text-forest-500 mt-1">/ lună</p>
+        <button class="cta-press w-full mt-6 font-display text-sm font-semibold bg-forest-700 hover:bg-forest-800 text-white py-3 rounded-xl">Abonează-te</button>
+      </div>
+
+      <!-- IP — disabled card -->
+      <div class="plan-card disabled-card bg-gradient-to-br from-coral-50 via-cream-100 to-gold-50 rounded-3xl p-7 border-2 border-coral-200 relative" title="Pricing temporarily unavailable">
+        <span class="absolute -top-3 left-7 inline-flex items-center gap-1 font-display text-xs font-bold uppercase tracking-wider bg-coral-200 text-coral-700 px-3 py-1 rounded-full">Premium · CSR-Ready</span>
+        <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600 mt-1">Impact Partner</p>
+        <div class="flex items-center gap-2 mt-3">
+          <p class="font-display text-3xl font-bold text-forest-500">EUR —</p>
+          <span class="inline-flex items-center gap-1 bg-forest-100 text-forest-600 text-[10px] font-display font-semibold uppercase tracking-wider px-2 py-1 rounded-full">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>
+            Indisponibil
+          </span>
+        </div>
+        <p class="text-xs text-coral-700 mt-1 italic">Prețul este temporar indisponibil — reîncărcați peste un minut.</p>
+        <button class="w-full mt-6 font-display text-sm font-semibold bg-cream-200 text-forest-400 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">Abonează-te anual</button>
+        <button class="w-full mt-2 font-display text-sm font-medium bg-cream-100 text-forest-400 border border-forest-200 py-3 rounded-xl cursor-not-allowed" disabled aria-disabled="true">Începe pilot · EUR 540</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SCREEN 5 — TABLET LAYOUT (768 px)
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Screen 5 — Tablet layout (768 px) <span class="state-badge state-info ml-2">Responsive</span></div>
+
+<div class="design-annotation">
+  <strong>Tablet (768 px):</strong> Sidebar collapses to a top app-bar with a hamburger trigger. The 2 plan cards fit in a 1-col grid (full-width) — vertical reading is preferred. HP-local cycle toggle stays inside the HP card (top-right). The premium gradient + wg-shimmer on the IP card are preserved.
+</div>
+
+<div class="design-screen">
+  <div class="screen-label"><span>/company/settings/subscription · iPad portrait</span><span class="right">768 × 1024</span></div>
+  <div class="p-8 bg-cream-100">
+    <div class="tablet-frame">
+      <!-- Top bar -->
+      <div class="bg-white border-b border-forest-100 px-4 py-3 flex items-center justify-between">
+        <button aria-label="Open menu" class="text-forest-700">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-gold-500 to-gold-700 flex items-center justify-center text-white text-[10px] font-bold">TC</div>
+          <span class="font-display text-sm font-semibold text-forest-800">TechCorp SRL</span>
+        </div>
+        <button aria-label="Account" class="text-forest-700">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 bg-cream-50">
+        <h2 class="font-display text-2xl font-bold text-forest-900">Alege planul tău</h2>
+        <p class="text-xs text-forest-500 mt-1 mb-5">Două niveluri. O singură misiune.</p>
+
+        <!-- No-active banner -->
+        <div class="bg-gold-50 border border-gold-200 rounded-xl p-3 mb-5 flex items-start gap-2">
+          <svg class="w-4 h-4 text-gold-700 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+          <p class="text-xs text-gold-900 font-display font-medium">Este necesar un abonament activ pentru a posta joburi</p>
+        </div>
+
+        <!-- Cards stacked 1-col -->
+        <div class="space-y-4">
+          <!-- HP -->
+          <div class="bg-white rounded-2xl p-5 border-2 border-forest-100">
+            <div class="flex items-start justify-between">
+              <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500">Hiring Partner</p>
+              <div class="inline-flex bg-cream-200 rounded-full p-1 text-[10px]">
+                <button class="px-2.5 py-1 rounded-full font-display font-semibold bg-white text-forest-800 shadow-sm">Lunar</button>
+                <button class="px-2.5 py-1 rounded-full font-display font-medium text-forest-500">Anual</button>
+              </div>
+            </div>
+            <p class="font-display text-3xl font-bold text-forest-900 mt-3">EUR 120 <span class="text-sm text-forest-500 font-normal">/ lună</span></p>
+            <p class="text-xs text-forest-500">sau EUR 1,000 / an (economisești EUR 440)</p>
+            <button class="w-full mt-4 font-display text-sm font-semibold bg-forest-700 text-white py-3 rounded-xl">Abonează-te</button>
+          </div>
+
+          <!-- IP -->
+          <div class="bg-gradient-to-br from-coral-50 via-cream-100 to-gold-50 rounded-2xl p-5 border-2 border-coral-300 relative wg-shimmer-overlay">
+            <span class="absolute -top-2 left-4 inline-flex items-center gap-1 font-display text-[10px] font-bold uppercase tracking-wider bg-coral-500 text-white px-2 py-0.5 rounded-full">Premium · CSR-Ready</span>
+            <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600 mt-1">Impact Partner</p>
+            <p class="font-display text-3xl font-bold text-forest-900 mt-2">EUR 3,600 <span class="text-sm text-coral-700 font-normal">/ an</span></p>
+            <p class="text-xs text-coral-700">Factură anuală în avans</p>
+            <div class="flex flex-col gap-2 mt-4">
+              <button class="w-full font-display text-sm font-semibold bg-coral-500 text-white py-3 rounded-xl">Abonează-te anual</button>
+              <button class="w-full font-display text-sm font-medium bg-white text-coral-700 border border-coral-300 py-3 rounded-xl">Pilot 3 luni · EUR 540</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     MOBILE LAYOUT (< 768 px) — required section per DESIGN_RULES §11
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Mobile Layout (&lt; 768 px) <span class="state-badge state-info ml-2">Responsive</span></div>
+
+<div class="design-annotation">
+  <strong>Navigation:</strong> The light Company sidebar collapses into a top app-bar with a hamburger button opening a drawer (same content as the desktop sidebar). The "Manage Subscription" button moves under the header (full-width) instead of top-right.
+</div>
+
+<div class="design-annotation">
+  <strong>Layout changes:</strong>
+  <ul class="list-disc ml-5 mt-2 space-y-1">
+    <li>2-column card grid → single-column stack (vertical, HP first then IP)</li>
+    <li>Sidebar (256 px) → off-canvas drawer triggered by hamburger</li>
+    <li>Header / Manage button row → stacked (title, Manage button full-width below)</li>
+    <li>HP-local cycle toggle → segmented control inside HP card header (full pill width)</li>
+    <li>IP CTA pair (Subscribe annually + Pilot) → both full-width, stacked vertically, pilot stays as a lighter ghost button</li>
+    <li>Founding pill row: wraps to two lines on narrow viewports; ★ icon stays leading</li>
+    <li>Founding badge top-right: shifts to inline below the tier label (no overlap with "Annual only" pill)</li>
+    <li>Pilot-active body: countdown + progress bar full-width; Convert CTA full-width</li>
+    <li>Banners: action button stacks below the message text instead of right-aligned</li>
+    <li>All CTA buttons keep height ≥ 44 px (DESIGN_RULES §13)</li>
+  </ul>
+</div>
+
+<div class="design-screen">
+  <div class="screen-label"><span>/company/settings/subscription · mobile portrait</span><span class="right">375 × 812</span></div>
+  <div class="p-8 bg-cream-100">
+    <div class="mobile-frame">
+      <!-- Top app-bar -->
+      <div class="bg-white border-b border-forest-100 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <button aria-label="Open menu" class="p-2 -ml-2 text-forest-700">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-gold-500 to-gold-700 flex items-center justify-center text-white text-[10px] font-bold">TC</div>
+          <span class="font-display text-sm font-semibold text-forest-800">Abonament</span>
+        </div>
+        <button aria-label="Account" class="p-2 -mr-2 text-forest-700">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/></svg>
+        </button>
+      </div>
+
+      <div class="p-4 bg-cream-50">
+        <!-- Breadcrumb -->
+        <p class="text-[10px] text-forest-500 font-display mb-1 uppercase tracking-wider">Setări › Abonament</p>
+
+        <!-- Header -->
+        <h1 class="font-display text-xl font-bold text-forest-900">Alege planul tău</h1>
+        <p class="text-xs text-forest-500 mt-1 mb-4">Două niveluri. O singură misiune.</p>
+
+        <!-- No-active banner -->
+        <div class="bg-gold-50 border border-gold-200 rounded-xl p-3 mb-4">
+          <p class="font-display text-xs font-semibold text-gold-900">Abonament activ necesar pentru a posta joburi</p>
+          <p class="text-[10px] text-gold-800 mt-0.5">Companiile VoluntX nu au plan gratuit.</p>
+        </div>
+
+        <!-- Cards stacked -->
+        <div class="space-y-3">
+
+          <!-- HP -->
+          <div class="bg-white rounded-2xl p-4 border-2 border-forest-100">
+            <div class="flex items-start justify-between">
+              <p class="font-display text-xs font-bold uppercase tracking-wider text-forest-500">Hiring Partner</p>
+            </div>
+            <div class="grid grid-cols-2 bg-cream-200 rounded-full p-1 mt-2 mb-3 text-[11px]">
+              <button class="py-1.5 rounded-full bg-white text-forest-800 font-display font-semibold shadow-sm">Lunar</button>
+              <button class="py-1.5 rounded-full text-forest-500 font-display font-medium">Anual</button>
+            </div>
+            <p class="font-display text-2xl font-bold text-forest-900">EUR 120 <span class="text-[11px] font-normal text-forest-500">/ lună</span></p>
+            <p class="text-[10px] text-forest-500">sau EUR 1,000 / an · economisești EUR 440</p>
+            <ul class="text-[11px] font-body text-forest-700 space-y-1 mt-3">
+              <li class="flex gap-1.5"><span class="text-forest-700">✓</span><span>Postări nelimitate</span></li>
+              <li class="flex gap-1.5"><span class="text-forest-700">✓</span><span>Walled Garden — răsfoiește</span></li>
+              <li class="flex gap-1.5"><span class="text-forest-700">✓</span><span>Verificare angajator</span></li>
+              <li class="flex gap-1.5 text-forest-400"><span>—</span><span>Fără contact direct</span></li>
+              <li class="flex gap-1.5 text-forest-400"><span>—</span><span>Fără raport impact</span></li>
+            </ul>
+            <button class="w-full mt-4 font-display text-xs font-semibold bg-forest-700 text-white py-3 rounded-xl min-h-[44px]">Abonează-te</button>
+          </div>
+
+          <!-- IP -->
+          <div class="bg-gradient-to-br from-coral-50 via-cream-100 to-gold-50 rounded-2xl p-4 border-2 border-coral-300 relative wg-shimmer-overlay">
+            <span class="absolute -top-2 left-4 inline-flex items-center gap-1 font-display text-[9px] font-bold uppercase tracking-wider bg-coral-500 text-white px-2 py-0.5 rounded-full">★ Premium</span>
+            <p class="font-display text-xs font-bold uppercase tracking-wider text-coral-600 mt-1">Impact Partner</p>
+            <p class="text-[10px] text-coral-700 italic">Doar anual</p>
+            <p class="font-display text-2xl font-bold text-forest-900 mt-2">EUR 3,600 <span class="text-[11px] font-normal text-coral-700">/ an</span></p>
+            <p class="text-[10px] text-coral-700">Factură anuală în avans</p>
+            <ul class="text-[11px] font-body text-forest-800 space-y-1 mt-3">
+              <li class="flex gap-1.5"><span class="text-coral-500">✓</span><span>Tot din Hiring Partner</span></li>
+              <li class="flex gap-1.5"><span class="text-coral-500">★</span><span>Contact direct cu voluntarii</span></li>
+              <li class="flex gap-1.5"><span class="text-coral-500">★</span><span>Raport trimestrial CSRD</span></li>
+              <li class="flex gap-1.5"><span class="text-coral-500">✓</span><span>2 parteneriate ONG</span></li>
+              <li class="flex gap-1.5"><span class="text-coral-500">✓</span><span>Campanie co-branded / an</span></li>
+            </ul>
+            <button class="w-full mt-4 font-display text-xs font-semibold bg-coral-500 text-white py-3 rounded-xl min-h-[44px]">Abonează-te anual</button>
+            <button class="w-full mt-2 font-display text-xs font-medium bg-white text-coral-700 border border-coral-300 py-3 rounded-xl min-h-[44px]">Pilot <strong>3 luni</strong> · <strong>EUR 540</strong></button>
+            <p class="text-[10px] text-coral-700 mt-2 italic text-center">Taxa pilot se creditează spre anual la conversie</p>
+          </div>
+
+        </div>
+
+        <p class="text-center text-[10px] text-forest-400 mt-5 font-display">Plată securizată prin Stripe · Facturare EUR · Anulezi oricând</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="design-annotation">
+  <strong>Touch targets:</strong> All interactive elements (cycle toggle pills, Subscribe / Pilot / Manage buttons, hamburger, account) ≥ 44 × 44 px. The Pilot CTA on mobile keeps "3 luni" + "EUR 540" prominent through bold spans inside the otherwise lighter-weight ghost button — preserves the "this is a one-time payment, not a subscription" tone.<br>
+  <strong>Gestures:</strong> Standard tap only. No swipe / pull-to-refresh (UC-073 is read-only, RSC, no live updates).
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     ACCESSIBILITY + INTERACTIONS
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Accessibility &amp; Interactions <span class="state-badge state-ok ml-2">WCAG AA</span></div>
+
+<div class="design-annotation">
+  <strong>Keyboard:</strong>
+  <ul class="list-disc ml-5 mt-1">
+    <li>HP cycle toggle: role=<code>tablist</code> · <code>aria-selected</code> on each tab · arrow-left/right cycles between Monthly and Annual within the HP card</li>
+    <li>Plan cards: <code>&lt;article&gt;</code> with <code>aria-label</code> · CTAs reachable in DOM order (HP block → IP block)</li>
+    <li>Manage Subscription button: top-right with <code>aria-label="Manage subscription"</code></li>
+    <li>Banners: role=<code>alert</code> (past-due, pilot-expiring) / role=<code>status</code> (no-active, cancel-pending, founding-closed, catalog-miss); first focusable child is the CTA</li>
+    <li>Pilot-active progress bar: role=<code>progressbar</code> with <code>aria-valuenow</code>, <code>aria-valuemin</code>, <code>aria-valuemax</code>, <code>aria-label</code></li>
+    <li>No modals in UC-073 — Escape not bound</li>
+  </ul>
+  <strong>Contrast:</strong>
+  <ul class="list-disc ml-5 mt-1">
+    <li>forest-900 on cream-50 = 12.1:1 (AAA)</li>
+    <li>coral-600 on coral-50/cream-100/gold-50 gradient ≥ 4.8:1 (AA — sampled at darkest gradient midpoint)</li>
+    <li>gold-900 on gold-50 (founding pill) = 9.4:1 (AAA)</li>
+    <li>red-800 on red-50 (past-due banner) = 8.6:1 (AAA)</li>
+    <li>amber-900 on amber-50 (cancel-pending / pilot-expiring) = 8.0:1 (AAA)</li>
+    <li>White on forest-700 (HP CTA) = 6.2:1 · White on coral-500 (IP CTA) = 5.1:1 · White on gold gradient (founding CTA) ≥ 4.7:1 — all AA for normal text</li>
+  </ul>
+  <strong>Reduced motion:</strong> <code>@media (prefers-reduced-motion: reduce)</code> disables <code>price-anim</code>, <code>fadeUp</code>, <code>shimmer</code>, and the <code>wg-shimmer-overlay</code> gradient sweep on the IP card.
+</div>
+
+<div class="design-annotation">
+  <strong>Interactions:</strong>
+  <ul class="list-disc ml-5 mt-1">
+    <li><strong>Card hover:</strong> 4 px lift + soft forest-shadow on <code>.plan-card:hover</code> (suppressed on disabled / pilot-grayed cards)</li>
+    <li><strong>HP cycle toggle:</strong> Click swaps active tab; the HP card price fades-in via <code>price-anim</code> keyframes (0.35 s, ease) and the savings pill highlight appears when Annual is selected</li>
+    <li><strong>CTA press:</strong> <code>active:scale-[0.98]</code> instant feedback (DESIGN_RULES §6)</li>
+    <li><strong>Founding badge:</strong> static + decorative; the gold gradient on the founding CTA carries the affordance (no tooltip — explanation lives in the founding pill row below the price)</li>
+    <li><strong>Pilot-active countdown:</strong> static snapshot (RSC) — the progress bar is computed at render time from <code>(now - pilot_start) / (pilot_end - pilot_start)</code></li>
+    <li><strong>State swap (designer chrome only):</strong> instant DOM update; the live page never swaps states client-side — each state corresponds to a different server render</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     BR / UC TRACE MATRIX
+     ════════════════════════════════════════════════════════════════════ -->
+<div class="design-section-divider"></div>
+<div class="design-section-title">Business Rule Trace Matrix</div>
+
+<div class="overflow-x-auto">
+<table class="w-full text-sm border border-forest-100 rounded-lg overflow-hidden">
+  <thead class="bg-cream-200 font-display text-xs uppercase tracking-wider text-forest-700">
+    <tr>
+      <th class="px-3 py-2 text-left">Rule / Step</th>
+      <th class="px-3 py-2 text-left">Design element</th>
+      <th class="px-3 py-2 text-left">Where in this file</th>
+    </tr>
+  </thead>
+  <tbody class="text-xs font-body text-forest-700 divide-y divide-forest-50">
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-01</td><td class="px-3 py-2">Per-tier feature display</td><td class="px-3 py-2">HP card <code>&lt;ul&gt;</code> (5 ✓ + 2 —) · IP card <code>&lt;ul&gt;</code> (7 ✓/★ + Founding-only co-creation row)</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-02</td><td class="px-3 py-2">Founding rates surfaced only when invited</td><td class="px-3 py-2"><code>data-show="founding-invited"</code> on founding-pill and founding-badge — not visible in state 6 (closed) or in states 1/2/3/4/7-11</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-03</td><td class="px-3 py-2">Founding CTA passes invite_token to UC-074</td><td class="px-3 py-2">Gold gradient CTAs · <code>data-uc-target="UC-074"</code> · <code>data-uc-step="A1.2"</code></td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-04</td><td class="px-3 py-2">Pilot lifetime uniqueness</td><td class="px-3 py-2">Pilot CTA gated by <code>data-show="pilot-available"</code> — visible only when state is default / hp-annual / founding-* (no-sub); HIDDEN in pilot-active/expiring/expired</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-05</td><td class="px-3 py-2">No mid-cycle upgrade on annual contracts</td><td class="px-3 py-2">Inline note under "Upgrade to Impact Partner" CTA (active-hp-monthly state) + identical reciprocal note on HP "Switch" CTA (active-ip-annual state)</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-06</td><td class="px-3 py-2">Founding-partner cancellation warning</td><td class="px-3 py-2">Gold sub-callout inside the cancel-pending amber banner</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-07</td><td class="px-3 py-2">30-day pilot credit conversion window</td><td class="px-3 py-2">Emerald inline note inside IP card when state="pilot-expired"</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-08</td><td class="px-3 py-2">No free tier — subscribe-to-post</td><td class="px-3 py-2">Gold no-active banner (visible in default / hp-annual / founding-invited / founding-closed states)</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-09</td><td class="px-3 py-2">Currency is EUR (format "EUR 1,000")</td><td class="px-3 py-2">All price spans · no "€" symbol anywhere</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-10</td><td class="px-3 py-2">All amounts from TT-024 catalog</td><td class="px-3 py-2"><code>data-entity="Catalog.company_*.amount"</code> on every price span</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-11</td><td class="px-3 py-2">Read-only — no writes</td><td class="px-3 py-2">All CTAs point to UC-074 / UC-075 / UC-076 via <code>data-uc-target</code></td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">BR-073-12</td><td class="px-3 py-2">i18n namespace companysubscription.*</td><td class="px-3 py-2">All visible strings have RO + EN pairs (designer toggle)</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A1</td><td class="px-3 py-2">Founding-invited surfacing + founding CTA</td><td class="px-3 py-2">State 5 chrome button · founding pill row + gold gradient CTA</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A2</td><td class="px-3 py-2">Founding programme closed — no founding UI</td><td class="px-3 py-2">State 6 chrome button · founding-closed info card · no founding pills anywhere</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A3</td><td class="px-3 py-2">N/A — no trial for Companies</td><td class="px-3 py-2">Verified absence — no "Trial" CTA anywhere on the page</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A4</td><td class="px-3 py-2">Past-due banner + warning border</td><td class="px-3 py-2">Red banner · <code>body[data-state="past-due"] .plan-card[data-current="true"]</code> rule · State 7</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A5</td><td class="px-3 py-2">Cancel-pending banner + Founding warning</td><td class="px-3 py-2">Amber banner · gold sub-callout · State 8</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A6</td><td class="px-3 py-2">Pilot active body + Convert CTA</td><td class="px-3 py-2">State 9 chrome · IP body replacement w/ countdown + progress bar · HP grayed-out via CSS</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A7</td><td class="px-3 py-2">Pilot expiring banner (14 days)</td><td class="px-3 py-2">Amber banner · State 10 chrome · Convert to Annual CTA</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A8</td><td class="px-3 py-2">Pilot expired + 30-day credit note</td><td class="px-3 py-2">State 11 chrome · emerald credit note inside IP card · Pilot CTA never shown again</td></tr>
+    <tr><td class="px-3 py-2 font-display font-semibold">A8 (catalog)</td><td class="px-3 py-2">Catalog miss — graceful degradation</td><td class="px-3 py-2">Screen 4 · disabled IP card · soft info banner</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     JS — designer state + HP cycle toggle (no React)
+     ════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  const body = document.body;
+  const screenLabel = document.getElementById('screen-state-label');
+
+  function updateScreenLabel() {
+    if (!screenLabel) return;
+    const s = body.dataset.state;
+    const c = body.dataset.hpCycle;
+    const l = body.dataset.lang;
+    screenLabel.textContent = `state: ${s} · hp-cycle: ${c} · lang: ${l}`;
+  }
+
+  // STATE toggle (designer chrome)
+  document.querySelectorAll('[data-set-state]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const state = btn.getAttribute('data-set-state');
+      body.dataset.state = state;
+
+      // When jumping to hp-annual preview, also flip the HP cycle to annual
+      if (state === 'hp-annual') {
+        body.dataset.hpCycle = 'annual';
+        syncHpCycleButtons('annual');
+      }
+
+      // Set data-current attribute on the matching plan card for past-due border
+      const hpCard = document.querySelector('[data-tier="hp"]');
+      const ipCard = document.querySelector('[data-tier="ip"]');
+      if (hpCard) hpCard.setAttribute('data-current', state === 'active-hp-monthly' || (state === 'past-due') ? 'true' : 'false');
+      if (ipCard) ipCard.setAttribute('data-current', state === 'active-ip-annual' ? 'true' : 'false');
+
+      document.querySelectorAll('[data-set-state]').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateScreenLabel();
+    });
+  });
+
+  // LANG toggle
+  document.querySelectorAll('[data-set-lang]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lang = btn.getAttribute('data-set-lang');
+      body.dataset.lang = lang;
+      document.querySelectorAll('.lang-ro').forEach((el) => el.classList.toggle('hidden', lang !== 'ro'));
+      document.querySelectorAll('.lang-en').forEach((el) => el.classList.toggle('hidden', lang !== 'en'));
+      document.querySelectorAll('[data-set-lang]').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.documentElement.setAttribute('lang', lang);
+      updateScreenLabel();
+    });
+  });
+
+  // HP cycle toggle (inside HP card)
+  function syncHpCycleButtons(cycle) {
+    document.querySelectorAll('[data-hp-cycle-set]').forEach((b) => {
+      const isActive = b.getAttribute('data-hp-cycle-set') === cycle;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  }
+  document.querySelectorAll('[data-hp-cycle-set]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cycle = btn.getAttribute('data-hp-cycle-set');
+      body.dataset.hpCycle = cycle;
+      syncHpCycleButtons(cycle);
+      // Re-trigger HP price animation
+      document.querySelectorAll('[data-hp-cycle-show]').forEach((span) => {
+        if (!span.classList.contains('hidden')) {
+          span.classList.remove('price-anim');
+          void span.offsetWidth;
+          span.classList.add('price-anim');
+        }
+      });
+      updateScreenLabel();
+    });
+  });
+
+  // Keyboard arrow nav on HP cycle tabs
+  const tabs = Array.from(document.querySelectorAll('[data-hp-cycle-set]'));
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const next = tabs[(i + 1) % tabs.length];
+        next.focus(); next.click();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const prev = tabs[(i - 1 + tabs.length) % tabs.length];
+        prev.focus(); prev.click();
+      }
+    });
+  });
+
+  // Initial sync
+  const hpCard = document.querySelector('[data-tier="hp"]');
+  const ipCard = document.querySelector('[data-tier="ip"]');
+  if (hpCard) hpCard.setAttribute('data-current', 'false');
+  if (ipCard) ipCard.setAttribute('data-current', 'false');
+  updateScreenLabel();
+})();
+</script>
+
+</body>
+</html>

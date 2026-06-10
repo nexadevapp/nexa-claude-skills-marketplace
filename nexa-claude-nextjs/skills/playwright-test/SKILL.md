@@ -177,11 +177,11 @@ await expect(page.locator('table')).toContainText(['New Item']);
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Sprint Branch Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
 
 ## Test User Provisioning
 
@@ -485,7 +485,7 @@ await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`.
 
 ## Workflow
 
@@ -537,4 +537,4 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`.

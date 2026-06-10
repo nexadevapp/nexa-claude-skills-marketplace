@@ -9,7 +9,7 @@
     {
       "name": "nexa-claude-core",
       "source": "./nexa-claude-core",
-      "description": "Nexa Agentic Engineering - stack-agnostic core SDLC methodology"
+      "description": "Nexa Agentic Engineering stack-agnostic core SDLC methodology"
     },
     {
       "name": "nexa-claude-nextjs",

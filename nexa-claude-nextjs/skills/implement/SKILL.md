@@ -29,11 +29,11 @@ Use the context7 MCP server to look up Next.js documentation when needed.
 
 ## Nexa Rules Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/NEXA_RULES_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
 ## Sprint Branch Gate
 
-Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/SPRINT_BRANCH_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
 
 ## Project Readiness Gate
 
@@ -47,15 +47,15 @@ Do not proceed with implementation until all items pass or the user explicitly w
 
 ## DoR Check
 
-- For **UC-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY.md`.
-- For **TT-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY_TT.md`.
-- For **BUG-XXX**: Read and follow `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/readiness/DEFINITION_OF_READY_BUG.md`.
+- For **UC-XXX**: Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY.md`.
+- For **TT-XXX**: Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY_TT.md`.
+- For **BUG-XXX**: Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY_BUG.md`.
 
 Do not proceed with implementation until all items pass or the user explicitly waives failures.
 
 ## Tracking
 
-Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`.
 
 ## Test Data Conventions
 
@@ -135,7 +135,7 @@ Read and follow the **Before Implementation** steps in `~/.claude/plugins/cache/
 
 ## Post-Implementation Tracking
 
-Read and follow the **After Implementation** steps in `~/.claude/plugins/cache/nexa-claude-marketplace/nexa-claude-core/1.0.0/shared/tracking/TRACKING.md`.
+Read and follow the **After Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`.
 
 ## Resources
 

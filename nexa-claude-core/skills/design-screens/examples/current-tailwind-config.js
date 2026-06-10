@@ -1,5 +1,5 @@
 /* ===================================================================
-   VoluntX Tailwind Theme — Currently: GREEN
+   ExampleApp Tailwind Theme — Currently: GREEN
    To switch themes, replace this file's contents with the desired theme:
      - blue-tailwind-config.js  (Blue/Indigo)
      - green-tailwind-config.js (Green/Forest)

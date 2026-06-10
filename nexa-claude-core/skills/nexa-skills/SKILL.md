@@ -40,6 +40,7 @@ nexa-claude-marketplace/
 │   └── skills/                   # All workflow steps as skills (slash commands)
 │       ├── setup-env-profiles/
 │       ├── setup-i18n/
+│       ├── setup-arch-unit/
 │       ├── prisma-migration/
 │       ├── setup-web-middleware/
 │       ├── implement/
@@ -47,14 +48,12 @@ nexa-claude-marketplace/
 │       ├── playwright-test/
 │       ├── code-quality/
 │       ├── deliver-use-case/
+│       ├── audit/
 │       ├── sprint-kickoff/
 │       ├── sprint-deliver/
 │       ├── sprint-complete/
-│       ├── sprint-rework/
 │       ├── setup-playwright-ci/
-│       ├── setup-quality-ci/
-│       ├── aws-dockerize/
-│       └── aws-setup-apprunner/
+│       └── setup-quality-ci/
 └── README.md
 ```
 
@@ -148,7 +147,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3**Multiple skills can apply.** A feature implementation might involve `design-screens` → `deliver-use-case` in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve `design-screens` → `deliver-use-case` in sequence.
 
 ## Quick Reference
 
@@ -178,6 +177,7 @@ These are the subtle errors that look like productivity but create problems:
 | Setup        | `/setup-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for code quality and coverage gates |
+| Setup        | `/setup-arch-unit`      | Set up arch-unit-ts architecture tests with a Husky pre-commit hook |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |
@@ -188,6 +188,3 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
-| Completion   | `/sprint-rework`        | Reset sprint branch to main and re-deliver after PR review           |
-| Infrastructure | `/aws-dockerize`        | Create production-ready Dockerfiles                                |
-| Infrastructure | `/aws-setup-apprunner`  | Generate AWS App Runner deployment infrastructure                  |

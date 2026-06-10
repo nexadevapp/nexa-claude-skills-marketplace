@@ -1,24 +1,31 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-echo $SCRIPT_DIR
-
 SKILLS_DIR="$(dirname "$SCRIPT_DIR")/skills"
-echo $SKILLS_DIR
-
 META_SKILL="$SKILLS_DIR/nexa-skills/SKILL.md"
-
-echo $META_SKILL
 
 if [ -f "$META_SKILL" ]; then
   CONTENT=$(cat "$META_SKILL")
-  # Output as JSON for Claude Code hook consumption
+  CONTEXT=$(printf '%s' "nexa-skills loaded. Use the skill discovery flowchart to find the right skill for your task.
+
+$CONTENT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
   cat <<EOF
 {
-  "priority": "IMPORTANT",
-  "message": "nexa-skills loaded. Use the skill discovery flowchart to find the right skill for your task.\n\n$CONTENT"
+  "systemMessage": "nexa-skills loaded — use the skill discovery flowchart to pick the right skill.",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": $CONTEXT
+  }
 }
 EOF
 else
-  echo '{"priority": "INFO", "message": "nexa-skills: nexa-skills meta-skill not found. Skills may still be available individually."}'
+  cat <<'EOF'
+{
+  "systemMessage": "nexa-skills: meta-skill not found.",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "nexa-skills: nexa-skills meta-skill not found. Skills may still be available individually."
+  }
+}
+EOF
 fi

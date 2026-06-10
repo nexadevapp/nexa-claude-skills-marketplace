@@ -1,2 +1,6 @@
 .idea/
 .DS_Store
+
+# Local Claude Code config (personal permissions, paths)
+.claude/settings.local.json
+.claude/*.local.json

@@ -75,12 +75,14 @@ This single command orchestrates the full pipeline automatically for a use case 
 
 - `/code-review` — Independent code review of your changes
 - `/evaluate` — Checks implementation against its spec and design
+- `/audit` — Deep quality audit (DoD, i18n, accessibility, visual fidelity)
 - `/report-bug` — Creates structured bug reports when something's off
 
-### 14. Deploy → `/aws-dockerize` + `/aws-setup-apprunner`
+### 14. Deliver the sprint
 
-- `/aws-dockerize` — Generates a production-ready Dockerfile
-- `/aws-setup-apprunner` — Creates AWS App Runner infrastructure with CI/CD via GitHub Actions
+- `/sprint-kickoff` — Create the sprint branch and start delivery
+- `/sprint-deliver` — Deliver use cases in priority order from the readiness report
+- `/sprint-complete` — Validate, close issues, archive, and open a PR to main
 
 ---
 

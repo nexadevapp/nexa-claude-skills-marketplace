@@ -1,2 +1,0 @@
-Deliver use case UC-001. 
-Deliver use case UC-002.

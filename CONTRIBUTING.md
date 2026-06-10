@@ -56,6 +56,21 @@ You can scaffold a new skill with the `write-a-skill` skill if you have it insta
 
 Keep the `version` field in every `.claude-plugin/plugin.json` at `1.0.0` for incremental changes. Only bump on a deliberate paradigm shift.
 
+## Validating your change
+
+Run the static validator before opening a PR — it checks every `SKILL.md` and plugin
+manifest for well-formedness and the conventions above (frontmatter fields, `name`↔dir
+match, description length, `${CLAUDE_PLUGIN_ROOT}` references that resolve, no hardcoded
+cache paths, pinned plugin version):
+
+```
+node scripts/validate-skills.mjs
+```
+
+It exits non-zero on any error and runs automatically on every PR via the
+`validate-skills` GitHub Actions workflow. This is **static** validation only — it does
+not run skills or judge their output quality.
+
 ## Testing your change locally
 
 1. Add this repo as a local marketplace in Claude Code:

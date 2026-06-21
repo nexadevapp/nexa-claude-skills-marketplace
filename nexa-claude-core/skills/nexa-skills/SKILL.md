@@ -53,7 +53,8 @@ nexa-claude-marketplace/
 │       ├── sprint-deliver/
 │       ├── sprint-complete/
 │       ├── setup-playwright-ci/
-│       └── setup-quality-ci/
+│       ├── setup-quality-ci/
+│       └── setup-xquik/
 └── README.md
 ```
 
@@ -177,6 +178,7 @@ These are the subtle errors that look like productivity but create problems:
 | Setup        | `/setup-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for code quality and coverage gates |
+| Setup        | `/setup-xquik`          | Set up server-only Xquik public X data integration for Next.js      |
 | Setup        | `/setup-arch-unit`      | Set up arch-unit-ts architecture tests with a Husky pre-commit hook |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |

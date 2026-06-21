@@ -51,7 +51,8 @@ nexa-claude-marketplace/
 │       ├── sprint-deliver/
 │       ├── sprint-complete/
 │       ├── setup-playwright-ci/
-│       └── setup-quality-ci/
+│       ├── setup-quality-ci/
+│       └── setup-xquik/
 └── README.md
 ```
 
@@ -112,6 +113,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Setup        | `/setup-web-middleware` | Build auth, RBAC, and security headers middleware                  |
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for code quality and coverage gates |
+| Setup        | `/setup-xquik`          | Set up server-only Xquik public X data integration for Next.js      |
 | Setup        | `/setup-arch-unit`      | Set up arch-unit-ts architecture tests with a Next.js default rule set and a dedicated Husky pre-commit hook |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
@@ -133,4 +135,4 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 - Always: Follow the skill-anatomy.md format for new skills
 - Never: Add skills that are vague advice instead of actionable processes
-- Never: Duplicate content between skills — reference other skills instead
+- Never: Duplicate content between skills - reference other skills instead

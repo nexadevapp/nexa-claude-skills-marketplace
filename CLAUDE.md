@@ -124,6 +124,39 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
 
+## Shared gate files (cross-plugin sync)
+
+`nexa-claude-core/shared/` holds the readiness/tracking gate files (`DEFINITION_OF_*`, `SPRINT_BRANCH_GATE.md`, `NEXA_RULES_GATE.md`, `TRACKING.md`, etc.). Next.js skills reference them via `${CLAUDE_PLUGIN_ROOT}/shared/...`, but that variable resolves to the *nextjs* plugin root — so each referenced file must also physically exist as a byte-identical copy in `nexa-claude-nextjs/shared/`.
+
+- **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under `nexa-claude-nextjs/shared/`.
+- To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated nextjs copy.
+- Exception: `nexa-claude-nextjs/shared/readiness/PROJECT_READINESS.md` is owned by the nextjs plugin (no core counterpart) and is edited there directly.
+- The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in nextjs skills — no hand-maintained manifest.
+
+## Commands
+
+This is a markdown plugin repo — there is no build, compile, or unit-test step. The one verification command:
+
+- `scripts/sync-shared.sh` — sync core shared files into nextjs.
+- `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references. Run this before committing changes to any `shared/` file or nextjs skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
+
+To test a skill, install the repo as a local marketplace (`/plugin marketplace add /path/to/this/repo`), install the plugin, and invoke the slash command. See `CONTRIBUTING.md`.
+
+## Other plugin contents
+
+Beyond `skills/`, each plugin may contain:
+
+- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`).
+- `hooks/` — e.g. `nexa-claude-core/hooks/` registers a `SessionStart` hook.
+- `.mcp.json` — MCP servers (core: context7; nextjs: Playwright).
+
+## When you add, rename, or remove a skill
+
+Keep these in sync (per `CONTRIBUTING.md`):
+
+1. The skill's `name:` frontmatter must match its directory name exactly.
+2. Update the tables in `README.md`, this `CLAUDE.md`, and the `nexa-skills` orchestrator index (`nexa-claude-core/skills/nexa-skills/SKILL.md`).
+
 ## Git
 
 - Do NOT bump the `version` field in `**/.claude-plugin/plugin.json` files. Always keep the version at `1.0.0`.
@@ -131,6 +164,6 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 ## Boundaries
 
-- Always: Follow the skill-anatomy.md format for new skills
+- Always: Follow the skill anatomy in `CONTRIBUTING.md` ("Anatomy of a skill") for new skills — frontmatter (`name`, `description` with trigger phrases), `When to use`, ordered `Process`, and a `Verification` step.
 - Never: Add skills that are vague advice instead of actionable processes
 - Never: Duplicate content between skills — reference other skills instead

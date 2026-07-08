@@ -201,8 +201,10 @@ Write `docs/sprints/next-sprint/SUMMARY.md`:
 ```markdown
 # Sprint N Summary
 
-**Completed:** [date]
-**Duration:** [first delivery commit] → [last delivery commit]
+| | |
+|---|---|
+| **Completed** | [date] |
+| **Duration** | [first delivery commit] → [last delivery commit] |
 
 ## Delivered Use Cases
 

@@ -283,8 +283,10 @@ Execute these phases in order.
 ```markdown
 # Requirements Engineering Progress
 
-**Started:** YYYY-MM-DD
-**Status:** In Progress
+| | |
+|---|---|
+| **Started** | YYYY-MM-DD |
+| **Status** | In Progress |
 
 ## Clusters
 
@@ -348,9 +350,11 @@ Nexa PO agent in the next step. Format:
 ```markdown
 # Cluster N: [Cluster Name] — Analysis
 
-**Use Cases:** UC-XXX, UC-YYY, UC-ZZZ
-**Entities:** [entities referenced by this cluster]
-**Actors:** [actors in this cluster]
+| | |
+|---|---|
+| **Use Cases** | UC-XXX, UC-YYY, UC-ZZZ |
+| **Entities** | [entities referenced by this cluster] |
+| **Actors** | [actors in this cluster] |
 
 ## CRUD Matrix
 
@@ -668,9 +672,11 @@ After all clusters are complete, run a final analysis across the entire project:
 ```markdown
 # Cross-Cutting Analysis
 
-**Date:** YYYY-MM-DD
-**Clusters processed:** [count]
-**Total use cases analyzed:** [count]
+| | |
+|---|---|
+| **Date** | YYYY-MM-DD |
+| **Clusters processed** | [count] |
+| **Total use cases analyzed** | [count] |
 
 ## Global CRUD Matrix
 
@@ -754,9 +760,11 @@ After all clusters are complete, run a final analysis across the entire project:
 ```markdown
 # Requirements Engineering Progress
 
-**Started:** YYYY-MM-DD
-**Completed:** YYYY-MM-DD
-**Status:** Complete
+| | |
+|---|---|
+| **Started** | YYYY-MM-DD |
+| **Completed** | YYYY-MM-DD |
+| **Status** | Complete |
 
 ## Summary
 

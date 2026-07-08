@@ -309,8 +309,10 @@ Produce `docs/sprints/next-sprint/requirements-refinement-proposal.md`:
 ```markdown
 # Requirements Refinement Proposal
 
-**Sprint:** next-sprint
-**Use Cases in Scope:** UC-XXX, UC-YYY, UC-ZZZ
+| | |
+|---|---|
+| **Sprint** | next-sprint |
+| **Use Cases in Scope** | UC-XXX, UC-YYY, UC-ZZZ |
 
 ## Scope Summary
 
@@ -746,8 +748,11 @@ Produce `docs/sprints/next-sprint/readiness-report.md`:
 ```markdown
 # Sprint Readiness Report
 
-**Sprint:** next-sprint
-**Use Cases:** UC-XXX, UC-YYY, UC-ZZZ
+| | |
+|---|---|
+| **Sprint** | next-sprint |
+| **Use Cases** | UC-XXX, UC-YYY, UC-ZZZ |
+
 ## Verdict: READY FOR DELIVERY | BLOCKERS REMAIN
 
 [1-2 sentence summary]

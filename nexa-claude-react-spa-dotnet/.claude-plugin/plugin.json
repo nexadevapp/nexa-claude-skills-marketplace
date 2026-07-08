@@ -1,0 +1,10 @@
+{
+  "name": "nexa-claude-react-spa-dotnet",
+  "description": "Nexa Agentic Engineering plugin for the React SPA + ASP.NET Core (.NET) stack",
+  "version": "1.0.0",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  }
+}

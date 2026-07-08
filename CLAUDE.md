@@ -52,6 +52,17 @@ nexa-claude-marketplace/
 │       ├── sprint-complete/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-react-spa-dotnet/       # React SPA + ASP.NET Core (.NET) technology stack plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   ├── .mcp.json                 # context7, Playwright
+│   └── skills/                   # Foundational slice — delivery pipeline (setup-*/sprint-*/audit planned)
+│       ├── ef-migration/
+│       ├── implement/
+│       ├── xunit-test/
+│       ├── playwright-test/
+│       ├── code-quality/
+│       └── deliver-use-case/
 └── README.md
 ```
 
@@ -61,6 +72,7 @@ nexa-claude-marketplace/
 
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
+- **nexa-claude-react-spa-dotnet** — Stack-specific: implementation, testing, and delivery for the React SPA + ASP.NET Core (.NET) stack. Requires nexa-claude-core. Currently a foundational slice (the delivery pipeline); `setup-*`, `sprint-*`, and `audit` skills are planned.
 
 ### Marketplace Configuration
 
@@ -124,21 +136,34 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
 
+### React SPA + .NET (stack-specific)
+
+Foundational slice — the per-use-case delivery pipeline. `setup-*`, `sprint-*`, and `audit` skills are planned but not yet available for this stack.
+
+| Phase        | Skill (slash command)   | Description                                                        |
+|--------------|-------------------------|--------------------------------------------------------------------|
+| Construction | `/ef-migration`         | Create EF Core entity classes and migrations from the entity model |
+| Construction | `/implement`            | Implement use cases: ASP.NET Core controllers/services + React SPA |
+| Construction | `/xunit-test`           | Create xUnit integration tests with Testcontainers + WebApplicationFactory |
+| Construction | `/playwright-test`      | Create Playwright e2e tests driving the React SPA against the API  |
+| Construction | `/code-quality`         | Run `dotnet format` (backend) and ESLint + Prettier (frontend)     |
+| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
+
 ## Shared gate files (cross-plugin sync)
 
-`nexa-claude-core/shared/` holds the readiness/tracking gate files (`DEFINITION_OF_*`, `SPRINT_BRANCH_GATE.md`, `NEXA_RULES_GATE.md`, `TRACKING.md`, etc.). Next.js skills reference them via `${CLAUDE_PLUGIN_ROOT}/shared/...`, but that variable resolves to the *nextjs* plugin root — so each referenced file must also physically exist as a byte-identical copy in `nexa-claude-nextjs/shared/`.
+`nexa-claude-core/shared/` holds the readiness/tracking gate files (`DEFINITION_OF_*`, `SPRINT_BRANCH_GATE.md`, `NEXA_RULES_GATE.md`, `TRACKING.md`, etc.). Stack-plugin skills reference them via `${CLAUDE_PLUGIN_ROOT}/shared/...`, but that variable resolves to *that plugin's* root — so each referenced file must also physically exist as a byte-identical copy in the plugin's own `shared/` (e.g. `nexa-claude-nextjs/shared/`, `nexa-claude-react-spa-dotnet/shared/`).
 
-- **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under `nexa-claude-nextjs/shared/`.
-- To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated nextjs copy.
-- Exception: `nexa-claude-nextjs/shared/readiness/PROJECT_READINESS.md` is owned by the nextjs plugin (no core counterpart) and is edited there directly.
-- The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in nextjs skills — no hand-maintained manifest.
+- **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under any stack plugin's `shared/`.
+- To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated plugin copies.
+- Exception: each plugin's `shared/readiness/PROJECT_READINESS.md` is owned by that plugin (no core counterpart) and is edited there directly. It is stack-specific (the nextjs copy targets Next.js middleware/instrumentation; the react-spa-dotnet copy targets the ASP.NET Core middleware pipeline).
+- `sync-shared.sh` discovers stack plugins automatically (every top-level `nexa-claude-*` dir except core that has a `skills/` dir) and derives the set of files to mirror from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in each plugin's skills — no hand-maintained manifest.
 
 ## Commands
 
 This is a markdown plugin repo — there is no build, compile, or unit-test step. The one verification command:
 
-- `scripts/sync-shared.sh` — sync core shared files into nextjs.
-- `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references. Run this before committing changes to any `shared/` file or nextjs skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
+- `scripts/sync-shared.sh` — sync core shared files into every stack plugin.
+- `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references across all stack plugins. Run this before committing changes to any `shared/` file or stack-plugin skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
 
 To test a skill, install the repo as a local marketplace (`/plugin marketplace add /path/to/this/repo`), install the plugin, and invoke the slash command. See `CONTRIBUTING.md`.
 
@@ -146,9 +171,9 @@ To test a skill, install the repo as a local marketplace (`/plugin marketplace a
 
 Beyond `skills/`, each plugin may contain:
 
-- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`).
+- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`, `nexa-claude-react-spa-dotnet/agents/playwright-test.md`).
 - `hooks/` — e.g. `nexa-claude-core/hooks/` registers a `SessionStart` hook.
-- `.mcp.json` — MCP servers (core: context7; nextjs: Playwright).
+- `.mcp.json` — MCP servers (core: context7; nextjs and react-spa-dotnet: Playwright).
 
 ## When you add, rename, or remove a skill
 

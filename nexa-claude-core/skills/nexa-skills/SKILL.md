@@ -54,6 +54,17 @@ nexa-claude-marketplace/
 │       ├── sprint-complete/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-react-spa-dotnet/       # React SPA + ASP.NET Core (.NET) technology stack plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   ├── .mcp.json                 # context7, Playwright
+│   └── skills/                   # Foundational slice — delivery pipeline (setup-*/sprint-*/audit planned)
+│       ├── ef-migration/
+│       ├── implement/
+│       ├── xunit-test/
+│       ├── playwright-test/
+│       ├── code-quality/
+│       └── deliver-use-case/
 └── README.md
 ```
 
@@ -188,3 +199,16 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |
+
+### React SPA + .NET (stack-specific)
+
+Foundational slice — the per-use-case delivery pipeline. `setup-*`, `sprint-*`, and `audit` skills are planned but not yet available for this stack.
+
+| Phase        | Skill (slash command)   | Description                                                        |
+|--------------|-------------------------|--------------------------------------------------------------------|
+| Construction | `/ef-migration`         | Create EF Core entity classes and migrations from the entity model |
+| Construction | `/implement`            | Implement use cases: ASP.NET Core controllers/services + React SPA |
+| Construction | `/xunit-test`           | Create xUnit integration tests with Testcontainers + WebApplicationFactory |
+| Construction | `/playwright-test`      | Create Playwright e2e tests driving the React SPA against the API  |
+| Construction | `/code-quality`         | Run `dotnet format` (backend) and ESLint + Prettier (frontend)     |
+| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |

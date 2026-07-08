@@ -20,7 +20,7 @@ async function globalSetup() {
   process.env.TESTCONTAINERS_RYUK_DISABLED = 'false';
   process.env.TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE = '/var/run/docker.sock';
 
-  // 1. Start PostgreSQL on fixed port 5432 (matches ConnectionStrings__Default in .env.e2e)
+  // 1. Start PostgreSQL on fixed port 5432 (matches ConnectionStrings__DefaultConnection in .env.e2e)
   await new GenericContainer('postgres:16')
     .withEnvironment({
       POSTGRES_USER: 'test',
@@ -34,7 +34,7 @@ async function globalSetup() {
     .withStartupTimeout(60_000)
     .start();
 
-  // The API reads its connection string from ConnectionStrings__Default.
+  // The API reads its connection string from ConnectionStrings__DefaultConnection.
   const apiEnv = { ...process.env, ASPNETCORE_ENVIRONMENT: 'Test' };
 
   // 2. Apply EF Core migrations against the container.

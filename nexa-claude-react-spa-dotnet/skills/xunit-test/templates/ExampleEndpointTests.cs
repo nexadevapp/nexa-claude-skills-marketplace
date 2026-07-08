@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Api.Models;             // <-- adapt: your entity namespace
 using MyApp.Api.Tests.Fixtures;
+using Xunit;
 
 namespace MyApp.Api.Tests.IntegrationTests;
 

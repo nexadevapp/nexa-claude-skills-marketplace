@@ -31,7 +31,7 @@ export default defineConfig({
   webServer: [
     {
       // ASP.NET Core API. `.env.e2e` sets ASPNETCORE_ENVIRONMENT=Test,
-      // ConnectionStrings__Default (the container), and the JWT secret.
+      // ConnectionStrings__DefaultConnection (the container), and the JWT secret.
       // --no-launch-profile so launchSettings.json can't override the env.
       command:
         "bash -c 'set -a; source .env.e2e; set +a; exec dotnet run --project src/<Project>.Api --no-launch-profile'",

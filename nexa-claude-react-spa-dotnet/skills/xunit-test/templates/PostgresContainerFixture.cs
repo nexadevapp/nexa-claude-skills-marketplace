@@ -1,5 +1,5 @@
-using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,6 +7,7 @@ using MyApp.Api.Data;               // <-- adapt: your DbContext namespace
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
+using Xunit;
 
 namespace MyApp.Api.Tests.Fixtures;
 
@@ -20,12 +21,14 @@ namespace MyApp.Api.Tests.Fixtures;
 /// </summary>
 public sealed class PostgresContainerFixture : IAsyncLifetime
 {
+    // The PostgreSql module has a built-in readiness wait (pg_isready); no custom
+    // wait strategy is needed. (Older Testcontainers' Wait.ForUnixContainer()
+    // .UntilPortIsAvailable() API was removed — do not reintroduce it.)
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
         .WithImage("postgres:16")
         .WithDatabase("testdb")
         .WithUsername("test")
         .WithPassword("test")
-        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5432))
         .Build();
 
     private Respawner _respawner = null!;
@@ -81,8 +84,18 @@ public sealed class PostgresContainerFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _connection.DisposeAsync();
-        await Factory.DisposeAsync();
+        // Null-safe: if InitializeAsync threw partway (e.g. Docker unavailable),
+        // these may be null — don't mask the real error with an NRE here.
+        if (_connection is not null)
+        {
+            await _connection.DisposeAsync();
+        }
+
+        if (Factory is not null)
+        {
+            await Factory.DisposeAsync();
+        }
+
         await _container.DisposeAsync();
     }
 }

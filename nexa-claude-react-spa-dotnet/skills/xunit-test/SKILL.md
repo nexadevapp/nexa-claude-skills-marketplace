@@ -53,15 +53,31 @@ Update `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md` per its own instructi
 ## Prerequisites
 
 - **Docker must be running** — Testcontainers spins up a `postgres:16` container.
-- The test project (`src/<Project>.Api.Tests/`) references the API project and needs these packages:
+- On **Colima / Podman / rootless** engines, the Testcontainers "Ryuk" reaper can fail to bind-mount
+  the docker socket (`invalid mount ... operation not supported`). Set `TESTCONTAINERS_RYUK_DISABLED=true`
+  in the test environment (Docker Desktop does not need this).
+- The test project (`src/<Project>.Api.Tests/`) references the API project and needs these packages.
+
+> **Pin versions to the framework — do NOT install these unpinned.** On a .NET 8 / EF Core 8 project,
+> `dotnet add package` grabs the latest major, which silently breaks the build or runtime:
+> - **Do not add `Npgsql` directly at all.** It comes transitively (at the correct 8.0.x) via
+>   `Npgsql.EntityFrameworkCore.PostgreSQL`. Adding it unpinned resolves **Npgsql 9/10** (note: the EF
+>   provider is versioned `8.0.10` but its Npgsql dependency is `8.0.5` — the numbers do NOT match, and
+>   Npgsql 8.x has no `8.0.10`), and a mismatched Npgsql throws `TypeLoadException: HackyEnumTypeMapping`
+>   at runtime. The fixture's `new NpgsqlConnection(...)` uses the transitive version — that is correct.
+> - **`Microsoft.AspNetCore.Mvc.Testing`** unpinned pulls a net9/net10-only build. Pin to the app's major.
+> - **`Respawn`** latest requires Npgsql ≥ 9. Pin to `6.*` for Npgsql 8.
+> - **`FluentAssertions` v8+ requires a paid commercial license** (Xceed). Pin to `6.*` (MIT) or use
+>   xUnit's built-in `Assert` instead — do not ship v8 into a commercial project.
 
 ```bash
-dotnet add src/<Project>.Api.Tests package Microsoft.AspNetCore.Mvc.Testing
+# Versions shown are for .NET 8 / EF Core 8. Confirm current compatible versions via context7.
+dotnet add src/<Project>.Api.Tests package Microsoft.AspNetCore.Mvc.Testing --version 8.0.*
 dotnet add src/<Project>.Api.Tests package Testcontainers.PostgreSql
-dotnet add src/<Project>.Api.Tests package Respawn
-dotnet add src/<Project>.Api.Tests package Npgsql
-dotnet add src/<Project>.Api.Tests package FluentAssertions
-dotnet add src/<Project>.Api.Tests package coverlet.collector   # coverage
+dotnet add src/<Project>.Api.Tests package Respawn --version 6.*
+dotnet add src/<Project>.Api.Tests package FluentAssertions --version 6.*   # v8+ is non-free for commercial use
+dotnet add src/<Project>.Api.Tests package coverlet.collector              # coverage
+# Do NOT add Npgsql directly — it is transitive via the EF Core provider at the correct version.
 ```
 
 > `Program` must be reachable from the test project. If the API uses top-level statements,

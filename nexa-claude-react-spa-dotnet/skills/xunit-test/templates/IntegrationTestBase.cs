@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using MyApp.Api.Data;               // <-- adapt: your DbContext namespace
+using Xunit;
 
 namespace MyApp.Api.Tests.Fixtures;
 

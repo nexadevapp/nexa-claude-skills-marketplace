@@ -144,7 +144,7 @@ await expect(page.locator('table')).toContainText(['New Item']);
 - Skip waiting for page loads or network requests to complete
 - Use hard-coded delays (`page.waitForTimeout`) instead of proper waits
 - Delete all data in cleanup (only remove data created during the test)
-- Hard-code the database connection string — the container's `ConnectionStrings__Default` is provisioned by global setup and read by the API. Hard-code neither it nor the API base URL; read the API base from `REACT_APP_API_BASE_URL`
+- Hard-code the database connection string — the container's `ConnectionStrings__DefaultConnection` is provisioned by global setup and read by the API. Hard-code neither it nor the API base URL; read the API base from `REACT_APP_API_BASE_URL`
 - Write tests that contradict the frontend design (e.g., asserting a table when the design specifies cards)
 - **Skip, exclude, or filter out tests** — never use `--grep-invert`, `--grep`, `--project` subsets, `test.skip()`, `test.fixme()`, or any other mechanism to avoid running tests. All tests must run and pass
 - **Claim tests pass without verifying output** — you must check the actual Playwright output for "X passed" and "0 failed" before declaring success
@@ -211,6 +211,8 @@ The API must expose a test-only endpoint for user provisioning and cleanup, acti
 
 Both actions return `404` outside the Test environment (defense in depth, mirroring the Next.js `guardTestEnv()` pattern). If this endpoint does not exist in the project, create it before writing tests from the template at [templates/E2EUsersController.cs](templates/E2EUsersController.cs) (place it at `src/<Project>.Api/Controllers/E2EUsersController.cs`, adjusting namespace, `DbContext`, and `User` entity to the project).
 
+> **Match the app's real auth model.** The template assumes email/password login with `IPasswordHasher<User>`. If the app authenticates another way — e.g. Google OAuth + JWT with a Test-only "mock-login" endpoint (common in this stack) — do **not** force a password flow. Instead, have the provisioning endpoint seed the user and issue/return a token via the app's mock-login path, and make the test-user helper log in through that endpoint. The login step in each journey must exercise whatever the app actually ships.
+
 ### Test User Helper
 
 Use the helper at [templates/test-user.ts](templates/test-user.ts) to provision and clean up users. It posts to `${REACT_APP_API_BASE_URL}/api/e2e/users` (the API origin, :5000). If `e2e/helpers/test-user.ts` does not exist, create it from the template.
@@ -233,7 +235,7 @@ Before writing tests, ensure the project has a global setup file that starts a P
 
 If `e2e/global-setup.ts` does not exist, create it using [templates/global-setup.ts](templates/global-setup.ts). It:
 
-1. Starts `postgres:16` on fixed port 5432 (matching `ConnectionStrings__Default` in `.env.e2e`).
+1. Starts `postgres:16` on fixed port 5432 (matching `ConnectionStrings__DefaultConnection` in `.env.e2e`).
 2. Applies migrations with `dotnet ef database update --project src/<Project>.Api` under `ASPNETCORE_ENVIRONMENT=Test` (or, alternatively, let the API auto-migrate on startup via `context.Database.Migrate()` and drop this step).
 3. Seeds baseline reference data (optional).
 
@@ -246,7 +248,7 @@ All E2E test environment variables live in a `.env.e2e` file at the project root
 ```
 ASPNETCORE_ENVIRONMENT=Test
 ASPNETCORE_URLS=http://localhost:5000
-ConnectionStrings__Default=Host=localhost;Port=5432;Database=testdb;Username=test;Password=test
+ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=testdb;Username=test;Password=test
 Jwt__Secret=test-secret-for-e2e-at-least-32-characters-long
 Jwt__Issuer=nexa-e2e
 Jwt__Audience=nexa-e2e
@@ -255,7 +257,7 @@ BROWSER=none
 CI=true
 ```
 
-Add project-specific env vars as needed. Commit this file (add `!.env.e2e` to `.gitignore` if `.env*` is ignored). `ConnectionStrings__Default` and `Jwt__*` use ASP.NET Core's `__` double-underscore config binding.
+Add project-specific env vars as needed. Commit this file (add `!.env.e2e` to `.gitignore` if `.env*` is ignored). The keys use ASP.NET Core's `__` double-underscore config binding, so they must match the app's **actual** configuration paths — `ConnectionStrings__DefaultConnection` matches the key `/ef-migration` uses, but the JWT keys are placeholders: mirror whatever your `Program.cs` reads (e.g. an app using `Authentication:Jwt:SecretKey` needs `Authentication__Jwt__SecretKey`, not `Jwt__Secret`). Confirm the config keys against the running app before relying on test logins.
 
 ### Playwright Configuration
 

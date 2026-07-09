@@ -48,6 +48,7 @@ nexa-claude-marketplace/
 │       ├── playwright-test/
 │       ├── code-quality/
 │       ├── deliver-use-case/
+│       ├── resolve-bug/
 │       ├── audit/
 │       ├── sprint-kickoff/
 │       ├── sprint-deliver/
@@ -184,6 +185,7 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run oxlint and oxfmt checks (lint, complexity, formatting)         |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
+| Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |

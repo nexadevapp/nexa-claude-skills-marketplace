@@ -76,6 +76,7 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Construction** | `/playwright-test` | Create Playwright end-to-end tests |
 | **Construction** | `/code-quality` | Run oxlint and oxfmt (lint, cyclomatic complexity, formatting) |
 | **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: implement → test → evaluate |
+| **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
 | **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 | **Delivery** | `/sprint-kickoff` | Create the sprint branch and start delivery |
 | **Delivery** | `/sprint-deliver` | Deliver use cases in priority order from the readiness report |

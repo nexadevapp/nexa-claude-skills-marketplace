@@ -3,7 +3,9 @@
 ## Instructions
 
 Before and after implementing a use case, technical task, bug fix, or change request, perform the tracking steps below using the `gh` CLI.
-This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), bug (`BUG-XXX`), and change request (`CR-XXX`) is tracked as a GitHub issue and stays in sync with the specification.
+Every use case (`UC-XXX`), technical task (`TT-XXX`), bug (`BUG-XXX`), and change request (`CR-XXX`) is tracked as a GitHub issue.
+
+The specification file in `docs/` is the single source of truth. The GitHub issue is a **thin pointer** to it — a one-line summary plus a link to the spec. The issue body never copies the spec's description, actors, or acceptance criteria, so there is nothing to keep in sync.
 
 ## Git Rules
 
@@ -18,100 +20,38 @@ This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), bug (`BUG-XXX
    - For **TT-XXX**: Read from `docs/technical_tasks/`
    - For **BUG-XXX**: Read from `docs/bugs/`
    - For **CR-XXX**: Read from `docs/change_requests/`
-3. Compute a hash of the spec file content: `md5 -q <spec-file>` (macOS) or `md5sum <spec-file>` (Linux)
-4. Build the absolute spec URL for the issue body:
+3. Build the absolute spec URL for the issue body:
    ```
    REPO_URL=$(gh repo view --json url -q .url)
    DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
    SPEC_URL="${REPO_URL}/blob/${DEFAULT_BRANCH}/<relative-path-to-spec>"
    ```
-5. Search for an existing GitHub issue:
-   - `gh issue list --search "in:title <id>" --state all` (where `<id>` is `UC-XXX`, `TT-XXX`, or `BUG-XXX`)
-6. If no issue exists, create one:
+4. Search for an existing GitHub issue:
+   - `gh issue list --search "in:title <id>" --state all` (where `<id>` is `UC-XXX`, `TT-XXX`, `BUG-XXX`, or `CR-XXX`)
+5. If no issue exists, create a thin-pointer issue:
    - Title: `<id>: <name>` (e.g., `UC-003: Place Order` or `TT-001: Set Up Dev Profile`)
-   - Body format for **UC-XXX**:
+   - Body (all ticket types) — a one-line summary drawn from the spec plus the spec link:
      ```
-     ## <use-case-id>: <use-case-name>
-
-     <brief description from the spec>
-
-     **Actors:** <actors from the spec>
-
-     **Acceptance criteria:**
-     - [ ] <derived from main success scenario and key alternative flows>
+     <one-line summary from the spec>
 
      **Spec:** [`<relative-path-to-spec>`](<SPEC_URL>)
-
-     <!-- spec-hash: <computed-hash> -->
      ```
-   - Body format for **TT-XXX**:
+   - For **BUG-XXX** only, append the fields a triager needs without opening the file, and the native cross-link to the parent use case:
      ```
-     ## <task-id>: <task-name>
-
-     <goal from the spec>
-
-     **Category:** <category from the spec>
-
-     **Acceptance criteria:**
-     - [ ] <copied from the spec's acceptance criteria>
-
-     **Spec:** [`<relative-path-to-spec>`](<SPEC_URL>)
-
-     <!-- spec-hash: <computed-hash> -->
-     ```
-   - Body format for **BUG-XXX**:
-     ```
-     ## <bug-id>: <title>
-
-     <description from the bug report>
-
      **Severity:** <severity from the bug report>
-     **Discovered In:** <discovered in from the bug report>
-
-     **Acceptance criteria:**
-     - [ ] Actual behavior resolved
-     - [ ] Expected behavior achieved
-     - [ ] Regression test added
-
-     **Spec:** [`<relative-path-to-spec>`](<SPEC_URL>)
-
-     <!-- spec-hash: <computed-hash> -->
+     **Relates to:** <UC-XXX from the bug report's Related Artifacts>
      ```
-   - Body format for **CR-XXX**:
-     ```
-     ## <cr-id>: <title>
-
-     <requested change from the CR document>
-
-     **References:** <UC-XXX: Use Case Name>
-     **Requested By:** <requested by from the CR document>
-
-     **Acceptance criteria:**
-     - [ ] <copied from the CR's acceptance criteria>
-
-     **Spec:** [`<relative-path-to-spec>`](<SPEC_URL>)
-
-     <!-- spec-hash: <computed-hash> -->
-     ```
+     If the referenced use case already has a GitHub issue, append its number so GitHub renders the backlink on both issues — look it up with `gh issue list --search "in:title <UC-XXX>"` and write `**Relates to:** <UC-XXX> #<uc-issue-number>`.
    - `gh issue create --title "<id>: <name>" --body "<body>"`
-7. If a **closed** issue already exists, ask the user:
+6. If a **closed** issue already exists, ask the user:
    - **Reopen** the existing issue (for rework or bug fix)
    - **Create a new** issue (for a fresh implementation)
    Then proceed based on their answer.
-8. If an open issue already exists, check for drift:
-   - Extract the hash from the issue body: look for `<!-- spec-hash: <hash> -->`
-   - If the hash differs from the current spec hash, update the issue body with fresh acceptance criteria and the new hash
-   - If the hash matches, no update needed
-9. **Issue-origin drift reconciliation (BUG-XXX only):**
-   If the bug report's **Origin** field is a GitHub issue URL (not `human-in-the-loop`), the issue is the authoritative source. Perform this additional check:
-   a. Read the current issue body: `gh issue view <issue-number> --json body -q .body`
-   b. Compare the issue's description with the bug report's **Description** section
-   c. If the issue body has changed since the bug report was created:
-      - Update the bug report's **Description**, **Steps to Reproduce**, **Expected Behavior**, and **Actual Behavior** sections to reflect the current issue content
-      - Recompute the spec hash and update `<!-- spec-hash: -->` in the issue body
-      - Log the reconciliation: add a comment on the issue noting the bug report was updated to match
-   d. If the bug report doc changed but the issue did not:
-      - Proceed with the normal spec-hash drift check (step 8) — the doc update flows to the issue as usual
+7. If an open issue already exists, no update is needed — the body is a pointer to the spec, which stays current on its own.
+8. **Bug origin (BUG-XXX only):**
+   The bug report's **Origin** field records where the bug was born:
+   - `human-in-the-loop` — the bug `.md` is the source of truth; create the issue as in step 5.
+   - a GitHub issue URL — the issue already exists and is where discussion lives; do not create a new one. Ensure the two point at each other: the bug `.md`'s **GitHub Issue** field holds the issue URL, and the issue links back to the bug `.md` (add the `**Spec:**` line via `gh issue comment` if it is missing). There is no content to reconcile.
 
 ## After Implementation
 
@@ -123,13 +63,12 @@ This ensures every use case (`UC-XXX`), technical task (`TT-XXX`), bug (`BUG-XXX
    - For **BUG-XXX** (`docs/bugs/BUG-XXX.md`): Set `Status` to `Fixed`
    - For **CR-XXX** (`docs/change_requests/CR-XXX.md`): Set `Status` to `Implemented`
      (live doc updates and evaluation still pending — status advances to `Done` once those are complete)
-3. On the existing GitHub issue, check off acceptance criteria that are now satisfied
-4. Add a comment summarizing what was implemented:
+3. Add a comment summarizing what was implemented:
    - `gh issue comment <issue-number> --body "Implemented: <brief summary of what was done>"`
-5. If all acceptance criteria and definition-of-done items are checked, close the issue:
+4. If the Definition of Done is satisfied, close the issue:
    - `gh issue close <issue-number>`
-6. If not all items are checked, leave the issue open and inform the user what remains
-7. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
+5. If the Definition of Done is not yet satisfied, leave the issue open and inform the user what remains
+6. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
    - **UC** → `feat(UC-XXX): <description>`
    - **TT** → `chore(TT-XXX): <description>`
    - **BUG** → `fix(BUG-XXX): <description>`

@@ -141,4 +141,4 @@ Determine the **origin** of the change request from $ARGUMENTS:
     b. Update the CR's **GitHub Issue** field with the issue URL
 14. **If origin is `github-issue`:**
     a. Follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
-       — the issue already exists, so only the hash sync and drift reconciliation steps apply
+       — the issue already exists, so only ensure the CR `.md` and the issue link to each other (no new issue is created)

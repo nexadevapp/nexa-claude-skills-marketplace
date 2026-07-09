@@ -61,7 +61,7 @@ For each item, report:
 Key verification points:
 - **Task Completeness** — Cross-reference every MSS step, alternative flow, business rule,
   precondition, and postcondition from the spec against the code
-- **Acceptance Criteria** — Check the GitHub issue for $ARGUMENTS; verify each criterion is satisfiable
+- **Acceptance Criteria** — Read the acceptance criteria from the spec file (`docs/use_cases/UC-XXX.md`) for $ARGUMENTS; verify each criterion is satisfiable
 - **Code Quality** — Run `npx next build`; verify input validation at system boundaries;
   verify error states surface meaningful feedback
 - **Test Coverage** — Verify unit tests exist for business logic, MSS, alternative flows,

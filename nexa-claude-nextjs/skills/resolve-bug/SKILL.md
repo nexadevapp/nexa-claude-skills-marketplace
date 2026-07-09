@@ -39,6 +39,11 @@ others' reasoning, so findings are independent, not rationalized.
 - Auto-close the GitHub issue on a Not Reproducible verdict — leave it open for a human to
   triage
 - Run more than 2 DoD_BUG fix iterations in Step 3
+- Hard-stop on DoR_BUG upfront for a doc auto-created from a raw GitHub issue in this run —
+  thin Expected/Actual Behavior, Steps to Reproduce, or Severity are expected there; let the
+  `bug-tester` fill them from actual investigation instead (see Step 0.4)
+- Apply that same leniency to a **pre-existing** `BUG-XXX` doc — a human wrote or reviewed it,
+  so it's still held to the full DoR_BUG standard immediately in Step 0
 
 ## Nexa Rules Gate
 
@@ -64,22 +69,35 @@ Store as the rollback point for Failure Recovery.
 
 ### Step 0: Resolve the Bug Doc
 
-1. If `$ARGUMENTS` matches `BUG-XXX`, read `docs/bugs/BUG-XXX.md` directly and go to 3.
+1. If `$ARGUMENTS` matches `BUG-XXX`, read `docs/bugs/BUG-XXX.md` directly. Mark this doc
+   **pre-existing** and go to 4.
 2. If `$ARGUMENTS` is a GitHub issue URL or bare number, search for an existing bug doc that
    already points at it:
    ```
    grep -rl "<issue-url-or-number>" docs/bugs/
    ```
-   If found, use that `BUG-XXX` and go to 3.
+   If found, use that `BUG-XXX`, mark it **pre-existing**, and go to 4.
 3. If no bug doc exists for a given GitHub issue, invoke the `report-bug` skill (via the Skill
    tool, `skill: "report-bug"`) with the issue URL as its argument. This creates the doc and
    the thin-pointer issue linkage per its own `github-issue` origin workflow — do not
-   duplicate that logic here. Use the resulting `BUG-XXX` id.
-4. Run `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY_BUG.md` against the bug
-   doc. If any item fails, report the failures and stop — do not begin the pipeline until the
-   user fixes the report or explicitly waives the failing items.
+   duplicate that logic here. Use the resulting `BUG-XXX` id and mark it **auto-created**.
+4. **DoR_BUG gate — conditional on origin:**
+   - **Pre-existing doc** (paths 1–2): a human is presumed to have written or reviewed it, so
+     hold it to the full standard now. Run
+     `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY_BUG.md` against it. If any
+     item fails, report the failures and stop — do not begin the pipeline until the user fixes
+     the report or explicitly waives the failing items.
+   - **Auto-created doc** (path 3): raw GitHub issues are routinely thin or poorly formatted —
+     missing Expected/Actual Behavior, vague or absent reproduction steps, no severity. Do
+     **not** run DoR_BUG here. Proceed straight to Step 1 and let the `bug-tester` fill these
+     gaps from its own investigation instead of demanding a human do it upfront. The gate is
+     not skipped, only deferred: Step 3 reuses `implement/SKILL.md`, which runs this exact same
+     `DEFINITION_OF_READY_BUG.md` check again before touching code. By then the doc should
+     carry real, investigated content; if it still doesn't, the pipeline stops there with a
+     concrete reason instead of a presumptive one now.
 5. Note the bug doc's **GitHub Issue** field — this is the issue number every subagent in
-   this pipeline will comment on.
+   this pipeline will comment on. Carry the **pre-existing / auto-created** marking into
+   Step 1's prompt.
 
 ---
 
@@ -91,11 +109,27 @@ cold: no visibility into any prior fix attempt or analysis.
 
 Invoke via the Agent tool with `subagent_type: "bug-tester"`. Prompt:
 
-> Reproduce the bug described in `docs/bugs/BUG-XXX.md` (GitHub issue #<number>).
+> Reproduce the bug described in `docs/bugs/BUG-XXX.md` (GitHub issue #<number>). This doc is
+> **[pre-existing | auto-created from the raw GitHub issue]**.
 >
 > Follow your operating manual (`resolve-bug/SKILL.md` Step 1, loaded as your identity) to the
-> letter. Report your verdict (Reproducible / Not Reproducible), the evidence you gathered,
-> and the issue comment you posted.
+> letter. If auto-created, fill any missing/placeholder Expected Behavior, Actual Behavior,
+> Steps to Reproduce, or Severity from your own investigation — do not leave them for a human
+> to backfill. Report your verdict (Reproducible / Not Reproducible / Insufficient
+> Information), the evidence you gathered, any fields you filled in, and the issue comment you
+> posted.
+
+**If Insufficient Information** (only possible for an auto-created doc — the tester couldn't
+determine what to even attempt): stop the pipeline. Print what's missing and:
+
+```
+PIPELINE STOPPED: BUG-XXX — not enough information to reproduce
+
+[tester's report of what's missing]
+
+The raw GitHub issue didn't have enough for the tester to act on. Add the missing detail to
+the issue (or docs/bugs/BUG-XXX.md directly) and re-run /resolve-bug.
+```
 
 **If Not Reproducible:** stop the pipeline here. Print the tester's evidence and:
 
@@ -155,10 +189,16 @@ applying it blindly** — the analysis was written moments ago but code is the s
 If the plan and the code disagree, trust the code and note the discrepancy in your delivery
 summary.
 
-`implement/SKILL.md` already runs the `DEFINITION_OF_READY_BUG.md` gate (already satisfied
-from Step 0) and, at its end, its own Post-Implementation Tracking section (issue comment,
-status update, close, conventional commit). **Do not let that tracking section run yet** —
-first complete the DoD_BUG gate below, then let it run.
+`implement/SKILL.md` already runs the `DEFINITION_OF_READY_BUG.md` gate itself before
+implementing. For a **pre-existing** doc this was already satisfied in Step 0 and simply
+re-passes. For an **auto-created** doc, Step 0 deliberately deferred that gate — this is
+where it actually bites: if the `bug-tester`'s fill-ins in Step 1 weren't enough to satisfy
+DoR_BUG, `implement/SKILL.md` stops here with the specific failing items, same as it would for
+any other `BUG-XXX`. Resolve those (or have the user waive them) before continuing.
+
+`implement/SKILL.md` also runs, at its end, its own Post-Implementation Tracking section
+(issue comment, status update, close, conventional commit). **Do not let that tracking section
+run yet** — first complete the DoD_BUG gate below, then let it run.
 
 **DoD_BUG Gate** — after implementation, tests, and build succeed (steps 1–12 of
 `implement/SKILL.md`), read `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_DONE_BUG.md`

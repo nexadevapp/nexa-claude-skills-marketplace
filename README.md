@@ -70,6 +70,7 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Setup** | `/setup-arch-unit` | Set up arch-unit-ts architecture tests with a Husky pre-commit hook |
 | **Setup** | `/setup-playwright-ci` | Generate a GitHub Actions workflow for Playwright E2E tests |
 | **Setup** | `/setup-quality-ci` | Generate a GitHub Actions workflow for quality and coverage gates |
+| **Setup** | `/onboard-existing-app` | Reverse-engineer requirements, entity model, and use cases from an existing Next.js codebase |
 | **Construction** | `/prisma-migration` | Create Prisma schema models and migrations from the entity model |
 | **Construction** | `/implement` | Implement use cases — pages, components, API routes, server actions |
 | **Construction** | `/vitest-test` | Create Vitest integration tests with Testcontainers |

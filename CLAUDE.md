@@ -159,7 +159,7 @@ Keep these in sync (per `CONTRIBUTING.md`):
 
 ## Git
 
-- Do NOT bump the `version` field in `**/.claude-plugin/plugin.json` files. Always keep the version at `1.0.0`.
+- Do NOT add a `version` field to `**/.claude-plugin/plugin.json` files. The field is intentionally omitted so the git commit SHA drives versioning — every commit counts as a new version, which is what lets `/plugin update` actually pull skill changes. A pinned `version` freezes users on their first-installed commit.
 - Skills reference files within their own plugin using `${CLAUDE_PLUGIN_ROOT}` — never hardcode the cache path.
 
 ## Boundaries

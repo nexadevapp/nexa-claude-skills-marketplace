@@ -1,7 +1,6 @@
 {
   "name": "nexa-claude-core",
   "description": "Nexa Agentic Engineering - stack-agnostic core SDLC methodology",
-  "version": "1.0.0",
   "author": {
     "name": "Marius Achim",
     "email": "marius@nexadev.app",

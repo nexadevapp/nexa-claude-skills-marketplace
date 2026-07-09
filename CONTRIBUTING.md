@@ -54,13 +54,14 @@ You can scaffold a new skill with the `write-a-skill` skill if you have it insta
 
 ## Versioning
 
-Keep the `version` field in every `.claude-plugin/plugin.json` at `1.0.0` for incremental changes. Only bump on a deliberate paradigm shift.
+Do **not** add a `version` field to any `.claude-plugin/plugin.json`. It is omitted on purpose: for a git-distributed marketplace, Claude Code uses the commit SHA as the version, so every merged commit is automatically a new version. That is what makes `/plugin update` actually pull skill changes. A pinned `version` (advisory only — it never invalidates the cache on its own) would freeze users on whatever commit they first installed.
 
 ## Testing your change locally
 
 1. Add this repo as a local marketplace in Claude Code:
    `/plugin marketplace add /path/to/nexa-claude-skills-marketplace`
 2. Install the plugin you changed: `/plugin install nexa-claude-core` (and/or `nexa-claude-nextjs`).
+   - For fast iteration, prefer `claude --plugin-dir /path/to/nexa-claude-skills-marketplace` and `/reload-plugins` after each edit — it loads skills straight from the source tree and sidesteps the directory-source cache staleness that a normal install can hit.
 3. Invoke your skill as a slash command and confirm it behaves as documented.
 4. Make sure no documentation references a skill that no longer exists, and that any new skill appears in `README.md`, `CLAUDE.md`, and the `nexa-skills` orchestrator index.
 

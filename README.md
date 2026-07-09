@@ -21,6 +21,18 @@ Install directly from inside Claude Code:
 
 Once installed, the skills are available as slash commands and the agent will suggest the right one for each task. You don't need to memorize them — describe what you want, and Claude routes you to the correct skill.
 
+### Updating
+
+New commits to this repo are picked up as new versions automatically (the git commit SHA is the version). To pull the latest skills, run from inside Claude Code:
+
+```text
+/plugin marketplace update nexa-claude-marketplace
+/plugin update nexa-claude-core
+/plugin update nexa-claude-nextjs
+```
+
+If a skill still looks stale after updating (a known, still-open Claude Code plugin-cache bug — see [#14061](https://github.com/anthropics/claude-code/issues/14061) and [#17361](https://github.com/anthropics/claude-code/issues/17361)), remove the cache and reinstall: `rm -rf ~/.claude/plugins/cache`, then restart Claude Code and re-run the install commands above.
+
 ---
 
 ## `nexa-claude-core` — Stack-Agnostic Methodology

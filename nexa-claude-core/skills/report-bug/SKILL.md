@@ -115,4 +115,4 @@ and shipping. The discount is visually applied to line items but not reflected i
    a. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
    b. Update the bug report's **GitHub Issue** field with the issue URL
 10. **If origin is `github-issue`:**
-    a. Follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md` — the issue already exists, so only the hash sync and drift reconciliation steps apply
+    a. Follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md` — the issue already exists, so only ensure the bug `.md` and the issue link to each other (no new issue is created)

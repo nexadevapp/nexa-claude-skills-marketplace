@@ -19,7 +19,7 @@ tracking until the user either fixes the issues or explicitly waives the failing
 
 ### Acceptance Criteria
 
-- [ ] **Tracking issue criteria met** — All acceptance criteria on the GitHub tracking issue are satisfiable
+- [ ] **Spec acceptance criteria met** — All acceptance criteria in the use case specification (`docs/use_cases/`) are satisfiable
 - [ ] **Spec fidelity** — No specified behavior is missing; no undocumented behavior is added
 
 ### Code Quality

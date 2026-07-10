@@ -45,6 +45,11 @@ and reports infrastructure gaps without touching anything that already works.
   `UC-XXX.md` — the orchestrator (this skill, main context) does the one sequential append
   into `docs/requirements.md` and `docs/use_cases.puml`
 - Attempt entity-model reverse-engineering against a non-Prisma stack — flag and skip instead
+- Generate wireframes or design specs for existing screens — `/generate-wireframe` and
+  `/design-screens` are prospective planning tools; reverse-capturing a live app's rendered UI
+  as a design artifact is a distinct capability this skill deliberately doesn't attempt.
+  `/evaluate`'s Design Conformance and `/audit`'s Screen Fidelity lens will simply skip for
+  onboarded UCs until a design doc exists via the normal flow on future work
 - Auto-generate `BUG-XXX`/`TT-XXX` docs from BMAD's `deferred-work.md` — mention counts/severity
   in the Step 6 report and point at `/report-bug` instead; that needs `resolve-bug`'s own
   reproduction rigor, not a doc-mapping pass

@@ -43,3 +43,6 @@ This gate does **not** apply to:
 - **Elaboration skills** (`/requirements`, `/entity-model`, `/use-case-diagram`, `/engineer-requirements`, `/generate-wireframe`) — these produce documentation, not code
 - **Construction planning skills** (`/use-case-spec`, `/design-screens`, `/sprint-prepare`, `/technical-task`) — these produce specifications and designs, not code
 - **Verification skills** (`/code-review`, `/evaluate`, `/report-bug`) — these are read-only reviews
+- **`/onboard-existing-app`** — reverse-engineers documentation and audits infrastructure for
+  an existing codebase; it doesn't modify application code, so it runs on `main` like the
+  other documentation-producing skills above

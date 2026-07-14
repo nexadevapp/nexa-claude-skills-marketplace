@@ -41,6 +41,7 @@ nexa-claude-marketplace/
 │       ├── setup-env-profiles/
 │       ├── setup-i18n/
 │       ├── setup-arch-unit/
+│       ├── onboard-existing-app/
 │       ├── prisma-migration/
 │       ├── setup-web-middleware/
 │       ├── implement/
@@ -179,6 +180,7 @@ These are the subtle errors that look like productivity but create problems:
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for code quality and coverage gates |
 | Setup        | `/setup-arch-unit`      | Set up arch-unit-ts architecture tests with a Husky pre-commit hook |
+| Setup        | `/onboard-existing-app` | Reverse-engineer requirements, entity model, and use cases from an existing Next.js codebase |
 | Construction | `/prisma-migration`     | Create Prisma schema and migrations                                |
 | Construction | `/implement`            | Implement use cases or technical tasks using Next.js               |
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |

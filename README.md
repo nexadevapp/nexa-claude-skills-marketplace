@@ -6,6 +6,7 @@ The marketplace has a **two-layer architecture**:
 
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and sprint delivery. Requires `nexa-claude-core`.
+- **`nexa-claude-react-spa-dotnet`** — the React SPA + ASP.NET Core (.NET) stack: implementation, testing, and per-use-case delivery. Requires `nexa-claude-core`. *(Foundational slice — the delivery pipeline; `setup-*`, `sprint-*`, and `audit` skills are planned.)*
 
 ---
 
@@ -16,7 +17,8 @@ Install directly from inside Claude Code:
 ```text
 /plugin marketplace add nexadevapp/nexa-claude-skills-marketplace
 /plugin install nexa-claude-core
-/plugin install nexa-claude-nextjs        # optional — only if you build on Next.js
+/plugin install nexa-claude-nextjs                 # optional — only if you build on Next.js
+/plugin install nexa-claude-react-spa-dotnet       # optional — only if you build on React SPA + .NET
 ```
 
 Once installed, the skills are available as slash commands and the agent will suggest the right one for each task. You don't need to memorize them — describe what you want, and Claude routes you to the correct skill.
@@ -84,6 +86,25 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Delivery** | `/sprint-complete` | Close the sprint: validate, close issues, archive, open a PR |
 
 Uses the **Context7** and **Playwright** MCP servers.
+
+---
+
+## `nexa-claude-react-spa-dotnet` — React SPA + ASP.NET Core Stack
+
+Adds implementation, testing, and delivery skills for a split **React single-page app + ASP.NET Core (.NET) API** stack (EF Core, PostgreSQL, xUnit). Requires `nexa-claude-core`.
+
+| Phase | Command | Description |
+|---|---|---|
+| **Construction** | `/ef-migration` | Create EF Core entity classes and migrations from the entity model |
+| **Construction** | `/implement` | Implement use cases — ASP.NET Core controllers/services + React SPA (React Query, react-hook-form/yup) |
+| **Construction** | `/xunit-test` | Create xUnit integration tests against a real database (Testcontainers + WebApplicationFactory) |
+| **Construction** | `/playwright-test` | Create Playwright end-to-end tests driving the React SPA against the API |
+| **Construction** | `/code-quality` | Run `dotnet format` (backend) and ESLint + Prettier (frontend) |
+| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: implement → test → evaluate |
+
+Uses the **Context7** and **Playwright** MCP servers.
+
+> **Foundational slice.** This plugin currently ships the core delivery pipeline. Setup skills (`setup-env-profiles`, `setup-web-middleware`, `setup-i18n`, `setup-arch-unit`, CI), the `sprint-*` orchestration trio, and `audit` are planned but not yet available for this stack.
 
 ---
 

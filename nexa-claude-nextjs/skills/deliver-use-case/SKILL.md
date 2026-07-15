@@ -65,6 +65,9 @@ Step 3; append a new section after every verification (E2E test run, coverage ev
 Pass this file to every re-launched agent: "Read `docs/delivery/$ARGUMENTS-iterations.md` —
 do NOT repeat fixes that already failed."
 
+Before every append, re-read the file's current contents (see TRACKING.md's Re-Read Before
+Write guidance) rather than relying on a copy read earlier in the pipeline.
+
 ## Entity Gate
 
 Hard stop before any pipeline step begins.

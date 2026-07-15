@@ -150,7 +150,9 @@ triage — decide whether to close it, request more repro details, or re-run
 ### Step 2: Analyze + Link (Parallel Isolated Agents)
 
 Spawn both subagents in the **same message** (two Agent tool calls) so they run in parallel —
-neither depends on the other's output.
+neither depends on the other's output. They don't share a write target (`bug-analyst` only
+posts a GitHub issue comment; `requirement-linker` is the sole writer of the bug doc's Related
+Artifacts section), so TRACKING.md's Re-Read Before Write guidance does not apply here.
 
 #### Senior Dev Analyst
 

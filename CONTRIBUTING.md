@@ -49,6 +49,7 @@ Guidelines:
 - Reference bundled files within a plugin using `${CLAUDE_PLUGIN_ROOT}`; never hardcode an absolute or cache path.
 - Bundle supporting assets (templates, examples) inside the skill directory.
 - Use the `setup-` prefix for skills that establish foundational infrastructure/config/tooling (run once, occasionally re-run). All other skills use a plain name.
+- **Keep `SKILL.md` under ~500 lines.** Anthropic's skill-authoring guidance loads the full `SKILL.md` body on every invocation regardless of which section is relevant, so it must stay lean. If a skill's body grows past ~500 lines, split it: keep the workflow skeleton (frontmatter, `When to use`, ordered `Process`, `Verification`) in `SKILL.md`, and extract templates, detailed examples, and edge-case tables into a single `REFERENCE.md` in the same skill directory. Link to it inline with `[REFERENCE.md](REFERENCE.md#some-heading)` at the point of use — one level deep only, no nested reference files. Any heading referenced by name from elsewhere (in-file or from another file, e.g. an `agents/*.md` prompt) must be kept as a stub in `SKILL.md`, never deleted outright. See `nexa-claude-core/skills/requirements/` or `nexa-claude-core/skills/sprint-prepare/` for worked examples of this pattern.
 
 You can scaffold a new skill with the `write-a-skill` skill if you have it installed.
 

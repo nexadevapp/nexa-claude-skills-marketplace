@@ -39,6 +39,7 @@ others' reasoning, so findings are independent, not rationalized.
 - Auto-close the GitHub issue on a Not Reproducible verdict — leave it open for a human to
   triage
 - Run more than 2 DoD_BUG fix iterations in Step 3
+- Run more than 2 Code Review iterations in Step 3
 - Hard-stop on DoR_BUG upfront for a doc auto-created from a raw GitHub issue in this run —
   thin Expected/Actual Behavior, Steps to Reproduce, or Severity are expected there; let the
   `bug-tester` fill them from actual investigation instead (see Step 0.4)
@@ -211,9 +212,30 @@ and re-check. Up to 2 iterations.
 If DoD_BUG still fails after 2 iterations, stop and follow **Failure Recovery** below — do not
 proceed to Post-Implementation Tracking with an unresolved Critical failure.
 
-Once DoD_BUG passes, let `implement/SKILL.md`'s Post-Implementation Tracking section run to
-completion (this is what comments "Implemented: ...", sets bug Status to `Fixed`, closes the
-issue if satisfied, and creates the `fix(BUG-XXX): ...` commit).
+**Code Review Gate (up to 2 iterations)** — once DoD_BUG passes, spawn a **typed
+`code-review` subagent** (not general-purpose) via the Agent tool with
+`subagent_type: "code-review"`. Prompt:
+
+> Review the fix for BUG-XXX (GitHub issue #<number>). Run `git diff <rollback-checkpoint-hash>`
+> (the hash recorded in Rollback Checkpoint) to see every change made so far, and review it
+> against `docs/bugs/BUG-XXX.md` and the `bug-analyst`'s fix plan posted to the issue.
+>
+> Follow your operating manual (`code-review/SKILL.md`) to the letter. Return the structured
+> review report exactly as specified in its Output Format section.
+
+Fix every Critical finding — required before proceeding. Fix Important findings when the fix
+is straightforward; otherwise note them in the completion summary as a follow-up rather than
+blocking. Minor findings never block. After applying fixes, re-run the DoD_BUG check, then
+re-launch the `code-review` subagent for re-review. This DoD_BUG re-check is a regression
+check within the Code Review Gate's own iteration budget — it does not consume or reset the
+DoD_BUG gate's already-exhausted budget from the step above.
+
+After 2 iterations with a Critical finding still open, stop and follow **Failure Recovery**
+below — do not proceed to Post-Implementation Tracking with an unresolved Critical finding.
+
+Once the Code Review Gate passes, let `implement/SKILL.md`'s Post-Implementation Tracking
+section run to completion (this is what comments "Implemented: ...", sets bug Status to
+`Fixed`, closes the issue if satisfied, and creates the `fix(BUG-XXX): ...` commit).
 
 ---
 
@@ -231,6 +253,7 @@ Terminal summary:
 | Link (requirement-linker)| [requirements linked] |
 | Fix (implement)          | ... |
 | DoD_BUG                  | N / 2 |
+| Code Review              | N / 2 |
 
 GitHub issue: <url>
 Bug doc: docs/bugs/BUG-XXX.md
@@ -240,12 +263,12 @@ Bug doc: docs/bugs/BUG-XXX.md
 
 ## Failure Recovery
 
-When the DoD_BUG gate exhausts its 2 iterations without passing:
+When the DoD_BUG gate or the Code Review Gate exhausts its 2 iterations without passing:
 
 ```
 BUGFIX FAILED: BUG-XXX
 
-[remaining DoD_BUG Critical failures]
+[remaining DoD_BUG or Code Review Critical failures]
 
 Roll back all changes from this pipeline run? (Y/n)
 

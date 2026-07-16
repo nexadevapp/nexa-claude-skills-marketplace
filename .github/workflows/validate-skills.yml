@@ -1,0 +1,32 @@
+name: validate-skills
+
+# Tier 1 static validation — the cheap, deterministic, blocking gate for skill changes.
+# Checks every SKILL.md and plugin manifest for well-formedness and repo conventions
+# (frontmatter fields, name↔dir match, description length, ${CLAUDE_PLUGIN_ROOT} refs
+# that resolve, no hardcoded cache paths, pinned plugin version). Does NOT run skills.
+#
+# Complements (does not duplicate):
+#   shared-sync.yml  — byte-identical cross-plugin shared gate files
+#   Tier 2 evals     — skill OUTPUT quality (run separately, non-blocking)
+
+on:
+  pull_request:
+    paths:
+      - 'nexa-claude-core/**'
+      - 'nexa-claude-nextjs/**'
+      - '.claude-plugin/**'
+      - 'scripts/validate-skills.mjs'
+      - '.github/workflows/validate-skills.yml'
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate skills and plugin manifests
+        run: node scripts/validate-skills.mjs

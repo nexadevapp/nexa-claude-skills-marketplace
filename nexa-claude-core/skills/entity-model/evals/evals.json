@@ -1,0 +1,42 @@
+{
+  "skill_name": "entity-model",
+  "output_file": "docs/entity_model.md",
+  "golden": "golden/docs/entity_model.md",
+  "evals": [
+    {
+      "id": "library-standard",
+      "prompt": "Create an entity model from the requirements in docs/requirements.md.",
+      "expected_output": "An entity model at docs/entity_model.md with a Mermaid erDiagram showing only entities and relationships (no attributes), and a 5-column attribute table for every entity. It should cover the library domain: members, authors, books, physical copies, and loans, with foreign keys linking books to authors, copies to books, and loans to both members and copies.",
+      "files": ["files/docs/requirements.md"],
+      "assertions": [
+        { "text": "Produces docs/entity_model.md", "grader": "code:output-exists" },
+        { "text": "Contains a Mermaid erDiagram block", "grader": "code:has-er-diagram" },
+        { "text": "No attributes appear inside the Mermaid entity blocks", "grader": "code:no-attributes-in-diagram" },
+        { "text": "Every entity in the ER diagram has a ### section", "grader": "code:entities-have-sections" },
+        { "text": "Every attribute table has exactly the 5 required columns", "grader": "code:tables-five-columns" },
+        { "text": "No 'Relationships' table is present", "grader": "code:no-relationships-table" },
+        { "text": "No prose attribute lists (e.g. 'Key attributes:')", "grader": "code:no-prose-attributes" },
+        { "text": "Every foreign key references an entity that exists in the model", "grader": "code:fk-references-valid" },
+        { "text": "Every Validation Rules cell uses a value from the skill's reference table", "grader": "code:validation-rules-known" },
+        { "text": "Every entity implied by the requirements (member, author, book, physical copy, loan) is represented" },
+        { "text": "Relationship cardinalities match the requirements: one author to many books, one book to many copies, one member to many loans, one copy to many loans" },
+        { "text": "Each entity description is a single accurate sentence reflecting its role in the requirements" }
+      ]
+    },
+    {
+      "id": "library-casual",
+      "prompt": "hey can you draw up the data model / ERD for the library based on what's in docs/requirements.md? need the tables too",
+      "expected_output": "Same as library-standard: a complete docs/entity_model.md. Tests that a casual, less precise phrasing still yields a fully structured entity model rather than a loose sketch.",
+      "files": ["files/docs/requirements.md"],
+      "assertions": [
+        { "text": "Produces docs/entity_model.md", "grader": "code:output-exists" },
+        { "text": "Contains a Mermaid erDiagram block", "grader": "code:has-er-diagram" },
+        { "text": "No attributes appear inside the Mermaid entity blocks", "grader": "code:no-attributes-in-diagram" },
+        { "text": "Every entity in the ER diagram has a ### section", "grader": "code:entities-have-sections" },
+        { "text": "Every attribute table has exactly the 5 required columns", "grader": "code:tables-five-columns" },
+        { "text": "Every foreign key references an entity that exists in the model", "grader": "code:fk-references-valid" },
+        { "text": "The output is a structured entity model document, not a loose prose description or a bare diagram" }
+      ]
+    }
+  ]
+}

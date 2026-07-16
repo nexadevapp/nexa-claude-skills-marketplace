@@ -56,6 +56,21 @@ You can scaffold a new skill with the `write-a-skill` skill if you have it insta
 
 Do **not** add a `version` field to any `.claude-plugin/plugin.json`. It is omitted on purpose: for a git-distributed marketplace, Claude Code uses the commit SHA as the version, so every merged commit is automatically a new version. That is what makes `/plugin update` actually pull skill changes. A pinned `version` (advisory only — it never invalidates the cache on its own) would freeze users on whatever commit they first installed.
 
+## Validating your change
+
+Run the static validator before opening a PR — it checks every `SKILL.md` and plugin
+manifest for well-formedness and the conventions above (frontmatter fields, `name`↔dir
+match, description length, `${CLAUDE_PLUGIN_ROOT}` references that resolve, no hardcoded
+cache paths, pinned plugin version):
+
+```
+node scripts/validate-skills.mjs
+```
+
+It exits non-zero on any error and runs automatically on every PR via the
+`validate-skills` GitHub Actions workflow. This is **static** validation only — it does
+not run skills or judge their output quality.
+
 ## Testing your change locally
 
 1. Add this repo as a local marketplace in Claude Code:

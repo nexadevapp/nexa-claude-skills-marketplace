@@ -1,0 +1,25 @@
+{
+  "id": "EVAL-001",
+  "skill": "sprint-deliver",
+  "scenario": "Happy path — readiness report verdict is clean, all Pre-Delivery Actions are already done, the next undelivered UC has spec and design in place, and delivery is delegated to /deliver-use-case without abbreviation.",
+  "preconditions": [
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker",
+    "Current git branch is sprint-1 (Sprint Branch Gate passes)",
+    "docs/sprints/next-sprint/readiness-report.md exists with '## Verdict' = READY (not BLOCKERS REMAIN)",
+    "The readiness report's Pre-Delivery Actions table lists a Prisma migration action, and prisma/schema.prisma already contains the entities from the Entity Model Changes section",
+    "The readiness report's Gaps section has no warning-severity entries",
+    "Delivery Order table lists UC-A (row 1) and UC-B (row 2); docs/delivery/UC-A-iterations.md does not yet exist for either",
+    "docs/use_cases/UC-A.md and docs/designs/UC-A-design.html both exist"
+  ],
+  "input": "/sprint-deliver",
+  "expected_steps": [
+    "Nexa Rules Gate and Sprint Branch Gate both pass",
+    "Step 1: docs/sprints/next-sprint/ found",
+    "Step 2: readiness report read; Verdict confirmed READY; Prisma migration Pre-Delivery Action confirmed satisfied by inspecting prisma/schema.prisma; no warnings to surface",
+    "Step 3: Delivery Order walked from row #1 downward; UC-A selected as the first row with no docs/delivery/UC-A-iterations.md; progress displayed as '0 / 2 use cases', 'Previously delivered this sprint: None'",
+    "Step 4: docs/use_cases/UC-A.md and docs/designs/UC-A-design.html both confirmed present",
+    "Step 5: /deliver-use-case UC-A invoked, following the full deliver-use-case SKILL.md pipeline without abbreviation"
+  ],
+  "expected_terminal_outcome": "sprint-deliver hands off cleanly to the /deliver-use-case pipeline for UC-A with no warnings or blockers surfaced; the progress summary correctly reports 0/2 delivered before this invocation.",
+  "pass_criteria": "No Pre-Delivery Action or Gaps warning is incorrectly surfaced when the readiness report shows none; the correct next-undelivered UC (first row without an iterations log) is selected; /deliver-use-case is invoked for exactly that UC with its full pipeline, not a shortened version."
+}

@@ -1,0 +1,30 @@
+{
+  "id": "EVAL-001",
+  "skill": "sprint-complete",
+  "scenario": "Happy path — all planned use cases are delivered, the E2E regression suite passes on the first run, GitHub issues close, and the sprint is archived and a PR created after user confirmation.",
+  "preconditions": [
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker",
+    "Currently on branch sprint-1",
+    "docs/sprints/next-sprint/readiness-report.md exists with a Delivery Order listing UC-A and UC-B",
+    "docs/delivery/UC-A-iterations.md and docs/delivery/UC-B-iterations.md both exist (both delivered)",
+    "e2e/**/*.spec.ts files exist",
+    "Docker is running",
+    "npx next build succeeds",
+    "Open GitHub issues exist for UC-A and UC-B titled 'UC-A: ...' and 'UC-B: ...'"
+  ],
+  "input": "/sprint-complete",
+  "expected_steps": [
+    "Nexa Rules Gate passes",
+    "Phase 1: both UC-A and UC-B found delivered (iteration logs exist) — no undelivered-UC prompt shown",
+    "Phase 2: e2e/**/*.spec.ts files found; docker info succeeds; npx playwright test run with no filters shows 0 failed, 0 skipped, exit code 0 on the first run",
+    "Phase 3: GitHub issue search finds open issues for UC-A and UC-B; both closed with a comment referencing sprint-1",
+    "Phase 4: sprint number N=1 extracted from the current branch name (sprint-1)",
+    "Phase 5: docs/sprints/next-sprint/SUMMARY.md generated with Delivered Use Cases, Sprint Metrics, E2E Regression Gate (PASSED), GitHub Issues, Issues Encountered, and Carryover sections",
+    "Phase 6: docs/sprints/sprints-overview/manifest.json updated — the in-progress entry set to status delivered, files pointing at the archived sprint-1 paths, currentSprint set to null",
+    "Phase 7: docs/sprints/next-sprint/ renamed to docs/sprints/sprint-1/; iteration and traceability logs moved into docs/sprints/sprint-1/delivery/; fresh docs/sprints/next-sprint/ created",
+    "Phase 8: user asked to confirm the commit; upon confirmation, git add docs/sprints/ docs/delivery/ and a chore(sprint-1): close commit created, then pushed",
+    "Phase 9: user asked to confirm PR creation; upon confirmation, gh pr create run from sprint-1 into main with the SUMMARY.md content as the body"
+  ],
+  "expected_terminal_outcome": "Sprint 1 completed! summary printed with delivered UCs, closed issues, PR URL, dashboard path, and SUMMARY.md path; docs/sprints/sprint-1/ exists as the archive; docs/sprints/next-sprint/ is fresh and empty.",
+  "pass_criteria": "Every phase runs in order with no skipped phase; the E2E regression gate is not skipped since spec files exist; both commit and PR creation only happen after explicit user confirmation, never automatically; the final summary accurately reflects delivered UCs and closed issues."
+}

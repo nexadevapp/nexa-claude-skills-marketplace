@@ -1,0 +1,29 @@
+{
+  "id": "EVAL-001",
+  "skill": "resolve-bug",
+  "scenario": "Happy path — pre-existing BUG-XXX doc passes DoR_BUG, the bug reproduces, analysis and requirement-linking run in parallel, the fix is implemented, and DoD_BUG passes on the first check.",
+  "preconditions": [
+    "docs/bugs/BUG-TEST.md exists (pre-existing, human-authored), fully satisfying DEFINITION_OF_READY_BUG.md (clear Expected/Actual Behavior, Steps to Reproduce, Severity, GitHub Issue field pointing at a real open issue)",
+    "docs/requirements.md and docs/use_cases/ exist for the requirement-linker agent to cross-reference",
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker",
+    "Current git branch is a sprint-* branch (Sprint Branch Gate)",
+    "The bug is genuinely reproducible in the scratch app given the documented repro steps"
+  ],
+  "input": "/resolve-bug BUG-TEST",
+  "expected_steps": [
+    "Nexa Rules Gate and Sprint Branch Gate both pass",
+    "Step 0: BUG-TEST matched directly (docs/bugs/BUG-TEST.md), marked pre-existing",
+    "DoR_BUG gate run in full (pre-existing path) — passes with no failing items",
+    "Rollback Checkpoint recorded via git rev-parse HEAD before Step 3",
+    "Step 1: bug-tester subagent spawned (subagent_type: bug-tester), returns verdict Reproducible with evidence, posts a comment on the GitHub issue",
+    "Step 2: bug-analyst and requirement-linker subagents spawned together in the same message (parallel) — bug-analyst posts a ## Fix Plan comment without editing any file; requirement-linker edits only the bug doc's Related Artifacts section and reports linked requirement(s)",
+    "Both Step 2 agents complete before Step 3 begins",
+    "Step 3: implement/SKILL.md run for BUG-TEST; the bug-analyst's Fix Plan comment is read via gh issue view and verified against current code before applying",
+    "implement/SKILL.md's own DEFINITION_OF_READY_BUG.md re-check simply re-passes (already satisfied in Step 0)",
+    "Build and tests pass; DoD_BUG gate checked against DEFINITION_OF_DONE_BUG.md and passes on iteration 1 — no Critical failures",
+    "Code Review Gate: code-review subagent spawned (subagent_type: code-review) once DoD_BUG passes, reviews git diff <rollback-checkpoint-hash> against docs/bugs/BUG-TEST.md and the bug-analyst's fix plan, returns no Critical findings on iteration 1 — gate passes",
+    "implement/SKILL.md's Post-Implementation Tracking runs only after the Code Review Gate passes: issue comment posted, bug doc Status set to Fixed, issue closed, fix(BUG-TEST): ... commit created"
+  ],
+  "expected_terminal_outcome": "Pipeline Complete: BUG-TEST summary table shows Reproduce=Reproducible, Analyze=Fix plan posted, Link=[requirements listed], Fix=complete, DoD_BUG=1/2, Code Review=1/2; GitHub issue is closed; bug doc Status = Fixed.",
+  "pass_criteria": "All four roles run as distinct isolated subagents with no step skipped; Step 2's two agents run in parallel, not sequentially; DoD_BUG and the Code Review Gate both pass without needing a second iteration; Post-Implementation Tracking only runs after both DoD_BUG and the Code Review Gate pass; the terminal summary and GitHub issue state match exactly."
+}

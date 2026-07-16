@@ -1,0 +1,24 @@
+{
+  "id": "EVAL-003",
+  "skill": "deliver-use-case",
+  "scenario": "Failure-recovery/short-circuit path — Step 4 Coverage Evaluation still reports Missing items after 2 iterations, exhausting its iteration cap, triggering Failure Recovery with a rollback offer.",
+  "preconditions": [
+    "Same baseline as EVAL-001 (all gates and Entity Gate pass, spec/design exist, Step 2 including its Code Review Gate, and Step 3 all complete successfully)",
+    "docs/use_cases/UC-TEST.md includes a business rule / alternative flow (e.g. an authorization check) that the initial E2E test suite never exercises",
+    "The evaluate subagent's fix-gap cycle (re-launching playwright-test with the gap analysis) is unable to close the gap within 2 attempts — e.g. the missing behavior is not actually implemented, so no test can be written to cover it",
+    "Rollback Checkpoint commit hash was recorded before the pipeline began"
+  ],
+  "input": "/deliver-use-case UC-TEST",
+  "expected_steps": [
+    "Rollback Checkpoint, Project Readiness Gate, Nexa Rules Gate, Sprint Branch Gate, Entity Gate, Step 1, Step 2 (including its Code Review Gate), Step 3 all pass as in EVAL-001",
+    "Step 4 Phase 1 (iteration 1): evaluate subagent reports a Missing item in the Coverage Matrix",
+    "QA evaluation logged to docs/delivery/UC-TEST-iterations.md under '## Coverage Evaluation Iterations'",
+    "Step 4 Phase 2 (iteration 1): playwright-test subagent re-launched with the gap analysis; tests independently re-verified as passing (existing tests still pass), but the gap is still Missing on re-evaluation",
+    "Step 4 Phase 1 (iteration 2): evaluate subagent re-run, still reports the same item as Missing",
+    "After 2 iterations with Missing items remaining, the pipeline stops and follows Failure Recovery — it does NOT update Spec Status to Done and does NOT generate the traceability/terminal-complete summary",
+    "DELIVERY FAILED: UC-TEST message displayed with the remaining Missing item(s), pointing to docs/delivery/UC-TEST-iterations.md",
+    "User is prompted: 'Roll back all changes from this delivery attempt? (Y/n)' with Roll back marked as Recommended"
+  ],
+  "expected_terminal_outcome": "DELIVERY FAILED: UC-TEST is printed (not Pipeline Complete); on rollback confirmation, git reset --hard <rollback-commit> is run and all delivery changes (implementation, tests, iterations.md) are reverted; docs/use_cases/UC-TEST.md Status remains whatever it was before this run (not Done).",
+  "pass_criteria": "The pipeline never exceeds 2 Coverage Evaluation iterations; it does not silently mark the UC Done despite the unresolved Missing item; Failure Recovery is invoked with the exact two options (roll back via git reset --hard, or keep code and remove only the iterations log); no GitHub issue comment claiming success is posted."
+}

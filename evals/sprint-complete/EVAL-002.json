@@ -1,0 +1,20 @@
+{
+  "id": "EVAL-002",
+  "skill": "sprint-complete",
+  "scenario": "Fix-loop/iteration path — the Phase 2 E2E Regression Gate fails on the first run with one regression, the user selects 'Fix and re-run', the fix is applied, and the suite passes on the second run — well within the 'up to 3 re-runs' cap for this phase.",
+  "preconditions": [
+    "Same baseline as EVAL-001 — Nexa Rules Gate passes, both UC-A and UC-B delivered, Docker running, npx next build succeeds",
+    "A bug fix landed earlier in the sprint inadvertently broke one existing Playwright test unrelated to UC-A/UC-B",
+    "The first npx playwright test run reports exactly one failure classified as 'Regression from bug fix'"
+  ],
+  "input": "/sprint-complete",
+  "expected_steps": [
+    "Nexa Rules Gate passes; Phase 1 confirms both UCs delivered",
+    "Phase 2 run 1: npx playwright test reports 1 failed test; failure classified as Regression from bug fix; 'E2E Regression Gate — FAILED' table displayed with Option 1 (Fix and re-run), Option 2 (Complete anyway), Option 3 (Cancel)",
+    "User selects Option 1; the regression is fixed in the codebase",
+    "Phase 2 run 2 (re-run count 1 of the allowed 3): npx playwright test re-run — 0 failed, 0 skipped, exit code 0",
+    "Pipeline proceeds to Phase 3 (close GitHub issues) and onward through Phase 9 exactly as in EVAL-001"
+  ],
+  "expected_terminal_outcome": "Sprint completes successfully; the SUMMARY.md's E2E Regression Gate section shows Result: PASSED with no known regressions listed, since the failure was fixed rather than accepted.",
+  "pass_criteria": "The pipeline does not silently continue past the Phase 2 failure without user input; it presents the exact 3-option choice; after the fix, it re-runs the FULL suite (no --grep filter) rather than only the previously-failing test; only 1 of the allowed 3 re-runs was needed and no re-run limit message is shown."
+}

@@ -1,0 +1,27 @@
+{
+  "id": "EVAL-002",
+  "skill": "deliver-use-case",
+  "scenario": "Fix-loop path — Step 3 E2E tests fail on the first independent verification run due to a test bug (bad selector), get fixed by re-launching the playwright-test subagent, and pass on the second run — exercising the 'up to 2 iterations' fix loop.",
+  "preconditions": [
+    "Same baseline as EVAL-001 (all gates and Entity Gate pass, spec/design exist)",
+    "docs/use_cases/UC-TEST.md and docs/designs/UC-TEST-design.html exist and are consistent",
+    "The scratch app's implementation is correct, but the design's element does not yet have a stable test selector (e.g. no data-testid), so the first-generated Playwright test uses a fragile text selector that fails intermittently on first run"
+  ],
+  "input": "/deliver-use-case UC-TEST",
+  "expected_steps": [
+    "Rollback Checkpoint, Project Readiness Gate, Nexa Rules Gate, Sprint Branch Gate, Entity Gate all pass",
+    "Step 2 Implementation: build and vitest pass, DoD check clean",
+    "Step 2 Code Review Gate: code-review subagent spawned, returns no Critical findings on iteration 1 — gate passes before Step 3 begins",
+    "Step 3 Phase 1: playwright-test subagent writes tests",
+    "Step 3 Phase 2 (iteration 1): npx playwright test run by main context fails — at least one failure",
+    "Failure classified as a Test bug (indicators: locator not found / Target closed / wrong assertion, not a wrong HTTP status or missing route)",
+    "Iteration logged to docs/delivery/UC-TEST-iterations.md under an '## Iteration 1' section with Phase: E2E Tests, Result: FAILED, Failures, and Fixes fields",
+    "playwright-test subagent re-launched with the error context and the iterations.md file passed so it does not repeat the same failed fix",
+    "Step 3 Phase 2 (iteration 2): npx playwright test re-run by main context — 0 failed, 0 skipped, exit code 0",
+    "Iteration 2 logged as PASSED in docs/delivery/UC-TEST-iterations.md",
+    "Pipeline proceeds to Step 4 Coverage Evaluation and passes on Phase 1 (iteration 1)",
+    "Spec Status updated to Done, traceability report generated, terminal summary printed"
+  ],
+  "expected_terminal_outcome": "Pipeline Complete: UC-TEST summary shows Code Review at 1/2, E2E Tests passing after retry, and Coverage Evaluation at 1/2; docs/delivery/UC-TEST-iterations.md contains exactly one failed E2E iteration followed by one passing iteration; no Failure Recovery block is shown since the fix succeeded within the 2-iteration cap.",
+  "pass_criteria": "The pipeline does not stop or roll back after the iteration-1 failure; it logs the failure, re-launches the isolated subagent (not the main context) to fix a test bug, and independently re-verifies before proceeding; the fix loop is used at most once here (well within the 2-iteration cap) and the pipeline completes successfully."
+}

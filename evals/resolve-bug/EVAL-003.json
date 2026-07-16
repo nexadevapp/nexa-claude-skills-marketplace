@@ -1,0 +1,22 @@
+{
+  "id": "EVAL-003",
+  "skill": "resolve-bug",
+  "scenario": "Failure-recovery/short-circuit path — the DoD_BUG gate still has a Critical failure after 2 iterations, exhausting its cap, triggering Failure Recovery with a rollback offer and leaving the GitHub issue open.",
+  "preconditions": [
+    "Same baseline as EVAL-001/002 — pre-existing BUG-TEST doc passes DoR_BUG, Step 1 reproduces, Step 2 analysis/linking complete",
+    "The bug's root cause is deeper than the bug-analyst's fix plan assumed (e.g. a shared library issue), so two consecutive fix attempts in Step 3 both leave 'Actual behavior resolved' failing in DEFINITION_OF_DONE_BUG.md",
+    "Rollback Checkpoint commit hash recorded before Step 3 began"
+  ],
+  "input": "/resolve-bug BUG-TEST",
+  "expected_steps": [
+    "Step 0 through Step 2 complete exactly as in EVAL-001",
+    "Step 3: implement/SKILL.md runs, DoD_BUG iteration 1 fails on 'Actual behavior resolved'",
+    "A fix attempt is made in main context; DoD_BUG iteration 2 re-checked and still fails on 'Actual behavior resolved'",
+    "After 2 iterations still failing, the pipeline stops and follows Failure Recovery instead of proceeding to Post-Implementation Tracking",
+    "BUGFIX FAILED: BUG-TEST message printed with the remaining DoD_BUG Critical failures",
+    "User is prompted: 'Roll back all changes from this pipeline run? (Y/n)' with Roll back marked as Recommended",
+    "Post-Implementation Tracking never runs: no issue comment claiming a fix, bug doc Status is NOT set to Fixed, GitHub issue is NOT closed"
+  ],
+  "expected_terminal_outcome": "BUGFIX FAILED: BUG-TEST is printed (not Pipeline Complete); on rollback confirmation, git reset --hard <rollback-commit> reverts all Step 3 changes; the GitHub issue remains open and the bug doc Status remains whatever it was before this pipeline run (e.g. still Open, not Fixed).",
+  "pass_criteria": "The pipeline never exceeds 2 DoD_BUG iterations; Post-Implementation Tracking (issue comment, Status=Fixed, close, commit) is never triggered when DoD_BUG hasn't passed; Failure Recovery presents exactly the roll-back-vs-keep-code choice described in the SKILL.md, and rollback truly reverts to the pre-Step-3 commit."
+}

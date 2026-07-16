@@ -1,0 +1,21 @@
+{
+  "id": "EVAL-002",
+  "skill": "resolve-bug",
+  "scenario": "Fix-loop path — the DoD_BUG gate fails on the first check (missing regression test), gets fixed, and passes on the second check — exercising the 'up to 2 DoD_BUG fix iterations' cap in Step 3.",
+  "preconditions": [
+    "Same baseline as EVAL-001 — pre-existing BUG-TEST doc passes DoR_BUG, Step 1 reproduces, Step 2 analysis/linking complete",
+    "The initial fix in Step 3 resolves the actual/expected behavior described in the bug report but the implementing agent forgets to add a regression test, so DEFINITION_OF_DONE_BUG.md's 'Regression test added' item fails on the first check"
+  ],
+  "input": "/resolve-bug BUG-TEST",
+  "expected_steps": [
+    "Step 0 through Step 2 complete exactly as in EVAL-001",
+    "Rollback Checkpoint recorded before Step 3",
+    "Step 3: implement/SKILL.md runs, build and tests pass, DoD_BUG checked (iteration 1) — 'Regression test added' item fails, everything else passes",
+    "Critical failure identified and fixed in main context: a regression test covering the original repro steps is added",
+    "DoD_BUG re-checked (iteration 2) — all items pass, including 'Existing tests pass' and 'No unintended side effects' after adding the new test",
+    "Code Review Gate: once DoD_BUG passes, code-review subagent spawned, returns no Critical findings on iteration 1 — gate passes",
+    "Post-Implementation Tracking runs only after both DoD_BUG (iteration 2) and the Code Review Gate (iteration 1) pass: issue comment, bug doc Status set to Fixed, issue closed, fix(BUG-TEST): ... commit created"
+  ],
+  "expected_terminal_outcome": "Pipeline Complete: BUG-TEST summary shows DoD_BUG = 2/2 and Code Review = 1/2; the fix commit includes the added regression test; no Failure Recovery block is shown since both gates passed within their 2-iteration caps.",
+  "pass_criteria": "Post-Implementation Tracking is not run after the iteration-1 DoD_BUG failure — it waits until DoD_BUG actually passes, and then also waits for the separate Code Review Gate to pass; the DoD_BUG fix loop stays in Step 3's main context (not re-delegated to a subagent, since Step 3 fixes are main-context per the SKILL.md); the pipeline completes successfully using exactly 2 of the allowed DoD_BUG iterations and 1 of the allowed Code Review iterations."
+}

@@ -13,8 +13,9 @@ context: fork
 ## Instructions
 
 Review the code changes for $ARGUMENTS with an independent, critical perspective.
-$ARGUMENTS can be a use case ID (`UC-XXX`), a technical task ID (`TT-XXX`), or a general
-description of what to review. If no argument is given, review all uncommitted changes.
+$ARGUMENTS can be a use case ID (`UC-XXX`), a technical task ID (`TT-XXX`), a bug ID
+(`BUG-XXX`), or a general description of what to review. If no argument is given, review
+all uncommitted changes.
 
 You are an independent reviewer. You have NOT seen the implementation reasoning or trade-off
 discussions. Judge the code purely on what is there, not on what was intended.
@@ -37,7 +38,8 @@ Evaluate the changes across these dimensions, in priority order:
 
 ### 1. Correctness
 
-- Does the logic match the specification? Read the spec from `docs/use_cases/` or `docs/technical_tasks/` if a UC/TT ID is given
+- Does the logic match the specification? Read the spec from `docs/use_cases/`,
+  `docs/technical_tasks/`, or `docs/bugs/` if a UC/TT/BUG ID is given
 - Are there off-by-one errors, null/undefined paths, or race conditions?
 - Are edge cases handled (empty inputs, boundary values, concurrent access)?
 
@@ -73,7 +75,8 @@ Evaluate the changes across these dimensions, in priority order:
 ## Workflow
 
 1. Determine what to review:
-   - If a UC/TT ID is given, read the specification from `docs/use_cases/` or `docs/technical_tasks/`
+   - If a UC/TT/BUG ID is given, read the specification from `docs/use_cases/`,
+     `docs/technical_tasks/`, or `docs/bugs/`
    - Run `git diff` to see uncommitted changes
    - Run `git diff HEAD~1` if changes are already committed
 2. Read each changed file in full to understand context (not just the diff)
@@ -84,7 +87,7 @@ Evaluate the changes across these dimensions, in priority order:
 ## Output Format
 
 ```markdown
-# Code Review: [UC-XXX / TT-XXX / Description]
+# Code Review: [UC-XXX / TT-XXX / BUG-XXX / Description]
 
 ## Summary
 

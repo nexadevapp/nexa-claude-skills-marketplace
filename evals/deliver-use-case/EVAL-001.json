@@ -1,0 +1,36 @@
+{
+  "id": "EVAL-001",
+  "skill": "deliver-use-case",
+  "scenario": "Happy path — spec and design exist, entities exist, implementation, E2E tests, and coverage evaluation all pass on the first attempt.",
+  "preconditions": [
+    "Scratch Next.js project with docs/requirements.md and docs/entity_model.md present (Prerequisites)",
+    "Project Readiness Gate items all pass (middleware, env files, Prisma schema/migrations present)",
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker <!-- NEXA_RULES_CONFIGURED -->",
+    "Current git branch is sprint-1 (or any sprint-* branch) to satisfy the Sprint Branch Gate",
+    "docs/use_cases/UC-TEST.md exists with Status: Ready, referencing only entities already present in docs/entity_model.md and prisma/schema.prisma",
+    "docs/designs/UC-TEST-design.html exists",
+    "docs/delivery/ directory has no pre-existing UC-TEST-iterations.md"
+  ],
+  "input": "/deliver-use-case UC-TEST",
+  "expected_steps": [
+    "Rollback Checkpoint records current commit via git rev-parse HEAD",
+    "Project Readiness Gate passes",
+    "Nexa Rules Gate passes",
+    "Sprint Branch Gate passes",
+    "Entity Gate passes — every entity referenced in UC-TEST.md found in entity_model.md and schema.prisma",
+    "Step 1: both docs/use_cases/UC-TEST.md and docs/designs/UC-TEST-design.html confirmed present",
+    "docs/delivery/UC-TEST-iterations.md created before Step 3",
+    "Step 2: implement/SKILL.md runs; npx next build succeeds; npx vitest run passes; DoD check finds no outstanding Critical items",
+    "Step 2 Code Review Gate: code-review subagent spawned (subagent_type: code-review), reviews git diff <rollback-checkpoint-hash> against docs/use_cases/UC-TEST.md, returns no Critical findings on iteration 1 — gate passes without a re-review cycle",
+    "implement/SKILL.md's Post-Implementation Tracking is held back until the Code Review Gate passes, then runs to completion",
+    "Step 3 Phase 1: playwright-test subagent spawned (subagent_type: playwright-test) and writes E2E tests",
+    "Step 3 Phase 2: main context independently runs npx playwright test with no filters — 0 failed, 0 skipped, exit code 0, test count matches the subagent's report",
+    "Step 4 Phase 1: evaluate subagent spawned (subagent_type: evaluate) returns PASS coverage verdict with no Missing items and no Partial on critical items",
+    "Spec Status in docs/use_cases/UC-TEST.md updated from Implemented to Done",
+    "docs/delivery/UC-TEST-traceability.md generated mapping FRs/BRs to test file lines",
+    "Terminal 'Pipeline Complete' summary table printed",
+    "GitHub issue search performed and, if a UC-TEST issue exists, a comment posted with the pipeline summary"
+  ],
+  "expected_terminal_outcome": "Pipeline Complete: UC-TEST summary table shows Artifact Check/Entity Gate/Implementation/E2E Tests all passing, Code Review at 1/2, and Coverage Evaluation at 1/2 (or better); docs/use_cases/UC-TEST.md Status = Done; no Failure Recovery block is shown.",
+  "pass_criteria": "Every listed step occurs in order with no step skipped or reordered; no gate is bypassed, including the Code Review Gate between Step 2's DoD check and Step 3; the fix loops in the Code Review Gate, Step 3, and Step 4 are never entered (each passes on iteration 1); Post-Implementation Tracking does not run before the Code Review Gate passes; the terminal summary table is present, accurate, and Status is Done."
+}

@@ -12,6 +12,16 @@ The specification file in `docs/` is the single source of truth. The GitHub issu
 - Always run `git pull` before starting any task to ensure the local branch is up to date.
 - Never create merge commits. Keep a linear Git history.
 
+## Re-Read Before Write
+
+Gate and log files that accumulate a running record via read-modify-write appends (e.g.
+`docs/delivery/*-iterations.md`) may in future be written by more than one agent within the
+same pipeline run. Before appending to such a file, re-read its current contents immediately
+beforehand — do not rely on a copy read earlier in the run. This is a low-cost guard against a
+lost update if two writes ever interleave; it does not apply to strictly sequential
+single-writer steps, and it does not apply to GitHub issue comments, which are atomic appends
+with no existing content to lose.
+
 ## Before Implementation
 
 1. Pull the latest changes: `git pull`

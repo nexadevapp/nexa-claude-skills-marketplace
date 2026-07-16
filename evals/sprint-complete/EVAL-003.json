@@ -1,0 +1,22 @@
+{
+  "id": "EVAL-003",
+  "skill": "sprint-complete",
+  "scenario": "Failure-recovery/short-circuit path — the Phase 2 E2E Regression Gate still fails after all 3 allowed re-runs, only Options 2 (complete anyway) and 3 (cancel) remain, and the user selects Cancel — short-circuiting the entire sprint-complete pipeline before any GitHub issue is touched or anything is archived.",
+  "preconditions": [
+    "Same baseline as EVAL-001 — Nexa Rules Gate passes, both UC-A and UC-B delivered, Docker running",
+    "A genuine, not-yet-understood regression causes the same Playwright test to fail on every run regardless of attempted fixes",
+    "The user attempts Option 1 (fix and re-run) three times, and the failure persists each time"
+  ],
+  "input": "/sprint-complete",
+  "expected_steps": [
+    "Nexa Rules Gate passes; Phase 1 confirms both UCs delivered",
+    "Phase 2 run 1: npx playwright test fails; user selects Option 1 (Fix and re-run)",
+    "Phase 2 run 2 (re-run 1 of 3): still fails; user selects Option 1 again",
+    "Phase 2 run 3 (re-run 2 of 3): still fails; user selects Option 1 again",
+    "Phase 2 run 4 (re-run 3 of 3): still fails — the 3 allowed re-runs are now exhausted, so only Option 2 (Complete anyway) and Option 3 (Cancel) remain available",
+    "User selects Option 3 (Cancel)",
+    "Pipeline stops immediately: Phase 3 (close GitHub issues), Phase 4 (sprint numbering), Phase 5 (SUMMARY.md generation), Phase 6 (dashboard update), Phase 7 (archive), Phase 8 (commit), and Phase 9 (PR creation) are never reached"
+  ],
+  "expected_terminal_outcome": "Sprint completion is cancelled; no GitHub issues are closed, docs/sprints/next-sprint/ is not renamed or archived, no commit or PR is created; the sprint branch and working tree remain exactly as they were before /sprint-complete was invoked (aside from any code changes attempted during the 3 fix attempts, which the user is responsible for, not this pipeline).",
+  "pass_criteria": "After the 3rd re-run still fails, Option 1 is no longer offered — only Complete anyway / Cancel remain, matching the SKILL.md's explicit cap; choosing Cancel produces a full stop with zero side effects in Phases 3 through 9; the pipeline does not fall back to 'complete anyway' by default."
+}

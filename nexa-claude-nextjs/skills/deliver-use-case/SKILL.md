@@ -49,14 +49,15 @@ Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
 ## Delivery Log
 
 Maintain `docs/delivery/$ARGUMENTS-iterations.md` throughout the pipeline. Create it before
-Step 3; append a new section after every verification (E2E test run, coverage evaluation):
+the Code Review Gate in Step 2; append a new section after every verification (code review,
+E2E test run, coverage evaluation):
 
 ```markdown
 # $ARGUMENTS Delivery Log
 
 ## Iteration N — [timestamp]
 
-- **Phase:** E2E Tests | Coverage Evaluation
+- **Phase:** Code Review | E2E Tests | Coverage Evaluation
 - **Result:** PASSED | FAILED (N/M passed)
 - **Failures:** [test name] — [classification: test bug / implementation bug] — [error summary]
 - **Fixes:** [description of each fix applied]
@@ -64,6 +65,9 @@ Step 3; append a new section after every verification (E2E test run, coverage ev
 
 Pass this file to every re-launched agent: "Read `docs/delivery/$ARGUMENTS-iterations.md` —
 do NOT repeat fixes that already failed."
+
+Before every append, re-read the file's current contents (see TRACKING.md's Re-Read Before
+Write guidance) rather than relying on a copy read earlier in the pipeline.
 
 ## Entity Gate
 
@@ -125,7 +129,10 @@ If standalone: run /use-case-spec $ARGUMENTS then /design-screens $ARGUMENTS.
 
 ### Step 2: Implementation
 
-Read and follow: `${CLAUDE_PLUGIN_ROOT}/skills/implement/SKILL.md`
+Read and follow: `${CLAUDE_PLUGIN_ROOT}/skills/implement/SKILL.md`. That skill runs its own
+**Post-Implementation Tracking** section at the end (status update, issue comment, possible
+issue close, conventional commit). **Do not let that section run yet** — first complete the
+Definition of Done check and Code Review Gate below, then let it run.
 
 **Verify:**
 1. `npx next build` succeeds
@@ -137,6 +144,27 @@ item against the code. Fix any Critical failures (DoD items that are entirely mi
 proceeding. Log remaining Minor items to the delivery log.
 
 Do not proceed until both build and unit tests pass and no Critical DoD items are outstanding.
+
+**Code Review Gate (up to 2 iterations)** — spawn a **typed `code-review` subagent** (not
+general-purpose) via the Agent tool with `subagent_type: "code-review"`. Prompt:
+
+> Review the implementation of $ARGUMENTS. Run `git diff <rollback-checkpoint-hash>` (the
+> hash recorded in Rollback Checkpoint) to see every change made so far, and review it against
+> `docs/use_cases/$ARGUMENTS.md`.
+>
+> Follow your operating manual (`code-review/SKILL.md`) to the letter. Return the structured
+> review report exactly as specified in its Output Format section.
+
+Log the result to the delivery log under `## Code Review Iterations`. Fix every Critical
+finding — required before proceeding. Fix Important findings when the fix is straightforward;
+otherwise log them as a follow-up in the delivery log rather than blocking. Minor findings
+never block. After applying fixes, re-run `npx next build` and `npx vitest run`, then re-launch
+the `code-review` subagent for re-review.
+
+After 2 iterations with a Critical finding still open, stop and follow **Failure Recovery**.
+
+Once the Code Review Gate passes, let `implement/SKILL.md`'s Post-Implementation Tracking
+section run to completion.
 
 ---
 
@@ -297,6 +325,7 @@ To find line numbers, grep the test file for BR/FR annotations introduced in the
 | Artifact Check          | ...    |
 | Entity Gate             | ...    |
 | Implementation          | ...    |
+| Code Review             | N / 2  |
 | E2E Tests               | ...    |
 | Coverage Evaluation     | N / 2  |
 ```

@@ -1,0 +1,18 @@
+{
+  "id": "EVAL-003",
+  "skill": "sprint-kickoff",
+  "scenario": "Failure-recovery/short-circuit path — no active sprint exists (docs/sprints/next-sprint/ is missing), so sprint-kickoff stops at Step 1 before touching git at all.",
+  "preconditions": [
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker",
+    "docs/sprints/next-sprint/ does not exist (no /sprint-prepare has been run yet, or the prior sprint was already completed and archived without starting a new one)"
+  ],
+  "input": "/sprint-kickoff",
+  "expected_steps": [
+    "Nexa Rules Gate passes",
+    "Step 1: docs/sprints/next-sprint/ checked and found missing",
+    "Pipeline stops immediately with: 'No active sprint found. Run /sprint-prepare to start a sprint.'",
+    "Step 2 (sprint numbering), Step 3 (summary), Step 4 (branch creation — no git status/fetch/checkout/push commands run), and Step 5 (confirmation/delegation) are never reached"
+  ],
+  "expected_terminal_outcome": "The 'No active sprint found' message is shown; no git branch is created or pushed; /sprint-deliver is never invoked.",
+  "pass_criteria": "The pipeline exits at Step 1 without running any git commands (no accidental branch creation from main with no sprint scope); the message correctly directs the user to /sprint-prepare rather than attempting to recover automatically."
+}

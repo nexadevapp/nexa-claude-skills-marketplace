@@ -1,0 +1,20 @@
+{
+  "id": "EVAL-003",
+  "skill": "sprint-deliver",
+  "scenario": "Failure-recovery/short-circuit path — the readiness report's Verdict is BLOCKERS REMAIN, so sprint-deliver stops immediately before even checking Pre-Delivery Actions or the Delivery Order.",
+  "preconditions": [
+    "Nexa Rules Gate and Sprint Branch Gate both pass",
+    "docs/sprints/next-sprint/ exists and docs/sprints/next-sprint/readiness-report.md exists",
+    "The readiness report's '## Verdict' line reads BLOCKERS REMAIN, with a Gaps section listing at least one blocker-severity gap (e.g. an unresolved ambiguous requirement)"
+  ],
+  "input": "/sprint-deliver",
+  "expected_steps": [
+    "Nexa Rules Gate and Sprint Branch Gate pass",
+    "Step 1: docs/sprints/next-sprint/ found",
+    "Step 2: readiness report read; Verdict found to be BLOCKERS REMAIN",
+    "Pipeline stops immediately with 'SPRINT NOT READY — blockers found in readiness report.' and the Gaps section pasted verbatim",
+    "Pre-Delivery Actions check, Delivery Order read, Step 3 (next UC selection), Step 4 (spec/design check), and Step 5 (/deliver-use-case invocation) are never reached"
+  ],
+  "expected_terminal_outcome": "SPRINT NOT READY message is shown with the blocking gaps; /deliver-use-case is never invoked; no use case's delivery state changes.",
+  "pass_criteria": "The pipeline short-circuits at the Verdict check in Step 2 before evaluating anything else in the readiness report; it does not attempt to guess which UC to deliver or partially proceed; the exact blockers from the Gaps section are surfaced to the user, matching what's in readiness-report.md."
+}

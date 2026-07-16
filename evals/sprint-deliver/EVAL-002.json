@@ -1,0 +1,21 @@
+{
+  "id": "EVAL-002",
+  "skill": "sprint-deliver",
+  "scenario": "Fix-loop/iteration path — the Prisma migration Pre-Delivery Action is not yet satisfied on the first run, sprint-deliver stops and tells the user to run /prisma-migration, and the second /sprint-deliver invocation (after the migration is applied) passes the check and proceeds to delivery.",
+  "preconditions": [
+    "Same Nexa Rules Gate / Sprint Branch Gate / readiness-report Verdict = READY baseline as EVAL-001",
+    "The readiness report's Entity Model Changes section lists a new entity (e.g. 'Invoice') added during sprint preparation, and its Pre-Delivery Actions table marks 'Migration Required: Yes'",
+    "On the FIRST invocation, prisma/schema.prisma does NOT yet contain an Invoice model",
+    "Between the two invocations, the user runs /prisma-migration, which adds the Invoice model and an accompanying migration"
+  ],
+  "input": "/sprint-deliver (run twice: once before, once after /prisma-migration)",
+  "expected_steps": [
+    "First invocation — Nexa Rules Gate and Sprint Branch Gate pass; Step 1 finds the sprint folder; Step 2 reads the readiness report, Verdict is READY, but the Prisma migration Pre-Delivery Action check finds no Invoice model in prisma/schema.prisma",
+    "First invocation stops with: 'PRE-DELIVERY ACTION REQUIRED: Run /prisma-migration before delivery.' — Step 3/4/5 are never reached, and /deliver-use-case is never invoked",
+    "User runs /prisma-migration; prisma/schema.prisma now contains the Invoice model and a new migration file",
+    "Second invocation — Nexa Rules Gate, Sprint Branch Gate, Step 1, Step 2 all pass, including the Prisma migration check now finding the Invoice model present",
+    "Second invocation proceeds through Step 3 (next undelivered UC identified), Step 4 (spec/design verified), Step 5 (/deliver-use-case invoked)"
+  ],
+  "expected_terminal_outcome": "First run ends with the PRE-DELIVERY ACTION REQUIRED message and no delivery attempted; second run, after the migration is applied, proceeds cleanly into /deliver-use-case for the next UC.",
+  "pass_criteria": "The first run does not silently proceed past the unmet Pre-Delivery Action, and does not attempt to run the migration itself; the second run passes only because the underlying schema fix was made externally, and re-checks the same condition rather than trusting a cached result."
+}

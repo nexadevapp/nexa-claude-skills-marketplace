@@ -1,0 +1,24 @@
+{
+  "id": "EVAL-001",
+  "skill": "sprint-kickoff",
+  "scenario": "Happy path — sprint is ready, working tree is clean, local main matches origin/main, the sprint branch is created and pushed on the first attempt, and the user confirms delegation to /sprint-deliver.",
+  "preconditions": [
+    "Target project's CLAUDE.md contains the Nexa Rules Gate marker",
+    "docs/sprints/next-sprint/ exists with a readiness-report.md present",
+    "No existing docs/sprints/sprint-N/ folders (so the new sprint number is sprint-1)",
+    "git status --porcelain returns empty (clean working tree)",
+    "git fetch origin main followed by git diff main..origin/main --stat shows no differences"
+  ],
+  "input": "/sprint-kickoff",
+  "expected_steps": [
+    "Nexa Rules Gate passes",
+    "Step 1: docs/sprints/next-sprint/ and its readiness-report.md both found",
+    "Step 2: no existing docs/sprints/sprint-*/ folders found, so sprint number N = 1",
+    "Step 3: sprint summary displayed (scope, delivery order, pre-delivery action status, blockers/warnings)",
+    "Step 4: git status --porcelain confirmed clean; git fetch origin main + diff show local main up to date; git checkout -b sprint-1 run; git push -u origin sprint-1 run; branch creation confirmed to the user",
+    "Step 5: user asked 'Ready to kick off Sprint 1?' with branch/scope/delivery order shown; user confirms",
+    "/sprint-deliver invoked upon confirmation"
+  ],
+  "expected_terminal_outcome": "sprint-1 branch exists locally and on origin, is checked out, and /sprint-deliver has been invoked to begin autonomous delivery.",
+  "pass_criteria": "The branch is created from an up-to-date main with no uncommitted changes carried over; the user is asked to confirm exactly once before delegation; /sprint-deliver is only invoked after that confirmation, never before or unconditionally."
+}

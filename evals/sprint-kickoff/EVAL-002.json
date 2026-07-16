@@ -1,0 +1,22 @@
+{
+  "id": "EVAL-002",
+  "skill": "sprint-kickoff",
+  "scenario": "Fix-loop/iteration path — Step 4's 'local main up to date' check fails on the first run (local main is behind origin/main), the user runs git pull origin main to fix it, and re-invoking /sprint-kickoff passes the check and proceeds to branch creation.",
+  "preconditions": [
+    "Nexa Rules Gate passes; docs/sprints/next-sprint/readiness-report.md exists; sprint number determined to be sprint-2",
+    "git status --porcelain is clean on both attempts",
+    "On the FIRST invocation, git fetch origin main followed by git diff main..origin/main --stat shows local main is missing a commit that exists on origin/main (e.g. a merged /sprint-prepare PR)",
+    "Between invocations, the user runs git pull origin main, bringing local main up to date"
+  ],
+  "input": "/sprint-kickoff (run twice: once before, once after git pull origin main)",
+  "expected_steps": [
+    "First invocation — Nexa Rules Gate, Step 1, Step 2, Step 3 all pass/complete normally",
+    "Step 4 first invocation: git status --porcelain clean, but git fetch + diff main..origin/main shows a difference",
+    "First invocation stops with: 'Local main is behind origin/main. Sprint preparation artifacts may not be on this branch. Run git pull origin main first...' — git checkout -b sprint-2 is never run, no branch is pushed, Step 5 is never reached",
+    "User runs git pull origin main; local main now matches origin/main",
+    "Second invocation — Nexa Rules Gate through Step 3 pass; Step 4's up-to-date check now passes; git checkout -b sprint-2 and git push -u origin sprint-2 both run",
+    "Step 5: user confirmation requested and, once given, /sprint-deliver invoked"
+  ],
+  "expected_terminal_outcome": "First run ends with the 'Local main is behind origin/main' message and no branch created; second run, after the user syncs main, creates and pushes sprint-2 and proceeds to confirmation and delegation.",
+  "pass_criteria": "The branch is never created off a stale main — the check must actually block Step 4 rather than warn-and-continue; the second run re-verifies the diff (does not just trust that the user says they pulled) before creating the branch."
+}

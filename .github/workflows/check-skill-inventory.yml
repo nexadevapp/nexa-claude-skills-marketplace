@@ -1,0 +1,27 @@
+name: skill-inventory
+
+# Guards the hand-maintained skill listings: README.md, CLAUDE.md, and the
+# nexa-skills orchestrator index must each list every skill directory as a
+# `/skill-name` slash command, with no stale/phantom entries and no
+# frontmatter `name:` drift from its directory name. Fails if a skill is
+# added, renamed, or removed without updating all three listings.
+
+on:
+  pull_request:
+    paths:
+      - 'nexa-claude-core/skills/**'
+      - 'nexa-claude-nextjs/skills/**'
+      - 'README.md'
+      - 'CLAUDE.md'
+      - 'scripts/check-skill-inventory.sh'
+      - '.github/workflows/check-skill-inventory.yml'
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify skill inventory is in sync
+        run: bash scripts/check-skill-inventory.sh --check

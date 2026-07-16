@@ -69,6 +69,9 @@ Do **not** add a `version` field to any `.claude-plugin/plugin.json`. It is omit
 
 - Keep changes focused; one logical change per PR.
 - Update `README.md` / `CLAUDE.md` / the `nexa-skills` index when you add, rename, or remove a skill.
+  <!-- TT-004 addition: begin -->
+  This is enforced in CI — `scripts/check-skill-inventory.sh` (via `.github/workflows/check-skill-inventory.yml`) fails the PR if a skill directory and these three listings drift out of sync, or if a `SKILL.md`'s `name:` frontmatter doesn't match its directory name. Run it locally with `scripts/check-skill-inventory.sh` before pushing.
+  <!-- TT-004 addition: end -->
 - Do not include references to private or third-party projects in examples — use a neutral placeholder (e.g. `ExampleApp`).
 
 By contributing, you agree that your contributions are licensed under the [Apache License 2.0](./LICENSE).

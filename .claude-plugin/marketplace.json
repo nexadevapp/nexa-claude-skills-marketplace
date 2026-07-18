@@ -15,6 +15,11 @@
       "name": "nexa-claude-nextjs",
       "source": "./nexa-claude-nextjs",
       "description": "Nexa Agentic Engineering plugin for the Next.js stack"
+    },
+    {
+      "name": "nexa-claude-tracker",
+      "source": "./nexa-claude-tracker",
+      "description": "Mechanisms for tracking and mapping the prompts to the outputs of the agents"
     }
   ]
 }

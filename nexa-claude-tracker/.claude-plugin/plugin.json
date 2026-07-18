@@ -1,0 +1,9 @@
+{
+  "name": "nexa-claude-tracker",
+  "description": "Mechanisms for tracking and mapping the prompts to the outputs of the agents",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  }
+}

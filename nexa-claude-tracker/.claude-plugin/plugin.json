@@ -1,6 +1,6 @@
 {
   "name": "nexa-claude-tracker",
-  "description": "Workflow automation hooks for Claude Code. Auto-commits to git after every prompt, using the prompt text as the commit message.",
+  "description": "Mechanisms for tracking and mapping the prompts to the outputs of the agents",
   "author": {
     "name": "Marius Achim",
     "email": "marius@nexadev.app",

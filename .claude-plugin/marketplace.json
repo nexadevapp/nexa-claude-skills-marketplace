@@ -19,7 +19,7 @@
     {
       "name": "nexa-claude-tracker",
       "source": "./nexa-claude-tracker",
-      "description": "Workflow automation hooks: auto-commit to git after every prompt, using the prompt as the commit message"
+      "description": "Mechanisms for tracking and mapping the prompts to the outputs of the agents"
     }
   ]
 }

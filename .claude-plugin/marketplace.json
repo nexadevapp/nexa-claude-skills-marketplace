@@ -17,8 +17,8 @@
       "description": "Nexa Agentic Engineering plugin for the Next.js stack"
     },
     {
-      "name": "nexa-workflow-control",
-      "source": "./nexa-workflow-control",
+      "name": "nexa-claude-tracker",
+      "source": "./nexa-claude-tracker",
       "description": "Workflow automation hooks: auto-commit to git after every prompt, using the prompt as the commit message"
     }
   ]

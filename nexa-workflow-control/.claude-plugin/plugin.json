@@ -1,0 +1,9 @@
+{
+  "name": "nexa-workflow-control",
+  "description": "Workflow automation hooks for Claude Code. Auto-commits to git after every prompt, using the prompt text as the commit message.",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  }
+}

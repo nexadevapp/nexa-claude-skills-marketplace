@@ -51,6 +51,7 @@ nexa-claude-marketplace/
 │       ├── deliver-use-case/
 │       ├── resolve-bug/
 │       ├── audit/
+│       ├── qa-use-case/
 │       ├── sprint-kickoff/
 │       ├── sprint-deliver/
 │       ├── sprint-complete/
@@ -189,6 +190,7 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
+| Verification | `/qa-use-case`          | Black-box manual QA: play the use case in a browser as a user, no code read |
 | Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
 | Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
 | Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |

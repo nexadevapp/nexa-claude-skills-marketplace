@@ -7,6 +7,24 @@ description: Discovers and invokes Nexa skills. Use when starting a session or t
 
 Nexa Skills is a set of engineering workflow skills which are intended to be used in the various phases of software development. This skill in particular helps you discover and apply the appropriate skill for the task at hand.
 
+## Work Item Types
+
+"Task", "work item", and "backlog item" are umbrella terms. Each refers to one of four
+types, distinguished by ID prefix, each with its own specification and delivery skill:
+
+| Type           | ID prefix | Specified by      | Delivered by                                |
+|----------------|-----------|-------------------|---------------------------------------------|
+| Use case       | `UC-XXX`  | `/use-case-spec`  | `/deliver-use-case`                         |
+| Technical task | `TT-XXX`  | `/technical-task` | `/implement`                                |
+| Bug            | `BUG-XXX` | `/report-bug`     | `/resolve-bug`                              |
+| Change request | `CR-XXX`  | `/change-request` | `/deliver-use-case` on the parent use case  |
+
+When the user says "deliver the tasks in this sprint", "work the backlog", or otherwise
+refers to work items without naming a type, it means **all four types**, not use cases
+alone. Resolve each item to its type by ID prefix, then dispatch to the matching skill
+above. If a sprint contains types with no items, say so rather than silently narrowing
+to use cases.
+
 ## Skill Discovery
 
 When a task arrives, identify the development phase and apply the corresponding skill:
@@ -32,6 +50,7 @@ nexa-claude-marketplace/
 │       ├── code-review/
 │       ├── evaluate/
 │       ├── report-bug/
+│       ├── change-request/
 │       └── setup-project-rules/
 ├── nexa-claude-nextjs/                  # Next.js technology stack plugin
 │   ├── .claude-plugin/

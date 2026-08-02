@@ -5,8 +5,8 @@ description: >
   implements the use case, writes E2E tests, and evaluates coverage against the spec.
   Iterates automatically until quality gates pass. Specification and design must exist
   beforehand via /sprint-prepare, /use-case-spec, or /design-screens.
-  This skill must only be invoked explicitly via /deliver-use-case or by /sprint-deliver —
-  never inferred from user messages.
+  Invoke only when the user explicitly names this skill or /deliver-use-case, or when called
+  by /sprint-deliver — never inferred from a bare "implement X" or "fix Y" request.
 ---
 
 # Deliver Use Case Pipeline

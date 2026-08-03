@@ -84,6 +84,82 @@ This single command orchestrates the full pipeline automatically for a use case 
 - `/sprint-deliver` — Deliver use cases in priority order from the readiness report
 - `/sprint-complete` — Validate, close issues, archive, and open a PR to main
 
+### 15. Running unattended
+
+Claude Code's built-in `/goal` and `/loop` commands can drive the delivery skills without you
+sitting there. `/goal <condition>` keeps a turn going until the condition holds. `/loop <prompt>`
+re-runs a prompt as a fresh turn, over and over.
+
+Neither is referenced from any skill — they are an operator overlay you apply from the outside.
+
+**Only use them on skills that are graded by something other than Claude's own prose.**
+`/deliver-use-case` qualifies: `npx next build`, `npx vitest run`, and `npx playwright test`
+exit codes are external verdicts, and the coverage check runs in an isolated `evaluate` agent.
+`/sprint-deliver` qualifies: its progress is a file on disk.
+
+**Never on the elaboration skills** — `/requirements`, `/engineer-requirements`,
+`/sprint-prepare`, `/design-screens`, `/use-case-spec`. Their output *is* the artifact the
+condition would be judged against, so you would be asking a model to grade text it just wrote.
+The cheapest way to satisfy "the requirements catalog is complete" is to write more
+requirements, not better ones.
+
+Write conditions as facts you could check yourself. "`npx playwright test` exits 0 with 0
+skipped" works; "the feature works well" does not.
+
+#### Deliver a whole sprint unattended
+
+`/sprint-deliver` delivers one use case and stops. Looping it delivers the rest — and because
+each firing is a fresh turn, use case 6 gets the same clean context as use case 1. Running a
+whole sprint inside one conversation would exhaust the window somewhere around the third.
+
+First clear any pre-delivery actions (e.g. `/prisma-migration`) — the skill blocks on those and
+the loop has no way past them. Then:
+
+```
+/loop Run /sprint-deliver. Readiness-report warnings are already accepted — proceed
+without asking. If it reports SPRINT COMPLETE, stop the loop. If any use case reports
+DELIVERY FAILED, stop the loop and do not roll back — leave the working tree for me.
+```
+
+That is a prompt, not a bare `/loop /sprint-deliver`, because the pipeline has gates that expect
+a human:
+
+| Gate | Handled by |
+|------|-----------|
+| Readiness-report warnings — "proceed, or address first?" | Pre-answered in the prompt |
+| Pre-delivery actions — confirm they are done | Cleared before the loop starts |
+| Delivery failure — "roll back all changes? (Y/n)" → `git reset --hard` | **Hard stop.** The prompt forbids rolling back |
+| A closed GitHub issue already exists — reopen or create new? | Only on rework; answer it yourself |
+
+The rollback prompt is the one that matters. Left unaddressed, an unattended run can answer it
+on your behalf and hard-reset the working tree.
+
+#### Push one use case to green
+
+`/deliver-use-case` gives its fix loops two attempts each. A goal lets it keep going:
+
+```
+/goal npx playwright test exits 0 with 0 skipped and the evaluate agent returns PASS for UC-007
+/deliver-use-case UC-007
+/goal clear
+```
+
+Watch this one. The two-attempt caps are there to stop Claude thrashing — every iteration
+rewrites code — and the goal removes that ceiling. And `/goal clear` is not optional: the hook
+outlives the task and will keep grading everything you do next.
+
+#### Watch CI after `/sprint-complete`
+
+CI runs outside the session, so this is the one place a wall-clock interval earns its keep:
+
+```
+/loop 10m Check gh pr checks on the sprint PR. If a check failed, diagnose and push a fix
+to the sprint branch. If all checks pass, stop the loop. Do not merge.
+```
+
+Keep "do not merge" in there. Merging the sprint PR is a human decision after formal code
+review — that is the release.
+
 ---
 
 ## Tips

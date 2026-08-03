@@ -76,7 +76,8 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Construction** | `/vitest-test` | Create Vitest integration tests with Testcontainers |
 | **Construction** | `/playwright-test` | Create Playwright end-to-end tests |
 | **Construction** | `/code-quality` | Run oxlint and oxfmt (lint, cyclomatic complexity, formatting) |
-| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: implement → test → evaluate |
+| **Construction** | `/mutation-test` | Run StrykerJS mutation testing on delivered business logic to verify the tests detect broken behaviour |
+| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: implement → mutation-test → test → evaluate |
 | **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
 | **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 | **Delivery** | `/sprint-kickoff` | Create the sprint branch and start delivery |

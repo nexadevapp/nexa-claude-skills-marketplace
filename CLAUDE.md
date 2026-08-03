@@ -47,6 +47,7 @@ nexa-claude-marketplace/
 │       ├── vitest-test/
 │       ├── playwright-test/
 │       ├── code-quality/
+│       ├── mutation-test/
 │       ├── deliver-use-case/
 │       ├── resolve-bug/
 │       ├── sprint-kickoff/
@@ -121,6 +122,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/vitest-test`          | Create Vitest integration tests with Testcontainers                |
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run oxlint and oxfmt checks (lint, complexity, formatting)         |
+| Construction | `/mutation-test`        | Run StrykerJS mutation testing on delivered business logic         |
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |

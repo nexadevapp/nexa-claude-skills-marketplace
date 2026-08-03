@@ -49,14 +49,15 @@ Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
 ## Delivery Log
 
 Maintain `docs/delivery/$ARGUMENTS-iterations.md` throughout the pipeline. Create it before
-Step 3; append a new section after every verification (E2E test run, coverage evaluation):
+Step 3; append a new section after every verification (mutation run, E2E test run, coverage
+evaluation):
 
 ```markdown
 # $ARGUMENTS Delivery Log
 
 ## Iteration N — [timestamp]
 
-- **Phase:** E2E Tests | Coverage Evaluation
+- **Phase:** E2E Tests | Coverage Evaluation | Mutation Testing
 - **Result:** PASSED | FAILED (N/M passed)
 - **Failures:** [test name] — [classification: test bug / implementation bug] — [error summary]
 - **Fixes:** [description of each fix applied]
@@ -140,7 +141,54 @@ Do not proceed until both build and unit tests pass and no Critical DoD items ar
 
 ---
 
-### Step 3: E2E Tests
+### Step 3: Mutation Testing
+
+Before the expensive E2E and coverage gates, verify the unit tests actually *detect* broken
+behaviour rather than merely executing it. Up to 1 fix iteration.
+
+Mutation testing runs unit tests only — E2E and integration tests are excluded from the Stryker
+runner — so its inputs are complete once Step 2 passes. It is the cheapest gate in the pipeline
+and it protects the most expensive one: a surviving mutant that exposes a real logic bug is far
+cheaper to fix now than after an agent has written a Playwright suite against it.
+
+#### Phase 1: Mutation Analysis (Isolated Agent)
+
+Spawn a **typed `mutation-tester` subagent** (not general-purpose). The agent's system prompt
+is its operating manual — the `mutation-test` SKILL is loaded as identity, not as a referenced
+doc.
+
+Invoke via the Agent tool with `subagent_type: "mutation-tester"`. Prompt:
+
+> Run mutation testing for $ARGUMENTS.
+>
+> Inputs:
+> - `docs/use_cases/$ARGUMENTS.md`
+> - Base commit for scoping changed files: `<rollback commit hash>`
+> - `docs/delivery/$ARGUMENTS-iterations.md` (prior fix attempts)
+>
+> Follow your operating manual (`mutation-test/SKILL.md`) to the letter. Return the verdict,
+> the mutation score read from `reports/mutation/mutation.json`, the files mutated, and the
+> surviving-mutant table with a killing assertion for every Test gap.
+
+#### Phase 2: Kill Surviving Mutants (Main Context)
+
+Log the verdict and score to the delivery log under `## Mutation Testing`.
+
+- **PASS / PASS WITH OBSERVATIONS / NOT APPLICABLE** — continue to Step 4.
+- **BLOCKED** — the unit suite is red. Fix it, re-run `npx vitest run`, and return to Phase 1.
+- **FAIL** — add the missing unit test assertions the agent named, in the main context.
+  Only Test-gap survivors mapping to a business rule or MSS step must be killed; equivalent
+  and not-worth-killing survivors are left alone. Re-run `npx vitest run` to confirm green,
+  then return to Phase 1 once.
+
+After 1 fix iteration with the verdict still FAIL, do **not** roll back the delivery. Record
+the final score in the delivery log and the terminal summary as an advisory failure, and
+continue to Step 4. Mutation score is a test-quality signal, not a correctness gate — the spec
+conformance gates (Steps 4 and 5) are the ones that decide whether the use case is Done.
+
+---
+
+### Step 4: E2E Tests
 
 Two phases: an isolated agent writes and self-fixes the tests; the main context independently
 verifies them. The main agent is the only authority that can declare tests as passing.
@@ -196,7 +244,7 @@ After 2 iterations with tests still failing, stop and follow **Failure Recovery*
 
 ---
 
-### Step 4: Coverage Evaluation
+### Step 5: Coverage Evaluation
 
 After E2E tests pass, evaluate coverage against the spec. Up to 2 iterations.
 
@@ -254,7 +302,7 @@ Log the QA evaluation result to the delivery log under `## Coverage Evaluation I
 
 If there are **Missing** items, re-launch the `playwright-test` subagent with the gap
 analysis and iteration history as input. After it returns, independently verify tests pass
-(same as Step 3 Phase 2).
+(same as Step 4 Phase 2).
 
 Then return to Phase 1 for re-evaluation.
 
@@ -263,6 +311,16 @@ After 2 iterations with Missing items remaining, stop and follow **Failure Recov
 ---
 
 ## Completion
+
+### 0. Re-run Mutation Testing If Code Changed
+
+The Step 3 score was measured before the E2E and coverage gates ran. Those gates' fix loops
+can patch implementation code in the main context, which would make the score stale.
+
+Check whether Steps 4 or 5 modified any file in the mutated scope recorded in
+`docs/delivery/$ARGUMENTS-mutation.md`. If none did — the common case, where E2E only turned
+up test bugs — skip this step. If any did, re-run Phase 1 of Step 3 once; it is scoped to a
+handful of files, so it is fast. Record the updated score and continue regardless of verdict.
 
 ### 1. Update Spec Status
 
@@ -297,12 +355,14 @@ To find line numbers, grep the test file for BR/FR annotations introduced in the
 | Artifact Check          | ...    |
 | Entity Gate             | ...    |
 | Implementation          | ...    |
+| Mutation Testing        | NN.N%  |
 | E2E Tests               | ...    |
 | Coverage Evaluation     | N / 2  |
 ```
 
 Include a **What was built** section listing key artifacts (pages, API routes, services, tests)
-and links to `docs/delivery/$ARGUMENTS-iterations.md` and `docs/delivery/$ARGUMENTS-traceability.md`.
+and links to `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS-traceability.md`,
+and `docs/delivery/$ARGUMENTS-mutation.md`.
 
 > To run a deep quality audit (i18n, accessibility, visual fidelity): `/audit $ARGUMENTS`
 

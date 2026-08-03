@@ -97,6 +97,35 @@ git rev-parse HEAD
 
 Store as the rollback point for Failure Recovery.
 
+## Commit Discipline
+
+After every pipeline step whose verification passed, commit. Never before.
+
+Rules:
+- **Green gate only.** A step commits only when its own verification passed: the build compiles
+  and the tests that step touched are green. A failing gate is never committed — that is what
+  Failure Recovery is for.
+- **Skip empty.** If `git status --porcelain` is empty, the step changed nothing — skip the commit
+  silently, do not create an empty one.
+- **Stage everything the step produced**, including the delivery log: `git add -A`.
+- **Never `--no-verify`.** If a pre-commit hook fails (arch-unit from `/setup-arch-unit`, lint),
+  that is a real finding. Fix the violation, re-run the step's verification, then commit.
+- **Subagents never commit.** `mutation-tester`, `playwright-test`, and `evaluate` run read-only
+  against git. The main context is the only committer.
+- Rollback is unaffected: `git reset --hard <rollback commit hash>` in Failure Recovery discards
+  every commit these steps created.
+
+| Step | Gate that must be green first | Commit message |
+|------|-------------------------------|----------------|
+| 2. Implementation | `npx next build` + `npx vitest run`, no Critical DoD items | `feat($ARGUMENTS): <one-line summary>` |
+| 3. Mutation Testing | `npx vitest run` (only if assertions were added in Phase 2) | `test($ARGUMENTS): kill surviving mutants (NN.N%)` |
+| 4. E2E Tests | `npx playwright test` verified in main context — 0 failed, 0 skipped | `test($ARGUMENTS): e2e coverage` |
+| 5. Coverage Evaluation | gap-fix tests pass the same Step 4 Phase 2 verification | `test($ARGUMENTS): close coverage gaps` |
+| Completion | spec status, traceability report, mutation report written | `docs($ARGUMENTS): mark Done + traceability` |
+
+Step 4 and 5 fix loops may patch implementation code — when they do, re-run `npx next build` and
+`npx vitest run` before committing (Step 4's fix loop already requires this).
+
 ## Pipeline
 
 ---
@@ -138,6 +167,8 @@ item against the code. Fix any Critical failures (DoD items that are entirely mi
 proceeding. Log remaining Minor items to the delivery log.
 
 Do not proceed until both build and unit tests pass and no Critical DoD items are outstanding.
+
+**Commit:** see Commit Discipline — `feat($ARGUMENTS): <one-line summary>`.
 
 ---
 
@@ -186,6 +217,9 @@ the final score in the delivery log and the terminal summary as an advisory fail
 continue to Step 4. Mutation score is a test-quality signal, not a correctness gate — the spec
 conformance gates (Steps 4 and 5) are the ones that decide whether the use case is Done.
 
+**Commit:** only if Phase 2 added assertions and `npx vitest run` is green — see Commit
+Discipline, `test($ARGUMENTS): kill surviving mutants (NN.N%)`.
+
 ---
 
 ### Step 4: E2E Tests
@@ -221,6 +255,8 @@ Invoke via the Agent tool with `subagent_type: "playwright-test"`. Prompt:
 1. `npx playwright test` (no filters)
 2. Confirm: 0 failed, 0 skipped, exit code 0
 3. Confirm test count matches what the agent reported
+
+Once Phase 2 passes — **Commit:** see Commit Discipline, `test($ARGUMENTS): e2e coverage`.
 
 #### Fix Loop (up to 2 iterations)
 
@@ -306,6 +342,9 @@ analysis and iteration history as input. After it returns, independently verify 
 
 Then return to Phase 1 for re-evaluation.
 
+Once Phase 1 re-evaluation passes — **Commit:** see Commit Discipline,
+`test($ARGUMENTS): close coverage gaps`.
+
 After 2 iterations with Missing items remaining, stop and follow **Failure Recovery**.
 
 ---
@@ -344,6 +383,9 @@ Generate `docs/delivery/$ARGUMENTS-traceability.md`:
 ```
 
 To find line numbers, grep the test file for BR/FR annotations introduced in the tests.
+
+**Commit:** see Commit Discipline — `docs($ARGUMENTS): mark Done + traceability`. This is the last
+commit of the delivery; the terminal summary and GitHub comment below change no files.
 
 ### 3. Terminal Summary
 
@@ -399,8 +441,16 @@ Delivery log: docs/delivery/$ARGUMENTS-iterations.md
 Roll back all changes from this delivery attempt? (Y/n)
 
 Recommended: Roll back. Resets to the pre-delivery state for a clean retry.
+  This discards the per-step commits this delivery created — list them first so the
+  user sees what is being dropped.
 Alternative: Keep code and tests, remove only the delivery log.
   Warning: Step 2 will encounter existing code on the next attempt — review before re-running.
+```
+
+Show the commits at stake before asking:
+
+```
+git log --oneline <saved-commit-hash>..HEAD
 ```
 
 ### Roll back (default)
@@ -409,10 +459,12 @@ Alternative: Keep code and tests, remove only the delivery log.
 git reset --hard <saved-commit-hash>
 ```
 
-Confirm all delivery changes have been reverted.
+Confirm all delivery changes have been reverted, including the per-step commits.
 
 ### Keep code
 
+The per-step commits stay. Drop only the log (it was committed by Step 2, so `git rm`):
+
 ```
-rm docs/delivery/$ARGUMENTS-iterations.md
+git rm docs/delivery/$ARGUMENTS-iterations.md
 ```

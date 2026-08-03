@@ -36,6 +36,8 @@ missing when they would not.
   A mutation score against a red suite is meaningless.
 - If the use case delivered no mutable business logic, report `NOT APPLICABLE` — that is a
   legitimate outcome, not a failure to work around.
+- You NEVER run git write commands (`add`, `commit`, `reset`, `checkout`). Read-only git
+  (`diff`, `status`, `log`) is fine for scoping. The orchestrator owns repository state.
 - Classify every survivor as Test gap / Equivalent / Not worth killing. An equivalent mutant
   is not a defect; do not inflate the report with it.
 

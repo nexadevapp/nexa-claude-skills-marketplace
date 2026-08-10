@@ -407,6 +407,8 @@ and links to `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS
 and `docs/delivery/$ARGUMENTS-mutation.md`.
 
 > To run a deep quality audit (i18n, accessibility, visual fidelity): `/audit $ARGUMENTS`
+>
+> To QA the flow black-box, driving the running app as a user: `/qa-use-case $ARGUMENTS`
 
 ### 4. GitHub Issue Report
 

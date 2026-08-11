@@ -10,6 +10,8 @@ on:
       - 'nexa-claude-core/shared/**'
       - 'nexa-claude-nextjs/shared/**'
       - 'nexa-claude-nextjs/skills/**'
+      - 'nexa-claude-react-spa-dotnet/shared/**'
+      - 'nexa-claude-react-spa-dotnet/skills/**'
       - 'scripts/sync-shared.sh'
       - '.github/workflows/sync-shared.yml'
   push:

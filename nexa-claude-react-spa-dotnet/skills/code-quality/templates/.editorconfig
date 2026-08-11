@@ -1,0 +1,40 @@
+root = true
+
+# Default .editorconfig for the React SPA + .NET stack.
+# Drives `dotnet format` (whitespace + style + analyzers) for C# sources.
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.cs]
+indent_size = 4
+
+# Turn the built-in Roslyn analyzers on and treat findings as build errors so
+# `dotnet format analyzers` has rules to enforce.
+dotnet_analyzer_diagnostic.severity = warning
+dotnet_diagnostic.CA1000.severity = warning
+
+# --- Cyclomatic-complexity intent -------------------------------------------
+# .NET has no single "max complexity 10" knob like oxlint's eslint/complexity.
+# The built-in equivalent is enabling the analyzer rules that flag the symptoms
+# of high complexity, or adding the Roslynator analyzer package for a dedicated
+# rule. Keep the "max complexity 10" spirit of the source: refactor any method
+# these flag rather than suppressing them.
+dotnet_diagnostic.CA1502.severity = warning   # Avoid excessive complexity
+dotnet_diagnostic.CA1506.severity = warning   # Avoid excessive class coupling
+# Optional (add the Roslynator.Analyzers package to activate):
+# dotnet_diagnostic.RCS1176.severity = warning
+
+# --- Style rules that dotnet format enforces --------------------------------
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_new_line_before_open_brace = all
+csharp_prefer_braces = true:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+
+[*.{json,js,jsx,ts,tsx,css,scss,html,yml,yaml}]
+indent_size = 2

@@ -68,7 +68,7 @@ The specification file in `docs/` is the single source of truth. The GitHub issu
 4. If the Definition of Done is satisfied, close the issue:
    - `gh issue close <issue-number>`
 5. If the Definition of Done is not yet satisfied, leave the issue open and inform the user what remains
-6. Commit the implementation using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) with the ID in the scope:
+6. Commit the implementation with the `conventional-commit` skill. That skill owns the message format; this list owns only which type goes with which ID, and the ID always goes in the scope:
    - **UC** → `feat(UC-XXX): <description>`
    - **TT** → `chore(TT-XXX): <description>`
    - **BUG** → `fix(BUG-XXX): <description>`

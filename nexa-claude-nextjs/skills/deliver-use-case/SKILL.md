@@ -101,6 +101,9 @@ Store as the rollback point for Failure Recovery.
 
 After every pipeline step whose verification passed, commit. Never before.
 
+The message format is owned by the `conventional-commit` skill (nexa-claude-core). This
+section owns only **when** a commit happens and which type each step uses.
+
 Rules:
 - **Green gate only.** A step commits only when its own verification passed: the build compiles
   and the tests that step touched are green. A failing gate is never committed — that is what

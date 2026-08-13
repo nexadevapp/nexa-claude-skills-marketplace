@@ -99,12 +99,8 @@ to the prose around them.
 
 ## DO NOT
 
-- Do not write a description longer than 72 characters. Move the detail to the body.
-- Do not start the description with a capital letter, and do not end it with a period.
-- Do not write a description that repeats the diff (`update files`, `changes`,
-  `fix stuff`). State the effect on behaviour.
-- Do not put more than one logical change in one commit. Split the work instead.
-- Do not use a type that is not in the table.
+The Verification checklist covers the format rules. These are the rules it cannot check:
+
 - Do not add a co-author, tool credit, or advertisement footer unless the user
   asks for one.
 - Do not amend or force-push a commit that is already on a shared branch without
@@ -139,13 +135,6 @@ to the prose around them.
 
 ```
 feat(UC-003): add the place order page and its API route
-```
-
-```
-fix(BUG-003): apply the discount code to the order total
-
-The order summary showed the list price. The discount step ran after the
-sum, so the total ignored it. Move the discount step before the sum.
 ```
 
 ```

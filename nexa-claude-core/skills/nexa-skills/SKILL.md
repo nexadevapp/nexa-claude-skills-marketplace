@@ -32,6 +32,7 @@ nexa-claude-marketplace/
 │       ├── code-review/
 │       ├── evaluate/
 │       ├── report-bug/
+│       ├── conventional-commit/
 │       └── setup-project-rules/
 ├── nexa-claude-nextjs/                  # Next.js technology stack plugin
 │   ├── .claude-plugin/
@@ -152,10 +153,13 @@ These are the subtle errors that look like productivity but create problems:
 
 3. **Multiple skills can apply.** A feature implementation might involve `design-screens` → `deliver-use-case` in sequence.
 
+4. **`conventional-commit` always applies.** Before every `git commit` or `git commit --amend`, in any repository, read `conventional-commit/SKILL.md` and compose the message from it. No commit message bypasses it — not one made inside another skill, and not a one-word fixup.
+
 ## Quick Reference
 
 | Phase        | Skill (slash command) | Description                            |
 |--------------|-----------------------|----------------------------------------|
+| Always       | `/conventional-commit`| Write every commit message in Conventional Commits + ASD-STE100 format |
 | Setup        | `/setup-project-rules`| Write Nexa workflow rules into the project's CLAUDE.md |
 | Inception    | `/requirements`       | Generate requirements from vision      |
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |

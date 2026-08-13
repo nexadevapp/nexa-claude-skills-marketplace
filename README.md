@@ -39,6 +39,7 @@ If a skill still looks stale after updating (a known, still-open Claude Code plu
 
 | Phase | Command | Description |
 |---|---|---|
+| **Always** | `/conventional-commit` | Write every commit message in Conventional Commits format with ASD-STE100 Simplified Technical English |
 | **Setup** | `/setup-project-rules` | Write Nexa workflow enforcement rules into the project's CLAUDE.md |
 | **Inception** | `/requirements` | Generate a requirements catalog from a vision document |
 | **Elaboration** | `/entity-model` | Create an entity model with a Mermaid ER diagram |

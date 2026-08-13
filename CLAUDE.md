@@ -31,6 +31,7 @@ nexa-claude-marketplace/
 │       ├── code-review/
 │       ├── evaluate/
 │       ├── report-bug/
+│       ├── conventional-commit/
 │       └── setup-project-rules/
 ├── nexa-claude-nextjs/                  # Next.js technology stack plugin
 │   ├── .claude-plugin/
@@ -91,6 +92,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 | Phase        | Skill (slash command) | Description                            |
 |--------------|-----------------------|----------------------------------------|
+| Always       | `/conventional-commit`| Write every commit message in Conventional Commits + ASD-STE100 format |
 | Setup        | `/setup-project-rules`| Write Nexa workflow enforcement rules into the project's CLAUDE.md |
 | Inception    | `/requirements`       | Generate requirements from vision      |
 | Elaboration  | `/entity-model`       | Create entity model with Mermaid ER    |

@@ -1,0 +1,5 @@
+{
+  "name": "nexa-claude-marketplace",
+  "description": "The Nexa agentic SDLC harness.",
+  "hooks": "./hooks/hooks.json"
+}

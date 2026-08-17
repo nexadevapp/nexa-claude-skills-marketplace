@@ -167,6 +167,10 @@ Keep these in sync (per `CONTRIBUTING.md`):
 
 ## Git
 
+- This repo does **trunk-based development**: commit straight to `main`. Do not open a branch for
+  ordinary work, and do not ask to. Keep each commit small, green, and self-contained, since `main`
+  is what `/plugin update` serves to installed users — every commit is a release. Branch only for
+  work that must not reach users half-finished, and merge it back fast.
 - Do NOT add a `version` field to `**/.claude-plugin/plugin.json` files. The field is intentionally omitted so the git commit SHA drives versioning — every commit counts as a new version, which is what lets `/plugin update` actually pull skill changes. A pinned `version` freezes users on their first-installed commit.
 - Skills reference files within their own plugin using `${CLAUDE_PLUGIN_ROOT}` — never hardcode the cache path.
 

@@ -9,12 +9,14 @@
     {
       "name": "nexa-claude-core",
       "source": "./nexa-claude-core",
-      "description": "Nexa Agentic Engineering stack-agnostic core SDLC methodology"
+      "description": "Nexa Agentic Engineering stack-agnostic core SDLC methodology",
+      "license": "Apache-2.0"
     },
     {
       "name": "nexa-claude-nextjs",
       "source": "./nexa-claude-nextjs",
-      "description": "Nexa Agentic Engineering plugin for the Next.js stack"
+      "description": "Nexa Agentic Engineering plugin for the Next.js stack",
+      "license": "Apache-2.0"
     }
   ]
 }

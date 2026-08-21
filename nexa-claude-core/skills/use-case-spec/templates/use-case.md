@@ -1,3 +1,16 @@
+<!--
+This comment is part of the template file only. Do not copy it into a
+generated use case document.
+
+Copyright 2025-2026 Simon Martinelli and the AI Unified Process contributors.
+Part of the AI Unified Process — https://unifiedprocess.ai
+Licensed under the Apache License, Version 2.0. See LICENSE and NOTICE.
+
+Modifications Copyright 2026 Nexa (nexadev.app).
+This file is derived from the AI Unified Process Marketplace and has been
+modified for the Nexa Agentic Engineering methodology.
+-->
+
 # Use Case: [Use Case Name]
 
 ## Overview

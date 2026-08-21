@@ -111,3 +111,16 @@ Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for how s
 ## License
 
 Licensed under the [Apache License 2.0](./LICENSE).
+
+## Attribution
+
+The `nexa-claude-core` plugin is derived from the
+[AI Unified Process Marketplace](https://github.com/AI-Unified-Process/marketplace)
+(`aiup-core`) by [Simon Martinelli](https://unifiedprocess.ai), used under the
+Apache License 2.0. Several core skills — `requirements`, `entity-model`,
+`use-case-diagram`, and `use-case-spec` — began as `aiup-core` skills and have
+been modified here; those files carry the original copyright notice.
+
+Nexa is an independent derivative work. It is not an official AI Unified
+Process distribution and is not endorsed by Simon Martinelli or Martinelli LLC.
+See [NOTICE](./NOTICE) for the full attribution.

@@ -179,3 +179,4 @@ Keep these in sync (per `CONTRIBUTING.md`):
 - Always: Follow the skill anatomy in `CONTRIBUTING.md` ("Anatomy of a skill") for new skills — frontmatter (`name`, `description` with trigger phrases), `When to use`, ordered `Process`, and a `Verification` step.
 - Never: Add skills that are vague advice instead of actionable processes
 - Never: Duplicate content between skills — reference other skills instead
+- Never: Remove the AI Unified Process attribution header comment from the derived `nexa-claude-core` skills listed in [NOTICE](./NOTICE) — the Apache License requires retaining them.

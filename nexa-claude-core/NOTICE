@@ -1,0 +1,50 @@
+Nexa Agentic Engineering Marketplace
+Copyright 2026 Nexa (nexadev.app)
+
+This product is derived from the AI Unified Process Marketplace by
+Simon Martinelli, and includes software developed by Simon Martinelli
+as part of the AI Unified Process methodology.
+
+  Source:  https://github.com/AI-Unified-Process/marketplace
+  License: Apache License, Version 2.0
+
+Specifically, the following files in nexa-claude-core/skills/ are derived
+from, and contain substantial portions of, the aiup-core plugin. All have
+been modified for the Nexa Agentic Engineering methodology:
+
+  requirements/SKILL.md          <- aiup-core/skills/requirements/SKILL.md
+  requirements/REFERENCE.md      <- aiup-core/skills/requirements/references/REFERENCE.md
+  entity-model/SKILL.md          <- aiup-core/skills/entity-model/{SKILL.md,references/REFERENCE.md}
+  use-case-diagram/SKILL.md      <- aiup-core/skills/use-case-diagram/SKILL.md
+  use-case-spec/SKILL.md         <- aiup-core/skills/use-case-spec/references/example.md
+  use-case-spec/templates/use-case.md
+                                 <- aiup-core/skills/use-case-spec/references/use-case.md
+
+The remainder of this marketplace, including the nexa-claude-nextjs plugin,
+is original work.
+
+-------------------------------------------------------------------------
+The following notice is reproduced from the NOTICE file of the upstream
+work, as required by Section 4(d) of the Apache License, Version 2.0:
+
+  AI Unified Process Marketplace
+  Copyright 2025-2026 Simon Martinelli, Martinelli LLC,
+  and the AI Unified Process contributors
+  https://unifiedprocess.ai
+
+  This product includes software developed by Simon Martinelli
+  as part of the AI Unified Process methodology, with contributions
+  from the AI Unified Process community.
+
+  "AI Unified Process" and the unifiedprocess.ai name are used to
+  identify the original work. The Apache License does not grant
+  permission to use these names for derivative works, except to
+  describe their origin.
+
+  Derivative works must retain this notice and state that they are
+  derived from the AI Unified Process Marketplace by Simon Martinelli.
+-------------------------------------------------------------------------
+
+"Nexa" and the nexadev.app name identify this derivative work. It is not
+an official AI Unified Process distribution and is not endorsed by
+Simon Martinelli or Martinelli LLC.

@@ -4,3 +4,6 @@
 # Local Claude Code config (personal permissions, paths)
 .claude/settings.local.json
 .claude/*.local.json
+
+# Claude Code session transcripts
+.claude-sessions/

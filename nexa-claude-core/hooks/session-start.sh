@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+# Copyright (c) 2025 Addy Osmani and the agent-skills contributors.
+# Derived from agent-skills — https://github.com/addyosmani/agent-skills
+# Licensed under the MIT License. See LICENSE-MIT-agent-skills and NOTICE.
+#
+# Modifications Copyright 2026 Nexa (nexadev.app).
+# This file is derived from `hooks/session-start.sh` and has been modified
+# for the Nexa Agentic Engineering methodology.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$(dirname "$SCRIPT_DIR")/skills"

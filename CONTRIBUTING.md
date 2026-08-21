@@ -73,8 +73,9 @@ Do **not** add a `version` field to any `.claude-plugin/plugin.json`. It is omit
 
 By contributing, you agree that your contributions are licensed under the [Apache License 2.0](./LICENSE).
 
-Some `nexa-claude-core` skills are derived from the AI Unified Process Marketplace and carry an
-attribution header comment. Never remove those headers — the Apache License requires derivative
-works to retain them. If you derive a new file from upstream, copy the header across and add it to
+Some `nexa-claude-core` files are derived from upstream projects — the AI Unified Process
+Marketplace (Apache-2.0) and agent-skills (MIT) — and carry an attribution header comment. Never
+remove those headers; both licenses require derivative works to retain them. If you derive a new
+file from either upstream, copy the header across and add it to the matching section of
 [NOTICE](./NOTICE). `nexa-claude-core/NOTICE` is a copy of the root file, because a plugin
 directory is also a distribution unit — change both together.

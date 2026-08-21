@@ -114,13 +114,21 @@ Licensed under the [Apache License 2.0](./LICENSE).
 
 ## Attribution
 
-The `nexa-claude-core` plugin is derived from the
-[AI Unified Process Marketplace](https://github.com/AI-Unified-Process/marketplace)
-(`aiup-core`) by [Simon Martinelli](https://unifiedprocess.ai), used under the
-Apache License 2.0. Several core skills — `requirements`, `entity-model`,
-`use-case-diagram`, and `use-case-spec` — began as `aiup-core` skills and have
-been modified here; those files carry the original copyright notice.
+The `nexa-claude-core` plugin derives from two upstream projects. Every derived
+file carries the original copyright notice in a header comment.
 
-Nexa is an independent derivative work. It is not an official AI Unified
-Process distribution and is not endorsed by Simon Martinelli or Martinelli LLC.
+**[AI Unified Process Marketplace](https://github.com/AI-Unified-Process/marketplace)**
+(`aiup-core`) by [Simon Martinelli](https://unifiedprocess.ai), used under the
+Apache License 2.0. The `requirements`, `entity-model`, `use-case-diagram`, and
+`use-case-spec` skills began as `aiup-core` skills and have been modified here.
+
+**[agent-skills](https://github.com/addyosmani/agent-skills)** by
+[Addy Osmani](https://addyosmani.com), used under the MIT License
+([full text](./LICENSE-MIT-agent-skills)). The `nexa-skills` orchestrator skill
+and the core plugin's `session-start.sh` hook derive from `using-agent-skills`
+and its session-start hook, and have been modified here.
+
+Nexa is an independent derivative work. It is not an official AI Unified Process
+distribution and is not endorsed by Simon Martinelli or Martinelli LLC, nor is it
+affiliated with or endorsed by Addy Osmani or the agent-skills project.
 See [NOTICE](./NOTICE) for the full attribution.

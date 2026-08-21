@@ -1,9 +1,20 @@
 Nexa Agentic Engineering Marketplace
 Copyright 2026 Nexa (nexadev.app)
 
-This product is derived from the AI Unified Process Marketplace by
-Simon Martinelli, and includes software developed by Simon Martinelli
-as part of the AI Unified Process methodology.
+This product is derived from two upstream works:
+
+  1. the AI Unified Process Marketplace by Simon Martinelli
+     (Apache License, Version 2.0), and
+  2. agent-skills by Addy Osmani (MIT License).
+
+Each is attributed in its own section below.
+
+=========================================================================
+1. AI Unified Process Marketplace (Apache License, Version 2.0)
+=========================================================================
+
+This product includes software developed by Simon Martinelli as part of
+the AI Unified Process methodology.
 
   Source:  https://github.com/AI-Unified-Process/marketplace
   License: Apache License, Version 2.0
@@ -20,8 +31,6 @@ been modified for the Nexa Agentic Engineering methodology:
   use-case-spec/templates/use-case.md
                                  <- aiup-core/skills/use-case-spec/references/use-case.md
 
-The remainder of this marketplace, including the nexa-claude-nextjs plugin,
-is original work.
 
 -------------------------------------------------------------------------
 The following notice is reproduced from the NOTICE file of the upstream
@@ -48,3 +57,60 @@ work, as required by Section 4(d) of the Apache License, Version 2.0:
 "Nexa" and the nexadev.app name identify this derivative work. It is not
 an official AI Unified Process distribution and is not endorsed by
 Simon Martinelli or Martinelli LLC.
+
+
+=========================================================================
+2. agent-skills (MIT License)
+=========================================================================
+
+This product includes software developed by Addy Osmani and the
+agent-skills contributors.
+
+  Source:  https://github.com/addyosmani/agent-skills
+  License: MIT License
+           Full text: LICENSE-MIT-agent-skills
+
+The following files are derived from, and contain substantial portions
+of, agent-skills. Both have been modified for the Nexa Agentic
+Engineering methodology:
+
+  nexa-claude-core/skills/nexa-skills/SKILL.md
+                                 <- skills/using-agent-skills/SKILL.md
+  nexa-claude-core/hooks/session-start.sh
+                                 <- hooks/session-start.sh
+
+The MIT License requires that the following notice accompany these
+files and any substantial portion of them:
+
+  MIT License
+
+  Copyright (c) 2025 Addy Osmani
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+  ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+Nexa is not affiliated with or endorsed by Addy Osmani or the
+agent-skills project.
+
+
+=========================================================================
+
+The remainder of this marketplace, including the nexa-claude-nextjs
+plugin, is original work.

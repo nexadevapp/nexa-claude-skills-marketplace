@@ -3,6 +3,16 @@ name: nexa-skills
 description: Discovers and invokes Nexa skills. Use when starting a session or to identify which skill is appropriate for the task at hand. This is the orchestrator skill which governs how all Nexa skills are discovered and invoked. 
 ---
 
+<!--
+Copyright (c) 2025 Addy Osmani and the agent-skills contributors.
+Derived from agent-skills — https://github.com/addyosmani/agent-skills
+Licensed under the MIT License. See LICENSE-MIT-agent-skills and NOTICE.
+
+Modifications Copyright 2026 Nexa (nexadev.app).
+This file is derived from `skills/using-agent-skills/SKILL.md` and has been
+modified for the Nexa Agentic Engineering methodology.
+-->
+
 # Using Nexa Skills
 
 Nexa Skills is a set of engineering workflow skills which are intended to be used in the various phases of software development. This skill in particular helps you discover and apply the appropriate skill for the task at hand.

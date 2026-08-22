@@ -57,11 +57,11 @@ and reports infrastructure gaps without touching anything that already works.
 ## Gates
 
 - **No Nexa Rules Gate section here** — Step 5 of this skill is what establishes that gate's
-  `<!-- NEXA_RULES_CONFIGURED -->` marker via `/setup-project-rules`. Requiring it upfront
+  `<!-- NEXA_RULES_CONFIGURED v2 -->` marker via `/setup-project-rules`. Requiring it upfront
   would be circular, the same reason `setup-project-rules` itself doesn't gate on it.
-- **No Sprint Branch Gate** — this skill runs on `main`, not a sprint branch (documentation
-  and read-only detection, not application feature code). It's listed in
-  `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`'s Exceptions section.
+- **No Worktree Gate** — this skill runs on `main` in the primary checkout, not in a work item
+  worktree (documentation and read-only detection, not application feature code). It's listed in
+  `${CLAUDE_PLUGIN_ROOT}/shared/readiness/WORKTREE_GATE.md`'s Exceptions section.
 - **`PROJECT_READINESS.md` is audited, not gated on** — Step 4 walks its checklist and reports
   gaps; it does not block this skill from completing (it blocks *implementation* work later,
   which is exactly what Step 4's report exists to prepare the user for).
@@ -253,7 +253,7 @@ plus every item in `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`
 
 ### Step 5: Nexa Rules + Tracking
 
-Run `/setup-project-rules` (Skill tool) if `<!-- NEXA_RULES_CONFIGURED -->` is missing from
+Run `/setup-project-rules` (Skill tool) if `<!-- NEXA_RULES_CONFIGURED v2 -->` is missing from
 `CLAUDE.md` — idempotent, no judgment calls, safe to always run.
 
 Then, per `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md` conventions, for every UC:
@@ -311,15 +311,15 @@ authoritative.
 
 ## Verification
 
-- Confirm the Nexa Rules Gate (`<!-- NEXA_RULES_CONFIGURED -->`) now passes.
+- Confirm the Nexa Rules Gate (`<!-- NEXA_RULES_CONFIGURED v2 -->`) now passes.
 - Spot-check at least one generated `UC-XXX.md` against the live route/component it claims to
   describe — MSS steps should match actual code behavior, not paraphrase intent.
 - Confirm `docs/delivery/UC-XXX-iterations.md` exists **only** for `Status: Done` UCs. This is
-  what makes `/sprint-prepare`'s "Delivered (immutable)" detection recognize them correctly —
+  what makes the project-wide "delivered" detection recognize them correctly —
   it keys off file existence, not the `Status` field. Write one with a single entry noting
   `Reverse-engineered from existing code, not delivered via the Nexa pipeline` for each Done
   UC, matching `deliver-use-case/SKILL.md`'s iterations-log format.
 - Confirm every closed GitHub issue corresponds to a `Status: Done` UC and every open one to
   `Review`/`Draft`.
-- `scripts/sync-shared.sh --check` if `SPRINT_BRANCH_GATE.md` was touched this run (it
+- `scripts/sync-shared.sh --check` if `WORKTREE_GATE.md` was touched this run (it
   shouldn't be — that's a one-time repo change, not something this skill edits per-project).

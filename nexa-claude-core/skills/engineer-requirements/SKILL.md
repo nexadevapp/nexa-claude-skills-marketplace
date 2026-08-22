@@ -122,7 +122,7 @@ When documenting findings, reference specific wireframe screens by their anchor 
 
 ## Analysis Techniques
 
-Apply these techniques to every cluster (all eight are mandatory):
+Apply these techniques to every cluster (all ten are mandatory):
 
 ### 1. CRUD Matrix Analysis
 
@@ -225,6 +225,74 @@ cases; they belong as steps in the main success scenario or as alternative/excep
 5. Flag the merge as a proposed change in the cluster analysis (HIGH CONFIDENCE unless
    the boundary between UCs is genuinely ambiguous)
 
+### 9. External Dependency Audit
+
+For each use case in the cluster, run through this checklist to detect dependencies that require
+provisioning, configuration, or human action outside the codebase:
+
+- **External accounts or API keys** — Does this UC integrate with a third-party service
+  (OAuth provider, payment gateway, email/SMS service, maps API)? If yes: who provisions the
+  developer and production credentials? Are they already available?
+- **Infrastructure provisioning** — Does this UC require infrastructure that does not exist yet
+  (message queue, object storage bucket, CDN, search index, cron scheduler)?
+- **Manual configuration** — Does this UC depend on configuration in an external system
+  (DNS records, webhook URLs registered with a partner, allowlist entries)?
+- **Third-party contracts or approvals** — Does this UC depend on an agreement, approval, or
+  sandbox access from an external party?
+- **Environment variables or secrets** — Does this UC introduce new secrets that must be
+  provisioned in each environment?
+
+For every "yes" answer:
+
+1. Create a **technical task** (TT-XXX) with `/technical-task` that describes the provisioning
+   or configuration work.
+2. Set the task's **Scope** row to `Cluster: <this cluster>` when it supports only this cluster,
+   or `Umbrella` when it supports the whole system.
+3. Record the task in the `Technical Tasks` column of the cluster table in
+   `docs/engineering/progress.md`, and draw the `UCXXX ..> TTYYY : <<requires>>` arrow in
+   `docs/use_cases.puml`.
+4. **Ask the user** whether the prerequisite is already satisfied. If the user confirms it is
+   done, mark the task `Done` rather than creating work that is already complete.
+
+This audit prevents discovering missing credentials or infrastructure mid-implementation.
+
+### 10. Dependency and Interface Declaration
+
+The delivery scheduler runs use cases in parallel. It decides what may run from two rows in each
+use case specification, so both must be correct before a cluster is complete.
+
+For each use case in the cluster, determine and record:
+
+1. **Depends On** — every use case that must reach `Status: Done` before this one can be
+   delivered. Derive it from:
+   - Preconditions that another use case establishes (e.g. "User is registered" → the registration UC)
+   - Postconditions this use case consumes
+   - `<<include>>` and `<<requires>>` relationships in `docs/use_cases.puml`
+   - Entities this use case reads that another use case creates
+
+   Write `None` when the use case stands alone. **Prefer `None`.** Every dependency you add
+   removes a chance to deliver in parallel, so add one only when the use case genuinely cannot
+   be delivered first. Shared entities are not a dependency; shared *data that another use case
+   must create* is.
+
+2. **User Interface** — `Yes` when the actor interacts with a screen, `No` for background jobs
+   and system-triggered processes. `No` means no screen design is produced for this use case.
+
+Flag a **CRITICAL AMBIGUITY** when two use cases appear to depend on each other. A dependency
+cycle cannot be delivered in any order and always means the use case boundaries are wrong.
+
+## Decision Provenance
+
+Every decision made during cluster analysis must be classified as one of:
+
+- **EXPLICIT** — Directly stated in the requirements, in a change request, or in user input.
+  Quote the source.
+- **INFERRED** — Deduced by the agent from context, patterns, or common sense. State the reasoning.
+
+Record the classification in the cluster analysis document. It is the audit trail that lets a
+reviewer tell a stakeholder decision apart from an agent assumption, and it carries through to
+the use case specification and the implementation ticket.
+
 ## Output Directory
 
 All engineering artifacts go in:
@@ -265,14 +333,19 @@ Execute these phases in order.
 ```markdown
 ## Proposed Clusters
 
-| # | Cluster Name         | Use Cases                          | Primary Entity/Domain | Actor(s)         | UCs |
-|---|----------------------|------------------------------------|-----------------------|------------------|-----|
-| 1 | Authentication       | UC-001, UC-002, UC-003, UC-004     | User, Session         | Visitor, User    | 4   |
-| 2 | Project Management   | UC-010, UC-011, UC-012, UC-013, UC-014 | Project, Task     | Manager, Member  | 5   |
-| 3 | Reporting            | UC-020, UC-021, UC-022             | Report                | Manager, Admin   | 3   |
+| # | Cluster Name         | Use Cases                          | Technical Tasks | Primary Entity/Domain | Actor(s)         | UCs |
+|---|----------------------|------------------------------------|-----------------|-----------------------|------------------|-----|
+| 1 | Authentication       | UC-001, UC-002, UC-003, UC-004     | TT-003          | User, Session         | Visitor, User    | 4   |
+| 2 | Project Management   | UC-010, UC-011, UC-012, UC-013, UC-014 | —           | Project, Task         | Manager, Member  | 5   |
+| 3 | Reporting            | UC-020, UC-021, UC-022             | TT-007          | Report                | Manager, Admin   | 3   |
+| — | Umbrella             | —                                  | TT-001, TT-002  | cross-cutting         | —                | 0   |
 
 **Total:** 12 use cases across 3 clusters
 **Estimated clusters to process:** 3 + 1 cross-cutting = 4 rounds
+
+**Umbrella** is not a cluster — it is where cross-cutting technical tasks live. A technical task
+belongs to a cluster when it supports only that cluster's use cases, and to Umbrella when it
+supports the system as a whole. This assignment is written into each task's **Scope** row.
 ```
 
 7. **Step gate:** User confirms or adjusts the clustering (and merges) before proceeding.
@@ -290,11 +363,12 @@ Execute these phases in order.
 
 ## Clusters
 
-| # | Cluster Name       | Use Cases                      | Status      | Completed  |
-|---|--------------------|--------------------------------|-------------|------------|
-| 1 | Authentication     | UC-001, UC-002, UC-003, UC-004 | Not Started | —          |
-| 2 | Project Management | UC-010..UC-014                 | Not Started | —          |
-| 3 | Reporting          | UC-020..UC-022                 | Not Started | —          |
+| # | Cluster Name       | Use Cases                      | Technical Tasks | Status      | Completed  |
+|---|--------------------|--------------------------------|-----------------|-------------|------------|
+| 1 | Authentication     | UC-001, UC-002, UC-003, UC-004 | TT-003          | Not Started | —          |
+| 2 | Project Management | UC-010..UC-014                 | —               | Not Started | —          |
+| 3 | Reporting          | UC-020..UC-022                 | TT-007          | Not Started | —          |
+| — | Umbrella           | —                              | TT-001, TT-002  | —           | —          |
 
 ## Cross-Cutting Analysis
 
@@ -626,12 +700,22 @@ Apply the user-approved changes to the living documents:
 3. **Update `docs/use_cases.puml`:**
    - Add new use cases with proper UC IDs following the existing numbering scheme
    - Add/update actor assignments and relationships (includes/extends)
+   - Add a `UCXXX ..> UCYYY : <<requires>>` arrow for every dependency found by technique 10,
+     and a `UCXXX ..> TTYYY : <<requires>>` arrow for every technical task from technique 9
    - Do NOT modify delivered use cases
 
-4. **Update progress manifest** (`docs/engineering/progress.md`):
-   - Mark the cluster as "Complete" with today's date
+4. **Write the delivery metadata into each use case specification.** For every UC in the
+   cluster that already has a spec at `docs/use_cases/UC-XXX.md`, set its **Depends On** and
+   **User Interface** rows from technique 10. For a UC with no spec yet, the values are
+   recorded in the cluster analysis and `/use-case-spec` picks them up when the spec is
+   written. Never edit a delivered use case.
 
-5. **Print a brief summary** of what was applied:
+5. **Update progress manifest** (`docs/engineering/progress.md`):
+   - Mark the cluster as "Complete" with today's date
+   - Fill the `Technical Tasks` column with the tasks from technique 9, and add any
+     cross-cutting task to the `Umbrella` row
+
+6. **Print a brief summary** of what was applied:
 
 ```markdown
 ## Cluster N Complete
@@ -640,6 +724,8 @@ Apply the user-approved changes to the living documents:
 - MoSCoW classified: [count] (M: [n] · S: [n] · C: [n] · W: [n])
 - Entity model: +1 attribute, +1 entity
 - Use case diagram: +1 UC, +1 relationship
+- Technical tasks: +1 (TT-003, cluster) · +0 umbrella
+- Deliverable in parallel: [n] of [total] use cases have no dependency
 - Next: Cluster N+1 ([name]) — [UC count] use cases
 ```
 
@@ -666,6 +752,10 @@ After all clusters are complete, run a final analysis across the entire project:
 | Cross-cluster granularity      | Use cases from different clusters that are actually steps in the same user journey — merge candidates missed during Phase 1 pre-check |
 | MoSCoW consistency             | Requirements classified differently across clusters for the same entity or actor — harmonize. Verify global distribution is healthy (not all Must-haves or all Won't-haves). Flag Must-have requirements that depend on Could/Won't-have requirements (priority inversion). |
 | Reference/seed data            | Data that use cases assume exists but no UC or migration creates   |
+| Dependency graph validity      | Every ID in a **Depends On** row names a real use case; no cycles exist; no use case depends on one that is `Obsolete`. A cycle is a blocker — it cannot be delivered in any order |
+| Dependency graph shape         | How many use cases have `Depends On: None`, and what is the longest dependency chain? A graph where almost everything is chained cannot be delivered in parallel and usually means dependencies were declared too freely — challenge each one |
+| Technical task coverage        | Every technical task has a **Scope** row, appears in the cluster table or the Umbrella row, and every use case that needs one declares the `<<requires>>` arrow |
+| Entity readiness               | Every entity referenced by a use case exists in `docs/entity_model.md`. Report a missing entity as a blocker and flag that `/prisma-migration` must run before delivery |
 
 3. Write the cross-cutting report to `docs/engineering/cross-cutting-analysis.md`:
 
@@ -780,11 +870,12 @@ After all clusters are complete, run a final analysis across the entire project:
 
 ## Clusters
 
-| # | Cluster Name       | Use Cases                      | Status   | Completed  |
-|---|--------------------|--------------------------------|----------|------------|
-| 1 | Authentication     | UC-001, UC-002, UC-003, UC-004 | Complete | YYYY-MM-DD |
-| 2 | Project Management | UC-010..UC-014, UC-NEW-01      | Complete | YYYY-MM-DD |
-| 3 | Reporting          | UC-020..UC-022                 | Complete | YYYY-MM-DD |
+| # | Cluster Name       | Use Cases                      | Technical Tasks | Status   | Completed  |
+|---|--------------------|--------------------------------|-----------------|----------|------------|
+| 1 | Authentication     | UC-001, UC-002, UC-003, UC-004 | TT-003          | Complete | YYYY-MM-DD |
+| 2 | Project Management | UC-010..UC-014, UC-NEW-01      | —               | Complete | YYYY-MM-DD |
+| 3 | Reporting          | UC-020..UC-022                 | TT-007          | Complete | YYYY-MM-DD |
+| — | Umbrella           | —                              | TT-001, TT-002  | —        | —          |
 
 ## Cross-Cutting Analysis
 
@@ -793,7 +884,7 @@ After all clusters are complete, run a final analysis across the entire project:
 
 ## Next Steps
 
-The project is ready for `/sprint-prepare`.
+The project is ready for delivery. Run `/deliver-cluster <cluster name>` to deliver a cluster.
 ```
 
 2. Print the final summary to the user:
@@ -828,5 +919,5 @@ The project is ready for `/sprint-prepare`.
 - `docs/engineering/cross-cutting-analysis.md`
 - `docs/engineering/cross-cutting-po-review.md`
 
-**Recommended next step:** `/sprint-prepare` to scope your first sprint.
+**Recommended next step:** `/deliver-cluster <cluster name>` to deliver the first cluster.
 ```

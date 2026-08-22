@@ -40,6 +40,7 @@ Use [templates/technical-task.md](templates/technical-task.md) as the document s
 | **Task Name** | Set Up Dev Profile |
 | **Category** | Configuration |
 | **Goal** | Create a development profile with seed data and relaxed security so developers can run the application locally without external dependencies. |
+| **Scope** | Umbrella |
 | **Status** | Approved |
 
 ## Acceptance Criteria
@@ -64,8 +65,11 @@ Use [templates/technical-task.md](templates/technical-task.md) as the document s
 1. Read existing technical tasks in `docs/technical_tasks/` to determine the next TT-XXX ID
 2. Understand the task to document from the user's request or from a prerequisite discovered during UC implementation
 3. Write the Overview section with category and goal
-4. Define concrete, verifiable acceptance criteria
-5. Identify affected areas of the codebase
-6. List dependencies on other TTs or UCs
-7. Set status to Draft (or Approved if the user confirms)
-8. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`
+4. Set **Scope** — `Cluster: <name>` when the task supports exactly one cluster from
+   `docs/engineering/progress.md`, `Umbrella` when it is cross-cutting. The project
+   overview groups technical tasks by this field.
+5. Define concrete, verifiable acceptance criteria
+6. Identify affected areas of the codebase
+7. List dependencies on other TTs or UCs
+8. Set status to Draft (or Approved if the user confirms)
+9. Create a GitHub tracking issue by following the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/shared/tracking/TRACKING.md`

@@ -49,9 +49,26 @@ others' reasoning, so findings are independent, not rationalized.
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
-## Sprint Branch Gate
+## Worktree Setup
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
+The fix runs in its own git worktree, so it does not share a working tree with a use case that
+is being delivered at the same time.
+
+If the user invoked this skill from the primary checkout, create the worktree first:
+
+```bash
+git fetch origin main
+git worktree add ../$(basename "$PWD")-BUG-XXX -b bug/BUG-XXX origin/main
+```
+
+Run the rest of the pipeline inside that directory. When the fix is green, hand the branch to
+`/merge-use-case BUG-XXX`, which runs the merge gate and removes the worktree.
+
+If a worktree for this bug already exists, reuse it.
+
+## Worktree Gate
+
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/WORKTREE_GATE.md`.
 
 ## Rollback Checkpoint
 

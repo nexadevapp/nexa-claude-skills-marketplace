@@ -36,7 +36,7 @@ Append the following section to the project's `CLAUDE.md`:
 ~~~markdown
 ## Nexa Workflow Rules
 
-<!-- NEXA_RULES_CONFIGURED -->
+<!-- NEXA_RULES_CONFIGURED v2 -->
 
 These rules are enforced by the Nexa Agentic Engineering methodology. Do not remove or
 weaken them.
@@ -45,7 +45,7 @@ weaken them.
 
 Never work on a new use case without following the official Nexa workflow:
 requirements → entity model → use case diagram → wireframe → engineer requirements →
-sprint prepare → use case spec → design screens → implement → test → evaluate.
+use case spec → design screens → implement → test → evaluate → merge.
 Every use case must pass through this pipeline. There are no shortcuts.
 
 ### Rule 2: Never jump straight to implementation
@@ -75,11 +75,15 @@ never ask the user to choose.
 
 ### Rule 6: Never write code on main/master
 
-Never run code-writing skills (`/implement`, `/deliver-use-case`, `/sprint-deliver`,
-`/prisma-migration`, `/vitest-test`, `/playwright-test`) on the `main` or `master` branch.
-All code changes must happen on a sprint branch (`sprint-*`) created by `/sprint-kickoff`.
-If the current branch is `main` or `master` and the user asks to implement something,
-redirect them to `/sprint-kickoff` first.
+Never run code-writing skills (`/implement`, `/deliver-use-case`, `/prisma-migration`,
+`/vitest-test`, `/playwright-test`) on the `main` or `master` branch, and never in the primary
+checkout. Every work item gets its own git worktree on its own branch: `uc/UC-XXX` for a use
+case, `tt/TT-XXX` for a technical task, `bug/BUG-XXX` for a bug, `cr/CR-XXX` for a change
+request. The worktree is what lets several use cases be delivered at the same time.
+
+If the current branch is `main` or `master` and the user asks to implement something, redirect
+them to `/deliver-cluster <cluster>` for a set of use cases, or `/deliver-use-case UC-XXX` for
+one. Both create the worktree. Never create the worktree by hand to work around this rule.
 
 ### Rule 7: E2E tests must be tagged via the traceability helper
 
@@ -111,7 +115,7 @@ not be added to that list.
 
 ## Marker
 
-The HTML comment `<!-- NEXA_RULES_CONFIGURED -->` inside the `## Nexa Workflow Rules`
+The HTML comment `<!-- NEXA_RULES_CONFIGURED v2 -->` inside the `## Nexa Workflow Rules`
 section serves as the machine-readable marker that the Nexa Rules Gate checks for.
 
 ## Workflow
@@ -119,10 +123,19 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
 1. Check if the target project has a `CLAUDE.md` file at its root
 2. If it exists, read it and check for `## Nexa Workflow Rules`
    - If the section already exists, show the user the existing rules and ask whether to
-     overwrite or skip
+     replace or skip
 3. If `CLAUDE.md` does not exist, create it
-4. Append the rules section (above) to `CLAUDE.md`
-5. Verify the marker `<!-- NEXA_RULES_CONFIGURED -->` is present in the written file
+4. Write the rules section (above) into `CLAUDE.md`:
+   - **If a `## Nexa Workflow Rules` section already exists, replace it in place** — delete
+     everything from that heading down to the next heading of the same level (or the end of the
+     file) and put the new section there. Never append a second one.
+   - If no such section exists, append the new section to the end of the file.
+5. Verify:
+   - The marker `<!-- NEXA_RULES_CONFIGURED v2 -->` is present
+   - `## Nexa Workflow Rules` appears **exactly once**
+   - The words `sprint branch` and `/sprint-` appear nowhere in the file. A project that
+     previously ran an older version of this skill carries the sprint-branch rule; leaving it
+     behind means the agent reads a rule that points at deleted skills
 6. Inform the user:
    ```
    ## Nexa Workflow Rules — Configured
@@ -134,7 +147,7 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
    3. Always check for duplicate use cases before creating new ones
    4. Never ask for a preferred use case number
    5. Always use the next available sequential number
-   6. Never write code on main/master — use a sprint branch
+   6. Never write code on main/master — use a work item worktree
    7. E2E tests must be tagged via the traceability helper (uc() on test.describe, meta() on test, bug() for pure regressions)
 
    These rules are enforced by the Nexa Rules Gate on every skill invocation.

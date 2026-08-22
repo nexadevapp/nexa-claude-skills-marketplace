@@ -1,12 +1,12 @@
 ---
 name: deliver-use-case
 description: >
-  Orchestrates the full per-use-case delivery pipeline: verifies spec and design exist,
-  implements the use case, writes E2E tests, and evaluates coverage against the spec.
-  Iterates automatically until quality gates pass. Specification and design must exist
-  beforehand via /sprint-prepare, /use-case-spec, or /design-screens.
-  This skill must only be invoked explicitly via /deliver-use-case or by /sprint-deliver —
-  never inferred from user messages.
+  Orchestrates the full per-use-case delivery pipeline: writes the specification and the
+  design if they are missing, implements the use case, writes E2E tests, and evaluates
+  coverage against the spec. Iterates automatically until quality gates pass. The use case
+  must be elaborated by /engineer-requirements first, and delivery runs in its own git
+  worktree on a uc/UC-XXX branch. This skill must only be invoked explicitly via
+  /deliver-use-case or by /deliver-cluster — never inferred from user messages.
 ---
 
 # Deliver Use Case Pipeline
@@ -42,9 +42,29 @@ Do not proceed until all items pass or the user explicitly waives failures.
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
-## Sprint Branch Gate
+## Worktree Setup
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
+Delivery runs in its own git worktree so that several use cases can be delivered at the same
+time without sharing a working tree.
+
+**If `/deliver-cluster` invoked this skill,** the worktree already exists and this skill is
+already running inside it. Skip to the Worktree Gate.
+
+**If the user invoked this skill directly,** create the worktree first:
+
+```bash
+git -C <primary checkout> fetch origin main
+git -C <primary checkout> worktree add ../$(basename "$PWD")-$ARGUMENTS -b uc/$ARGUMENTS origin/main
+```
+
+Then run the rest of this pipeline inside that directory. When the pipeline completes, hand the
+branch to `/merge-use-case $ARGUMENTS`, which runs the merge gate and removes the worktree.
+
+If a worktree for this use case already exists, reuse it — do not create a second one.
+
+## Worktree Gate
+
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/WORKTREE_GATE.md`.
 
 ## Delivery Log
 
@@ -120,6 +140,7 @@ Rules:
 
 | Step | Gate that must be green first | Commit message |
 |------|-------------------------------|----------------|
+| 1. Specification and Design | Definition of Ready and the fidelity checks pass | `docs($ARGUMENTS): add the specification and the design` |
 | 2. Implementation | `npx next build` + `npx vitest run`, no Critical DoD items | `feat($ARGUMENTS): <one-line summary>` |
 | 3. Mutation Testing | `npx vitest run` (only if assertions were added in Phase 2) | `test($ARGUMENTS): kill surviving mutants (NN.N%)` |
 | 4. E2E Tests | `npx playwright test` verified in main context — 0 failed, 0 skipped | `test($ARGUMENTS): e2e coverage` |
@@ -133,26 +154,86 @@ Step 4 and 5 fix loops may patch implementation code — when they do, re-run `n
 
 ---
 
-### Step 1: Verify Specification and Design
+### Step 1: Ensure Specification and Design
 
-Check both files exist:
-1. `docs/use_cases/$ARGUMENTS.md`
-2. `docs/designs/$ARGUMENTS-design.html`
+This step produces the artifacts the pipeline needs. It does not merely check for them.
 
-`docs/requirements.md` is a living document — `/sprint-prepare` updates it with refined
-requirements before generating specs. All skills use the same canonical source.
+`docs/requirements.md` is a living document — `/engineer-requirements` refines it per cluster.
+All skills read that same canonical source.
 
-If either artifact is missing, stop:
+**1a. Specification.** If `docs/use_cases/$ARGUMENTS.md` does not exist, run
+`/use-case-spec $ARGUMENTS` (nexa-claude-core). Tell it to work from the refined requirements
+for this use case's cluster (`docs/engineering/cluster-N-analysis.md`) rather than the broad
+catalog, so the spec reflects the decisions already taken.
+
+If the cluster analysis does not exist, stop:
 
 ```
-PIPELINE STOPPED: Missing artifacts for $ARGUMENTS
+PIPELINE STOPPED: $ARGUMENTS has no specification and no cluster analysis
 
-- Specification (docs/use_cases/$ARGUMENTS.md): [exists / MISSING]
-- Frontend Design (docs/designs/$ARGUMENTS-design.html): [exists / MISSING]
-
-If part of a sprint: re-run /sprint-prepare.
-If standalone: run /use-case-spec $ARGUMENTS then /design-screens $ARGUMENTS.
+Run /engineer-requirements first so the use case is elaborated, then re-run
+/deliver-use-case $ARGUMENTS.
 ```
+
+**1b. Read the Overview table.** The **Depends On** and **User Interface** rows drive the rest
+of this step. If either row is missing, stop and tell the user to run `/engineer-requirements`
+for this cluster — a use case without them cannot be scheduled.
+
+**1c. Dependency check.** Every use case named in **Depends On** must have `Status: Done`. If
+any does not, stop:
+
+```
+PIPELINE STOPPED: $ARGUMENTS has unmet dependencies
+
+Blocked by: UC-XXX (Status: <status>), UC-YYY (Status: <status>)
+
+Deliver those use cases first, or run /deliver-cluster <cluster> which schedules
+dependencies automatically.
+```
+
+**1d. Design.** If **User Interface** is `No`, skip this step and record the reason in the
+delivery log. Otherwise, if `docs/designs/$ARGUMENTS-design.html` does not exist, launch an
+**isolated agent** (Agent tool) to produce it from a clean context. The agent must not see
+implementation details or conversation history — it works only from the specification,
+wireframe, entity model, and design examples.
+
+Agent prompt:
+
+> You are an independent frontend designer. Read and follow the complete instructions in the
+> `design-screens` skill of the nexa-claude-core plugin, then create a screen design artifact
+> for $ARGUMENTS.
+>
+> **Your inputs (read these and nothing else):**
+> - Use case specification: `docs/use_cases/$ARGUMENTS.md`
+> - Entity model: `docs/entity_model.md` (if it exists)
+> - Wireframe: `docs/wireframes/index.html`
+> - Design rules: `docs/designs/DESIGN_RULES.md` (if it exists)
+> - Existing theme files in `docs/designs/` (if they exist)
+> - Example files in the skill's `examples/` directory
+>
+> **Your output:** `docs/designs/$ARGUMENTS-design.html`
+>
+> Do NOT read implementation code or any file outside the inputs listed above. Your design
+> must be based solely on the use case specification and the wireframe.
+
+**Verify:** the file exists and contains at least one screen definition (check for the
+`design-screen` class in the HTML).
+
+**1e. Readiness gate.** Read `${CLAUDE_PLUGIN_ROOT}/shared/readiness/DEFINITION_OF_READY.md`
+and check every item. Then check these fidelity items, which catch a spec and a design that
+drifted apart before any code is written:
+
+| Check | What fails it |
+|-------|---------------|
+| Requirements to specification fidelity | A functional requirement mapped to this use case has no corresponding scenario step or business rule |
+| Specification to design fidelity | A Main Success Scenario step or Alternative Flow has no corresponding screen state in the design |
+| Entity to specification field coverage | The design or the scenario uses a field that the entity model does not define |
+| Alternative flow coverage | An Alternative Flow has no error state in the design |
+| Decision provenance | A decision in the spec is tagged neither EXPLICIT nor INFERRED |
+
+Report all failures and stop, unless the user waives them.
+
+**Commit:** see Commit Discipline — `docs($ARGUMENTS): add the specification and the design`.
 
 ---
 
@@ -397,7 +478,7 @@ commit of the delivery; the terminal summary and GitHub comment below change no 
 
 | Step                    | Status |
 |-------------------------|--------|
-| Artifact Check          | ...    |
+| Specification and Design| ...    |
 | Entity Gate             | ...    |
 | Implementation          | ...    |
 | Mutation Testing        | NN.N%  |
@@ -410,6 +491,13 @@ and links to `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS
 and `docs/delivery/$ARGUMENTS-mutation.md`.
 
 > To run a deep quality audit (i18n, accessibility, visual fidelity): `/audit $ARGUMENTS`
+
+The branch `uc/$ARGUMENTS` is green but not yet on `main`.
+
+- **If `/deliver-cluster` invoked this skill:** return control. The orchestrator sends the
+  branch to the merge queue.
+- **If the user invoked this skill directly:** run `/merge-use-case $ARGUMENTS` to rebase the
+  branch onto `main`, run the full regression gate, merge, and remove the worktree.
 
 ### 4. GitHub Issue Report
 

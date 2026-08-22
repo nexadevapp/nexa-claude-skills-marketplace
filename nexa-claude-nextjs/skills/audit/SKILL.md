@@ -3,7 +3,7 @@ name: audit
 description: >
   Runs a comprehensive implementation audit for a delivered use case. Checks Definition of Done,
   i18n completeness and correctness, error message i18n, accessibility, visual fidelity against
-  the design, and loading/error states. Run after /deliver-use-case or before /sprint-complete
+  the design, and loading/error states. Run after /deliver-use-case or before /merge-use-case
   for a quality deep-dive. Results are advisory — Critical and Major findings should be fixed;
   Minor findings are observations.
 context: fork
@@ -201,9 +201,9 @@ Otherwise, for every spec under `e2e/**/*.spec.ts`:
    be marked resolved.
 
 For each violation, report file path, line number, and the specific rule
-broken. Severity: **Major** during rollout (advisory). Once one full sprint
+broken. Severity: **Major** during rollout (advisory). Once one full cluster
 has been delivered cleanly under the helper, escalate to **Critical** and have
-the audit fail sprint completion.
+the audit fail the merge gate.
 
 ---
 

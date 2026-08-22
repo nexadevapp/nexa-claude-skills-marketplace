@@ -31,5 +31,7 @@ either fixes the spec or explicitly waives the failing items.
 
 ### Dependencies
 
+- [ ] **Dependencies declared** — The **Depends On** row lists every use case that must reach `Done` first, or states `None`. This is what the delivery scheduler parses to decide what can be delivered in parallel
+- [ ] **User interface declared** — The **User Interface** row states `Yes` or `No`, so it is unambiguous whether a screen design is expected
 - [ ] **Entity model exists** — `docs/entity_model.md` exists and covers the entities referenced in the use case
 - [ ] **Database migration exists** — A corresponding database migration exists for the entities used in this use case

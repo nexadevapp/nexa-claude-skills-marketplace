@@ -53,6 +53,8 @@ Use [templates/use-case.md](templates/use-case.md) as the document structure.
 | **Use Case Name** | Create Reservation |
 | **Primary Actor** | Front Desk Clerk |
 | **Goal** | Create a new room reservation for a guest |
+| **Depends On** | UC-000 |
+| **User Interface** | Yes |
 | **Status** | Approved |
 
 ## Preconditions
@@ -133,16 +135,29 @@ Reservations of 3 or more nights require a 50% deposit.
 ## Workflow
 
 1. Read the requirements document and use case diagram
-2. Identify the use case to document
-3. Use TodoWrite to track progress
-4. Write the Overview section with actor and goal
-5. Define preconditions (what must be true before starting)
-6. Write the Main Success Scenario step by step
-7. Identify alternative flows:
+2. Read `docs/engineering/cluster-N-analysis.md` for the cluster this use case belongs to, if
+   it exists. `/engineer-requirements` records there the refined requirements, the **Depends On**
+   and **User Interface** values, and the EXPLICIT or INFERRED provenance of each decision.
+   Those decisions were reviewed — copy them, do not derive them again, and do not contradict them
+3. Identify the use case to document
+4. Use TodoWrite to track progress
+5. Write the Overview section with actor and goal
+6. Fill **Depends On** — take it from the cluster analysis when step 2 found one. Otherwise
+   list every use case that must be `Done` before this one can be delivered, or `None`, derived
+   from the preconditions, from postconditions this use case consumes, and from
+   `docs/use_cases.puml`. This row is what the delivery scheduler parses to decide what can run
+   in parallel; an unlisted dependency causes a use case to be delivered against a system that
+   is not ready for it.
+7. Fill **User Interface** — take it from the cluster analysis when step 2 found one. Otherwise
+   `Yes` if the actor interacts with a screen, `No` for background jobs and system-triggered
+   processes. `No` means no screen design will be produced.
+8. Define preconditions (what must be true before starting)
+9. Write the Main Success Scenario step by step
+10. Identify alternative flows:
     - Error conditions
     - Optional paths
     - Exceptional situations
-8. Define postconditions for both success and failure
-9. Document applicable business rules
-10. Review for completeness and clarity
-11. Mark todo complete
+11. Define postconditions for both success and failure
+12. Document applicable business rules
+13. Review for completeness and clarity
+14. Mark todo complete

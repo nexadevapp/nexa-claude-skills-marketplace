@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Document</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<style>
+:root { --bg:#fff; --text:#1a1d23; --muted:#666e7a; --border:#e2e5ea; --panel:#f7f8fa; --accent:#2563eb; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#14171c; --text:#e6e9ee; --muted:#99a1ad; --border:#2c323b; --panel:#1c2027; --accent:#6b9bff; }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 28px 32px; background: var(--bg); color: var(--text);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+#doc { max-width: 860px; }
+h1, h2, h3, h4 { line-height: 1.3; margin: 1.6em 0 .5em; }
+h1 { font-size: 26px; margin-top: 0; }
+h2 { font-size: 20px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); }
+code { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: .9em; }
+pre { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; }
+pre code { background: none; border: 0; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 14px; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--border); padding: 7px 11px; text-align: left; vertical-align: top; }
+th { background: var(--panel); }
+blockquote { margin: 1em 0; padding: 2px 16px; border-left: 3px solid var(--border); color: var(--muted); }
+img, svg { max-width: 100%; }
+.error { color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="doc" class="error">Loading…</div>
+<script>
+const file = new URLSearchParams(location.search).get('file');
+const doc = document.getElementById('doc');
+
+function resize() {
+  parent.postMessage({ type: 'md-viewer-height', height: document.documentElement.scrollHeight }, '*');
+}
+
+if (!file) {
+  doc.textContent = 'No file given. Use ?file=path/to/doc.md';
+  resize();
+} else {
+  fetch(file)
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(text => {
+      doc.className = '';
+      // A specification, a delivery log, or a bug report is untrusted markup once it reaches
+      // innerHTML — marked passes embedded HTML through unchanged.
+      const html = marked.parse(text);
+      doc.innerHTML = (typeof DOMPurify !== 'undefined')
+        ? DOMPurify.sanitize(html)
+        : html.replace(/<(script|iframe|object|embed)\b[\s\S]*?<\/\1>/gi, '');
+      document.title = (doc.querySelector('h1') || {}).textContent || file.split('/').pop();
+      // Turn ```mermaid blocks into diagrams.
+      doc.querySelectorAll('pre > code.language-mermaid').forEach(code => {
+        const holder = document.createElement('pre');
+        holder.className = 'mermaid';
+        holder.textContent = code.textContent;
+        code.parentElement.replaceWith(holder);
+      });
+      const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+      mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'default' });
+      return mermaid.run({ querySelector: '.mermaid' }).catch(() => {});
+    })
+    .catch(e => { doc.className = 'error'; doc.textContent = 'Could not read ' + file + ' (' + e.message + ')'; })
+    .finally(() => { resize(); setTimeout(resize, 400); });
+}
+
+addEventListener('resize', resize);
+</script>
+</body>
+</html>

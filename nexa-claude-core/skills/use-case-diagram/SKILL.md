@@ -69,6 +69,14 @@ user --> UC003
   usecase "TT-010\nProvision OAuth App" as TT010 <<technical>>
   UC045 ..> TT010 : <<requires>>
   ```
+- **Use case dependencies** — when a use case cannot be delivered until another use case is
+  done, draw the same dotted `<<requires>>` arrow between them:
+  ```plantuml
+  UC005 ..> UC003 : <<requires>>
+  ```
+  The diagram is the **visual mirror**. The authoritative declaration is the **Depends On** row
+  in `docs/use_cases/UC-XXX.md` — that is what the delivery scheduler parses. Keep the two in
+  agreement; when they disagree, the use case specification wins.
 - Each use case should trace to at least one functional requirement
 - Add notes sparingly, only where relationships need clarification
 

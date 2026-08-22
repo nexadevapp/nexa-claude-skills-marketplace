@@ -21,6 +21,8 @@ modified for the Nexa Agentic Engineering methodology.
 | **Use Case Name** | [Descriptive Name] |
 | **Primary Actor** | [Role] |
 | **Goal** | [What the actor wants to achieve] |
+| **Depends On** | UC-XXX, UC-YYY · or None |
+| **User Interface** | Yes · No |
 | **Status** | Draft · Reviewed · Approved · Implemented · Tested · Done · Obsolete |
 
 ## Preconditions
@@ -72,6 +74,13 @@ modified for the Nexa Agentic Engineering methodology.
 ---
 
 ## Reference
+
+### Overview Fields
+
+| Field | Description |
+|-------|-------------|
+| **Depends On** | The use cases that must reach `Done` before this one can be delivered. Comma-separated `UC-XXX` IDs, or `None`. This row is the authoritative dependency declaration — the scheduler reads it to decide what can be delivered in parallel. `docs/use_cases.puml` mirrors it visually. |
+| **User Interface** | `Yes` if the actor interacts with a screen, `No` for background jobs and system-triggered processes with no UI. `No` means no screen design is produced and none is expected. |
 
 ### Status Values
 

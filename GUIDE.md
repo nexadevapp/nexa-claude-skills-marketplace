@@ -30,13 +30,15 @@ Claude designs your data model with a Mermaid ER diagram — entities, relations
 
 Claude generates a PlantUML diagram mapping actors to use cases, giving you a birds-eye view of system behavior.
 
-### 5. Prepare a sprint → `/sprint-prepare`
+### 5. Elaborate the use cases → `/engineer-requirements`
 
-Select which use cases to tackle. Claude refines requirements, evolves the entity model, generates use case specifications and screen designs, and produces a sprint readiness report.
+Claude groups the use cases into thematic clusters and works through them one at a time: it refines the requirements, evolves the entity model, audits external dependencies into technical tasks, and records for every use case which other use cases it depends on and whether it has a screen.
+
+That dependency data is what makes the next part parallel.
 
 ---
 
-*At this point, your sprint is fully specified. Now you build it (Next.js stack):*
+*At this point, your use cases are elaborated. Now you build them (Next.js stack):*
 
 ---
 
@@ -78,11 +80,15 @@ This single command orchestrates the full pipeline automatically for a use case 
 - `/audit` — Deep quality audit (DoD, i18n, accessibility, visual fidelity)
 - `/report-bug` — Creates structured bug reports when something's off
 
-### 14. Deliver the sprint
+### 14. Deliver a whole cluster → `/deliver-cluster`
 
-- `/sprint-kickoff` — Create the sprint branch and start delivery
-- `/sprint-deliver` — Deliver use cases in priority order from the readiness report
-- `/sprint-complete` — Validate, close issues, archive, and open a PR to main
+`/deliver-cluster <name>` reads the dependency graph and delivers everything that is not blocked **at the same time**, one git worktree per use case. As each pipeline goes green, the branch enters a serial merge queue: `/merge-use-case` rebases it onto `main`, runs the full unfiltered regression suite, and fast-forwards. After each merge the ready set is recomputed, so finishing one use case can unblock the next.
+
+Human review is optional. Add `--review` to stop at a pull request instead of merging.
+
+### 15. See where the project stands → `/dashboard`
+
+Regenerates `docs/overview/` — every cluster with its delivered count, each use case linked to its specification, its design, and its acceptance tests, and the technical tasks split between the cluster they support and the Umbrella section for cross-cutting ones.
 
 ---
 
@@ -90,5 +96,5 @@ This single command orchestrates the full pipeline automatically for a use case 
 
 - **You don't need to memorize this.** Just describe what you want and Claude will suggest the right skill.
 - **Each skill builds on the previous artifacts.** Follow the order above for new projects; jump to any step for existing ones.
-- **`/deliver-use-case` is the power move.** Once your specs and designs are ready, it handles implementation, testing, and evaluation in one shot.
+- **`/deliver-cluster` is the power move.** It delivers several use cases at once and merges them for you. Use `/deliver-use-case` when you want exactly one.
 - **Technical tasks** (config, infra, cleanup) that aren't user-facing? Use `/technical-task` to spec those separately.

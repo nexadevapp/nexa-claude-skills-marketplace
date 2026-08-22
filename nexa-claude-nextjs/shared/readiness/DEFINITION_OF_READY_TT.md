@@ -27,3 +27,4 @@ either fixes the spec or explicitly waives the failing items.
 ### Dependencies
 
 - [ ] **Dependencies listed or explicitly none** — Dependencies on other TTs or UCs are listed, or "None" is stated explicitly
+- [ ] **Scope declared** — The **Scope** row states `Cluster: <name>` or `Umbrella`, so the task is grouped correctly in the project overview

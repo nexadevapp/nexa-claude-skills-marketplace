@@ -42,8 +42,8 @@ The wireframe serves four downstream consumers:
    design output.
 3. **Human review** — Stakeholders review the wireframe to validate screen flow, information
    hierarchy, visual direction, and navigation. A polished wireframe builds confidence early.
-4. **`/sprint-prepare`** — Can trigger wireframe generation for new use cases added during
-   sprint refinement, ensuring the wireframe stays current as the project evolves.
+4. **`/engineer-requirements`** — Can trigger wireframe generation for new use cases added
+   during cluster elaboration, ensuring the wireframe stays current as the project evolves.
 
 ## Design Philosophy
 

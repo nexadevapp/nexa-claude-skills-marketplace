@@ -36,10 +36,10 @@ nexa-claude-marketplace/
 │       ├── engineer-requirements/
 │       ├── use-case-spec/
 │       ├── technical-task/
-│       ├── sprint-prepare/
 │       ├── generate-wireframe/
 │       ├── design-screens/
 │       ├── code-review/
+│       ├── dashboard/
 │       ├── evaluate/
 │       ├── report-bug/
 │       ├── conventional-commit/
@@ -61,11 +61,10 @@ nexa-claude-marketplace/
 │       ├── code-quality/
 │       ├── mutation-test/
 │       ├── deliver-use-case/
+│       ├── deliver-cluster/
+│       ├── merge-use-case/
 │       ├── resolve-bug/
 │       ├── audit/
-│       ├── sprint-kickoff/
-│       ├── sprint-deliver/
-│       ├── sprint-complete/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
 └── README.md
@@ -178,7 +177,6 @@ These are the subtle errors that look like productivity but create problems:
 | Elaboration  | `/engineer-requirements` | Clustered elaboration of all use cases with interactive refinement |
 | Construction | `/use-case-spec`      | Write detailed use case specifications |
 | Construction | `/technical-task`     | Create technical task specifications   |
-| Construction | `/sprint-prepare`     | Select, refine, and validate use cases for sprint delivery |
 | Construction | `/design-screens`     | Create screen design specifications    |
 | Verification | `/code-review`        | Independent code review (runs in isolation) |
 | Verification | `/evaluate`           | Evaluate implementation against spec and design (runs in isolation) |
@@ -202,9 +200,8 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/playwright-test`      | Create Playwright e2e tests                                        |
 | Construction | `/code-quality`         | Run oxlint and oxfmt checks (lint, complexity, formatting)         |
 | Construction | `/mutation-test`        | Run StrykerJS mutation testing on delivered business logic         |
-| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for a use case   |
+| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for one use case |
+| Construction | `/deliver-cluster`      | Deliver a cluster: parallel worktrees, dependency order, serial merge queue |
+| Construction | `/merge-use-case`       | Rebase a use case branch onto main, run the regression gate, merge |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
-| Construction | `/sprint-kickoff`       | Create sprint branch and start delivery                            |
-| Construction | `/sprint-deliver`       | Deliver use cases in priority order from readiness report          |
-| Completion   | `/sprint-complete`      | Close sprint: validate, close GH issues, dashboard, archive, publish |

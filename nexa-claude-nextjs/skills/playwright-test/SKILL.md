@@ -179,9 +179,9 @@ await expect(page.locator('table')).toContainText(['New Item']);
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/NEXA_RULES_GATE.md`.
 
-## Sprint Branch Gate
+## Worktree Gate
 
-Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/SPRINT_BRANCH_GATE.md`.
+Read and follow `${CLAUDE_PLUGIN_ROOT}/shared/readiness/WORKTREE_GATE.md`.
 
 ## Test User Provisioning
 

@@ -8,6 +8,7 @@
 | **Task Name** | [Descriptive Name] |
 | **Category** | Configuration \| Cleanup \| Dependency \| Infrastructure \| DevEx |
 | **Goal** | [What this task achieves and why it is needed] |
+| **Scope** | Cluster: [cluster name] \| Umbrella |
 | **Status** | Draft \| Reviewed \| Approved \| Implemented \| Tested \| Done \| Obsolete |
 
 ## Acceptance Criteria
@@ -35,6 +36,13 @@
 ---
 
 ## Reference
+
+### Scope Values
+
+| Scope | Description |
+|-------|-------------|
+| `Cluster: <name>` | The task supports one cluster only. It is listed under that cluster and must be `Done` before any of the cluster's use cases are delivered. |
+| `Umbrella` | The task is cross-cutting and supports the whole system. It is listed in the Umbrella section and is not tied to any one cluster. |
 
 ### Status Values
 

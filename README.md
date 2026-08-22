@@ -5,7 +5,7 @@ A collection of [Claude Code](https://claude.com/claude-code) plugins that imple
 The marketplace has a **two-layer architecture**:
 
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
-- **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and sprint delivery. Requires `nexa-claude-core`.
+- **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and parallel delivery. Requires `nexa-claude-core`.
 
 ---
 
@@ -48,8 +48,8 @@ If a skill still looks stale after updating (a known, still-open Claude Code plu
 | **Elaboration** | `/engineer-requirements` | Cluster-based elaboration of all use cases with interactive refinement |
 | **Construction** | `/use-case-spec` | Write detailed use case specifications |
 | **Construction** | `/technical-task` | Create technical task specifications (non-user-facing work) |
-| **Construction** | `/sprint-prepare` | Select, refine, and validate use cases for sprint delivery |
 | **Construction** | `/design-screens` | Create screen design specifications from the wireframe |
+| **Reporting** | `/dashboard` | Generate the cluster-based project overview |
 | **Verification** | `/code-review` | Independent code review (runs in isolation) |
 | **Verification** | `/evaluate` | Evaluate an implementation against its spec and design (runs in isolation) |
 | **Verification** | `/report-bug` | Create structured bug report documents |
@@ -78,12 +78,11 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Construction** | `/playwright-test` | Create Playwright end-to-end tests |
 | **Construction** | `/code-quality` | Run oxlint and oxfmt (lint, cyclomatic complexity, formatting) |
 | **Construction** | `/mutation-test` | Run StrykerJS mutation testing on delivered business logic to verify the tests detect broken behaviour |
-| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: implement → mutation-test → test → evaluate |
+| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: spec → design → implement → mutation-test → test → evaluate |
+| **Delivery** | `/deliver-cluster` | Deliver a whole cluster: parallel worktrees in dependency order, then a serial merge queue |
+| **Delivery** | `/merge-use-case` | Rebase a use case branch onto main, run the full regression gate, and merge |
 | **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
 | **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
-| **Delivery** | `/sprint-kickoff` | Create the sprint branch and start delivery |
-| **Delivery** | `/sprint-deliver` | Deliver use cases in priority order from the readiness report |
-| **Delivery** | `/sprint-complete` | Close the sprint: validate, close issues, archive, open a PR |
 
 Uses the **Context7** and **Playwright** MCP servers.
 
@@ -93,10 +92,20 @@ Uses the **Context7** and **Playwright** MCP servers.
 
 1. **Start with a vision** — a short `docs/vision.md` describing what you want to build.
 2. **Elaborate** — `/requirements` → `/entity-model` → `/use-case-diagram` → `/engineer-requirements`.
-3. **Specify** — `/use-case-spec` and `/design-screens` (or `/sprint-prepare` to do a whole sprint's worth at once).
+3. **Specify** — `/use-case-spec` and `/design-screens`, or let `/deliver-use-case` write whichever is missing.
 4. **Build (Next.js)** — `/setup-*` infrastructure once, then `/implement`, `/vitest-test`, `/playwright-test`, `/code-quality`.
-5. **Deliver** — `/deliver-use-case` runs implement → test → evaluate and iterates until the quality gates pass. `/sprint-kickoff` → `/sprint-deliver` → `/sprint-complete` runs a whole sprint.
+5. **Deliver** — `/deliver-cluster` delivers a whole cluster: it reads each use case's `Depends On` row, runs every unblocked use case at the same time in its own git worktree, and merges the green branches into `main` one at a time. `/deliver-use-case` does one use case; `/merge-use-case` runs the merge gate.
 6. **Verify** — `/code-review`, `/evaluate`, `/audit`, `/report-bug`.
+7. **Report** — `/dashboard` regenerates `docs/overview/`, which shows each cluster, what is delivered, and links to every specification, design, and acceptance test.
+
+### Migrating from the sprint workflow
+
+Sprints were removed. Before updating, finish or abandon any in-flight sprint branch — the new
+flow delivers each use case on its own `uc/UC-XXX` worktree branch and merges it with
+`--ff-only`. An existing `docs/sprints/` folder becomes an inert archive; nothing reads it, and
+`/dashboard` writes to `docs/overview/` instead. Run `/setup-project-rules` again so the
+project's CLAUDE.md carries the worktree rule instead of the sprint-branch rule. To stay on the
+old workflow, pin to the [`nexa-alpha-sprints-harness`](https://github.com/nexadevapp/nexa-claude-skills-marketplace/releases/tag/nexa-alpha-sprints-harness) release.
 
 See [GUIDE.md](./GUIDE.md) for a step-by-step walkthrough.
 

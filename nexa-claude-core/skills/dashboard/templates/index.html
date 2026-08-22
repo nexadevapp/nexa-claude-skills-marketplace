@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Overview</title>
+<style>
+:root {
+  --bg: #ffffff; --panel: #f7f8fa; --border: #e2e5ea; --text: #1a1d23;
+  --muted: #666e7a; --accent: #2563eb; --done: #157f4b; --done-bg: #e6f4ec;
+  --open: #8a6d00; --open-bg: #fdf5d9; --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171c; --panel: #1c2027; --border: #2c323b; --text: #e6e9ee;
+    --muted: #99a1ad; --accent: #6b9bff; --done: #55d093; --done-bg: #13301f;
+    --open: #e0bd4a; --open-bg: #332b0f;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex; min-height: 100vh;
+}
+a { color: var(--accent); }
+
+/* Sidebar */
+#sidebar {
+  width: 290px; flex: 0 0 290px; background: var(--panel);
+  border-right: 1px solid var(--border); padding: 20px 0; overflow-y: auto;
+  height: 100vh; position: sticky; top: 0;
+}
+#sidebar h1 { font-size: 16px; margin: 0 20px 4px; }
+#sidebar .sub { margin: 0 20px 18px; color: var(--muted); font-size: 12px; }
+.section { margin: 0 0 6px; }
+.section > .section-title {
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 12px 20px 6px; font-weight: 600;
+}
+.cluster > summary {
+  list-style: none; cursor: pointer; padding: 7px 20px;
+  display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;
+}
+.cluster > summary::-webkit-details-marker { display: none; }
+.cluster > summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
+.cluster[open] > summary::before { content: "▾"; }
+.cluster > summary:hover { background: var(--border); }
+.count { margin-left: auto; font-weight: 500; font-size: 12px; color: var(--muted); }
+.count.complete { color: var(--done); }
+.item {
+  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  background: none; border: 0; color: inherit; font: inherit;
+  padding: 5px 20px 5px 40px; cursor: pointer;
+}
+.item:hover { background: var(--border); }
+.item.active { background: var(--border); font-weight: 600; }
+.item .id { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+.item.done .dot { background: var(--done); }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .55; flex: 0 0 7px; }
+.item .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subhead { padding: 8px 20px 2px 40px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+
+/* Main */
+#main { flex: 1; min-width: 0; padding: 32px 40px; }
+#main h2 { margin: 0 0 6px; font-size: 24px; }
+.meta { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+.badge {
+  display: inline-block; padding: 2px 9px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; background: var(--open-bg); color: var(--open);
+}
+.badge.done { background: var(--done-bg); color: var(--done); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
+  padding: 2px 10px; font-size: 12px; font-variant-numeric: tabular-nums;
+}
+.links { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 26px; }
+.links a, .note {
+  display: inline-block; padding: 7px 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--panel);
+  text-decoration: none; font-size: 14px;
+}
+.links a:hover { border-color: var(--accent); }
+.note { color: var(--muted); }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 26px; font-size: 14px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.id { font-variant-numeric: tabular-nums; white-space: nowrap; }
+iframe { width: 100%; height: 78vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+pre { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; font-size: 13px; }
+.empty { color: var(--muted); }
+#toggle {
+  display: none; position: fixed; top: 12px; left: 12px; z-index: 10;
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 7px 11px; cursor: pointer; color: inherit; font: inherit;
+}
+@media (max-width: 860px) {
+  #toggle { display: block; }
+  #sidebar { position: fixed; z-index: 9; height: 100vh; transform: translateX(-100%); transition: transform .2s; }
+  body.nav-open #sidebar { transform: none; }
+  #main { padding: 60px 20px 32px; }
+}
+</style>
+</head>
+<body>
+<button id="toggle" aria-label="Toggle navigation">☰</button>
+<nav id="sidebar"><h1 id="project">Loading…</h1><p class="sub" id="generated"></p><div id="nav"></div></nav>
+<main id="main"><p class="empty">Loading the manifest…</p></main>
+
+<script>
+const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstChild; };
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Manifest values become href/src. Allow only relative paths — never javascript:, data:, or an absolute URL.
+const url = (s) => (typeof s === 'string' && !/^[a-z][a-z0-9+.-]*:/i.test(s) && !s.startsWith('//')) ? esc(s) : '';
+let M = null;
+
+fetch('manifest.json')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(m => {
+    M = m;
+    try { render(); }
+    catch (e) {
+      document.getElementById('main').innerHTML =
+        '<h2>Could not render the manifest</h2><p class="empty">' + esc(e.message) +
+        '. Run <code>/dashboard</code> to regenerate <code>manifest.json</code>.</p>';
+      throw e;
+    }
+  })
+  .catch(e => {
+    document.getElementById('main').innerHTML =
+      '<h2>No manifest</h2><p class="empty">Could not read <code>manifest.json</code> (' + esc(e.message) +
+      '). Run <code>/dashboard</code> to generate it. Serve this directory over HTTP — opening the file directly blocks the fetch.</p>';
+  });
+
+function render() {
+  // Normalise once so no call site has to guard. A partial manifest renders empty, never blank.
+  M.useCases = M.useCases || {};
+  M.technicalTasks = M.technicalTasks || {};
+  M.clusters = M.clusters || [];
+  M.documents = M.documents || [];
+  M.umbrella = M.umbrella || {};
+  document.getElementById('project').textContent = M.project || 'Project Overview';
+  document.getElementById('generated').textContent = M.generated ? 'Updated ' + M.generated : '';
+  const nav = document.getElementById('nav');
+
+  const clusters = M.clusters || [];
+  const unclustered = Object.keys(M.useCases || {}).filter(id => !clusters.some(c => (c.useCases || []).includes(id)));
+  if (unclustered.length) clusters.push({ name: 'Unclustered', useCases: unclustered, technicalTasks: [] });
+
+  nav.appendChild($('<div class="section-title">Clusters</div>'));
+  clusters.forEach((c, i) => nav.appendChild(clusterNode(c, i === 0)));
+
+  const umb = (M.umbrella && M.umbrella.technicalTasks) || [];
+  if (umb.length) {
+    nav.appendChild($('<div class="section-title">Umbrella</div>'));
+    umb.forEach(id => nav.appendChild(ttNode(id)));
+  }
+
+  nav.appendChild($('<div class="section-title">Documents</div>'));
+  (M.documents || []).forEach(d => {
+    const b = $('<button class="item"><span class="dot"></span><span class="label">' + esc(d.name) + '</span></button>');
+    b.onclick = () => select(b, () => showDoc(d));
+    nav.appendChild(b);
+  });
+  if (M.wireframe) {
+    const b = $('<button class="item"><span class="dot"></span><span class="label">Wireframe</span></button>');
+    b.onclick = () => select(b, () => showFrame('Wireframe', M.wireframe));
+    nav.appendChild(b);
+  }
+
+  showSummary(clusters);
+}
+
+function clusterNode(c, open) {
+  const ucs = c.useCases || [];
+  const done = ucs.filter(id => (M.useCases[id] || {}).delivered).length;
+  const cls = ucs.length && done === ucs.length ? ' complete' : '';
+  const d = $('<details class="cluster"' + (open ? ' open' : '') + '><summary><span>' + esc(c.name) +
+    '</span><span class="count' + cls + '">' + done + '/' + ucs.length + '</span></summary></details>');
+  d.querySelector('summary').addEventListener('click', () => setTimeout(() => showCluster(c), 0));
+  ucs.forEach(id => d.appendChild(ucNode(id)));
+  const tts = c.technicalTasks || [];
+  if (tts.length) {
+    d.appendChild($('<div class="subhead">Technical tasks</div>'));
+    tts.forEach(id => d.appendChild(ttNode(id)));
+  }
+  return d;
+}
+
+function ucNode(id) {
+  const uc = M.useCases[id] || { name: '(missing)' };
+  const b = $('<button class="item' + (uc.delivered ? ' done' : '') + '"><span class="dot"></span>' +
+    '<span class="id">' + esc(id) + '</span><span class="label">' + esc(uc.name) + '</span></button>');
+  b.onclick = () => select(b, () => showUC(id));
+  return b;
+}
+
+function ttNode(id) {
+  const tt = (M.technicalTasks || {})[id] || { name: '(missing)' };
+  const done = tt.status === 'Done';
+  const b = $('<button class="item' + (done ? ' done' : '') + '"><span class="dot"></span>' +
+    '<span class="id">' + esc(id) + '</span><span class="label">' + esc(tt.name) + '</span></button>');
+  b.onclick = () => select(b, () => showTT(id));
+  return b;
+}
+
+function select(btn, fn) {
+  document.querySelectorAll('.item.active').forEach(e => e.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.classList.remove('nav-open');
+  fn();
+}
+
+function main(html) { document.getElementById('main').innerHTML = html; }
+
+function showSummary(clusters) {
+  const rows = clusters.map(c => {
+    const ucs = c.useCases || [];
+    const done = ucs.filter(id => (M.useCases[id] || {}).delivered).length;
+    const tts = (c.technicalTasks || []).join(', ') || '—';
+    return '<tr><td>' + esc(c.name) + '</td><td>' + done + '</td><td>' + ucs.length + '</td><td class="id">' + esc(tts) + '</td></tr>';
+  }).join('');
+  const all = Object.values(M.useCases || {});
+  const del = all.filter(u => u.delivered).length;
+  main('<h2>' + esc(M.project || 'Project') + '</h2><p class="meta">' + del + ' of ' + all.length +
+    ' use cases delivered</p><table><thead><tr><th>Cluster</th><th>Delivered</th><th>Total</th><th>Technical tasks</th></tr></thead><tbody>' +
+    rows + '</tbody></table><p class="empty">Select a use case to see its specification, its design, and its acceptance tests.</p>');
+}
+
+function showCluster(c) {
+  const rows = (c.useCases || []).map(id => {
+    const uc = M.useCases[id] || {};
+    return '<tr><td class="id">' + esc(id) + '</td><td>' + esc(uc.name) + '</td><td><span class="badge' +
+      (uc.delivered ? ' done">Delivered' : '">' + esc(uc.status || 'Open')) + '</span></td><td>' +
+      (uc.ui === false ? 'no screen' : (uc.design ? 'design' : '—')) + '</td><td>' +
+      ((Array.isArray(uc.tests) ? uc.tests.length : (uc.tests ? 1 : 0)) ? 'tests' : '—') + '</td></tr>';
+  }).join('');
+  const tts = (c.technicalTasks || []).map(id => {
+    const tt = (M.technicalTasks || {})[id] || {};
+    return '<tr><td class="id">' + esc(id) + '</td><td>' + esc(tt.name) + '</td><td><span class="badge' +
+      (tt.status === 'Done' ? ' done' : '') + '">' + esc(tt.status || 'Open') + '</span></td></tr>';
+  }).join('');
+  main('<h2>' + esc(c.name) + '</h2><table><thead><tr><th>ID</th><th>Use case</th><th>Status</th><th>Design</th><th>Tests</th></tr></thead><tbody>' +
+    (rows || '<tr><td colspan="5" class="empty">No use cases.</td></tr>') + '</tbody></table>' +
+    (tts ? '<h3>Technical tasks</h3><table><thead><tr><th>ID</th><th>Task</th><th>Status</th></tr></thead><tbody>' + tts + '</tbody></table>' : ''));
+}
+
+function showUC(id) {
+  const uc = M.useCases[id] || {};
+  const deps = (uc.dependsOn || []).length
+    ? '<div class="chips">' + uc.dependsOn.map(d => '<span class="chip">' + esc(d) + '</span>').join('') + '</div>'
+    : '<span class="empty">None — this use case can be delivered on its own.</span>';
+  let links = '';
+  if (uc.spec) links += '<a href="md-viewer.html?file=' + encodeURIComponent(uc.spec) + '" target="_blank">Specification</a>';
+  if (uc.ui === false) links += '<span class="note">No user interface — this use case has no screen.</span>';
+  else if (uc.design) links += '<a href="' + url(uc.design) + '" target="_blank">Design</a>';
+  else links += '<span class="note">Design not created yet.</span>';
+  // tests is a list — a use case can be covered by several spec files, and two can share one.
+  const tests = Array.isArray(uc.tests) ? uc.tests : (uc.tests ? [uc.tests] : []);
+  if (tests.length) tests.forEach((t, i) => {
+    links += '<a href="' + url(t) + '" target="_blank">Acceptance tests' +
+             (tests.length > 1 ? ' (' + (i + 1) + ')' : '') + '</a>';
+  });
+  else links += '<span class="note">Acceptance tests appear once the use case is delivered.</span>';
+  if (uc.delivery) links += '<a href="md-viewer.html?file=' + encodeURIComponent(uc.delivery) + '" target="_blank">Delivery log</a>';
+
+  main('<h2>' + esc(id) + ' — ' + esc(uc.name) + '</h2>' +
+    '<p class="meta"><span class="badge' + (uc.delivered ? ' done">Delivered' : '">' + esc(uc.status || 'Open')) + '</span></p>' +
+    '<h3>Depends on</h3>' + deps + '<div class="links">' + links + '</div>' +
+    (uc.ui !== false && uc.design ? '<iframe src="' + url(uc.design) + '" title="Design"></iframe>' : ''));
+}
+
+function showTT(id) {
+  const tt = (M.technicalTasks || {})[id] || {};
+  main('<h2>' + esc(id) + ' — ' + esc(tt.name) + '</h2>' +
+    '<p class="meta"><span class="badge' + (tt.status === 'Done' ? ' done' : '') + '">' + esc(tt.status || 'Open') +
+    '</span> · Scope: ' + esc(tt.scope || 'undeclared') + '</p>' +
+    (tt.spec ? '<iframe src="md-viewer.html?file=' + encodeURIComponent(tt.spec) + '" title="Task"></iframe>' : ''));
+}
+
+function showDoc(d) {
+  if (/\.puml$/i.test(d.file)) {
+    main('<h2>' + esc(d.name) + '</h2><pre id="puml" class="empty">Loading…</pre>');
+    fetch(d.file).then(r => r.text())
+      .then(t => { const p = document.getElementById('puml'); p.className = ''; p.textContent = t; })
+      .catch(() => { document.getElementById('puml').textContent = 'Could not read ' + d.file; });
+    return;
+  }
+  if (/\.html?$/i.test(d.file)) return showFrame(d.name, d.file);
+  main('<h2>' + esc(d.name) + '</h2><iframe src="md-viewer.html?file=' + encodeURIComponent(d.file) + '" title="' + esc(d.name) + '"></iframe>');
+}
+
+function showFrame(title, file) {
+  main('<h2>' + esc(title) + '</h2><iframe src="' + url(file) + '" title="' + esc(title) + '"></iframe>');
+}
+
+// The markdown viewer posts its height; grow the iframe to fit instead of scrolling inside it.
+addEventListener('message', (e) => {
+  if (!e.data || e.data.type !== 'md-viewer-height' || !Number.isFinite(e.data.height)) return;
+  const frame = document.querySelector('#main iframe[src^="md-viewer.html"]');
+  if (frame) frame.style.height = (e.data.height + 24) + 'px';
+});
+
+document.getElementById('toggle').onclick = () => document.body.classList.toggle('nav-open');
+</script>
+</body>
+</html>

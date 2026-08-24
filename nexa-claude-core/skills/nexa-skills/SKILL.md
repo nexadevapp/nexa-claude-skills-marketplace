@@ -63,6 +63,7 @@ nexa-claude-marketplace/
 │       ├── deliver-use-case/
 │       ├── deliver-cluster/
 │       ├── merge-use-case/
+│       ├── merge-queue/
 │       ├── resolve-bug/
 │       ├── audit/
 │       ├── setup-playwright-ci/
@@ -203,5 +204,6 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for one use case |
 | Construction | `/deliver-cluster`      | Deliver a cluster: parallel worktrees, dependency order, serial merge queue |
 | Construction | `/merge-use-case`       | Rebase a use case branch onto main, run the regression gate, merge |
+| Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |

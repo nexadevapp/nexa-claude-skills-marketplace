@@ -86,6 +86,8 @@ This single command orchestrates the full pipeline automatically for a use case 
 
 Human review is optional. Add `--review` to stop at a pull request instead of merging.
 
+When several agents have been working at once — two clusters, a bug fix on the side, pull requests that are now approved — `/merge-queue` lands everything that is ready, in dependency order, one at a time. A machine-wide merge lock keeps two merges from ever running together.
+
 ### 15. See where the project stands → `/dashboard`
 
 Regenerates `docs/overview/` — every cluster with its delivered count, each use case linked to its specification, its design, and its acceptance tests, and the technical tasks split between the cluster they support and the Umbrella section for cross-cutting ones.

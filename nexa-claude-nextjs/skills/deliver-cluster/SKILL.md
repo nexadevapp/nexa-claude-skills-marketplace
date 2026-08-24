@@ -185,6 +185,12 @@ request instead of merging.
 finished. A merge rebases onto `main` and runs the full regression suite, so a second
 concurrent merge would test a tree that is about to change under it.
 
+`/merge-use-case` takes a machine-wide merge lock, so a merge started by *another* agent —
+another cluster, a bug fix, a use case delivered on its own — stops this one rather than
+racing it. If a merge reports the lock is held, leave that branch in the queue and try it
+again after the current item; do not treat it as a failure. To land branches left behind by
+several agents at once, run `/merge-queue`.
+
 If a merge stops with a red gate, leave that worktree in place, move the use case to the
 **failed** set, report it, and continue with the rest of the queue. A failed branch does not
 block the others, and it is never retried automatically within this run.

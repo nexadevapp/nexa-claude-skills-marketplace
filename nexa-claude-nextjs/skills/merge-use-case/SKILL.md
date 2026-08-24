@@ -57,9 +57,59 @@ This skill runs in the **primary checkout**. It reaches into the use case worktr
 it, then merges from the primary checkout. It is listed in the Exceptions section of
 `${CLAUDE_PLUGIN_ROOT}/shared/readiness/WORKTREE_GATE.md`.
 
+## Merge Lock Gate
+
+Only one merge may run at a time **across the whole machine**, not just within one session.
+Several agents may be delivering different use cases or different clusters at once, and each
+one reaches this skill on its own. Nothing else serializes them, so the lock does.
+
+The lock lives in the shared git directory, which every worktree of the repository resolves to
+the same path. Ask for it as an absolute path — `--git-common-dir` alone prints `.git`, relative
+to wherever the shell happens to stand, and a lock under the wrong directory locks nothing. Take
+it before Step 1:
+
+```bash
+LOCK="$(git rev-parse --path-format=absolute --git-common-dir)/nexa-merge.lock"
+mkdir "$LOCK" 2>/dev/null \
+  && printf '%s\n%s\n' "$ARGUMENTS" "$(date -u +%FT%TZ)" > "$LOCK/owner" \
+  || { echo "LOCKED BY:"; cat "$LOCK/owner"; }
+```
+
+`mkdir` either creates the directory or fails — there is no window between the check and the
+create, which is what makes it a lock and not a suggestion.
+
+**On failure**, stop. Do not merge, do not wait in a loop, and never remove another owner's
+lock. Report:
+
+```
+MERGE LOCK — HELD
+
+Another merge is in progress: <owner ID>, taken at <timestamp>.
+
+Nothing was merged. The branch for $ARGUMENTS stays in its worktree.
+Run /merge-use-case $ARGUMENTS again when that merge finishes, or run
+/merge-queue to land every ready branch in order.
+```
+
+**Release the lock with `rm -rf "$LOCK"` on every exit path** — after Step 7, after the pull
+request stop in Step 4 (`--review`), and equally after a red gate or an unresolvable conflict. A
+merge that stops without releasing blocks every other agent on the machine.
+
+The one path that keeps the lock is a rejected `--ff-only`: that returns to Step 1 and rebases
+again, so the merge is still in progress and the lock still belongs to it.
+
+A lock is stale when its timestamp is older than a full gate run — a build plus the three suites
+— and no agent reports being mid-merge. Only the user clears a stale lock, with
+`rm -rf "$LOCK"`.
+
+> `ponytail:` a directory on the local filesystem, so it serializes agents on one machine.
+> Agents on separate machines need a lock on the remote — add one only when that setup is real.
+
 ## DO NOT
 
-- Run while another `/merge-use-case` is in progress
+- Run while another `/merge-use-case` is in progress — the Merge Lock Gate enforces this
+- Wait, sleep, or poll for the lock to free up — report and stop
+- Remove a lock this invocation did not take
 - Merge when the gate is red — there is no "merge anyway" option
 - Create a merge commit — `main` keeps a linear history
 - Filter the regression suite with `--grep`, `--grep-invert`, or a `--project` subset
@@ -179,6 +229,12 @@ gh pr create --base main --head uc/$ARGUMENTS \
   --body "<the delivery summary, plus a link to docs/use_cases/$ARGUMENTS.md>"
 ```
 
+Then release the lock — the gate is finished and nothing else in this run touches `main`:
+
+```bash
+rm -rf "$(git rev-parse --path-format=absolute --git-common-dir)/nexa-merge.lock"
+```
+
 Then stop. Do not merge, and do not remove the worktree — the reviewer may ask for changes.
 
 **Say what is now blocked.** The pull request path does not set the specification to `Done` on
@@ -188,7 +244,7 @@ Report:
 ```
 $ARGUMENTS is awaiting review: <pull request URL>
 
-Nothing was merged. Worktree kept at <path>.
+Nothing was merged. Worktree kept at <path>. Merge lock released.
 Blocked until this lands: <dependent work item IDs, or "none">
 
 When the pull request is merged, run:
@@ -197,7 +253,8 @@ When the pull request is merged, run:
 
 ### Step 4b: After the review lands (`--after-review`)
 
-Run this once the pull request has been merged on GitHub. It performs only the bookkeeping the
+Run this once the pull request has been merged on GitHub — by a human, or with
+`gh pr merge <number> --rebase --delete-branch=false`. It performs only the bookkeeping the
 merge path would have done:
 
 ```bash
@@ -231,7 +288,11 @@ lists it), then repeat with `--force`, and add those paths to the project's `.gi
 does not recur. Do not skip this step — a leaked worktree keeps its branch alive and makes
 Verification 2 and 3 fail on a merge that actually succeeded.
 
-### Step 7: Report
+### Step 7: Release the lock and report
+
+```bash
+rm -rf "$(git rev-parse --path-format=absolute --git-common-dir)/nexa-merge.lock"
+```
 
 ```
 ## Merged: $ARGUMENTS — <use case name>
@@ -243,11 +304,13 @@ Verification 2 and 3 fail on a merge that actually succeeded.
 | Unit tests          | pass   |
 | E2E regression      | N passed, 0 failed, 0 skipped |
 
-Merged to main as <short SHA>. Worktree removed.
+Merged to main as <short SHA>. Worktree removed. Merge lock released.
 ```
 
 ## Verification
 
+0. `<git-common-dir>/nexa-merge.lock` does not exist — the lock was released, whatever the
+   outcome.
 1. `git log --graph --oneline main | head` shows no merge commit.
 2. `git worktree list` no longer lists the use case worktree.
 3. `git branch --list "*/$ARGUMENTS"` returns nothing.

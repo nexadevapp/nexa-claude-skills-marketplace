@@ -81,6 +81,7 @@ Adds implementation, testing, and delivery skills specific to Next.js. Requires 
 | **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: spec → design → implement → mutation-test → test → evaluate |
 | **Delivery** | `/deliver-cluster` | Deliver a whole cluster: parallel worktrees in dependency order, then a serial merge queue |
 | **Delivery** | `/merge-use-case` | Rebase a use case branch onto main, run the full regression gate, and merge |
+| **Delivery** | `/merge-queue` | Land every ready branch and approved pull request from parallel agents, in dependency order, one at a time |
 | **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
 | **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 

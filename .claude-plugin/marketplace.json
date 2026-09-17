@@ -17,6 +17,12 @@
       "source": "./nexa-claude-nextjs",
       "description": "Nexa Agentic Engineering plugin for the Next.js stack",
       "license": "Apache-2.0"
+    },
+    {
+      "name": "nexa-claude-go",
+      "source": "./nexa-claude-go",
+      "description": "Nexa Agentic Engineering plugin for the Go stack (net/http, templ, htmx, sqlc, goose)",
+      "license": "Apache-2.0"
     }
   ]
 }

@@ -1,0 +1,40 @@
+name: Playwright E2E Tests
+on:
+  push:
+    branches: ["{{BRANCH}}"]
+  pull_request:
+    branches: ["{{BRANCH}}"]
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install Playwright Chromium
+        run: go tool playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: go test -tags=e2e -v ./e2e/...
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: e2e/test-results/
+          retention-days: 14

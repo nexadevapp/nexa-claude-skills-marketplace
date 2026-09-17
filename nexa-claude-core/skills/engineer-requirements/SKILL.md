@@ -755,7 +755,7 @@ After all clusters are complete, run a final analysis across the entire project:
 | Dependency graph validity      | Every ID in a **Depends On** row names a real use case; no cycles exist; no use case depends on one that is `Obsolete`. A cycle is a blocker — it cannot be delivered in any order |
 | Dependency graph shape         | How many use cases have `Depends On: None`, and what is the longest dependency chain? A graph where almost everything is chained cannot be delivered in parallel and usually means dependencies were declared too freely — challenge each one |
 | Technical task coverage        | Every technical task has a **Scope** row, appears in the cluster table or the Umbrella row, and every use case that needs one declares the `<<requires>>` arrow |
-| Entity readiness               | Every entity referenced by a use case exists in `docs/entity_model.md`. Report a missing entity as a blocker and flag that `/prisma-migration` must run before delivery |
+| Entity readiness               | Every entity referenced by a use case exists in `docs/entity_model.md`. Report a missing entity as a blocker and flag that the stack's migration skill (`/prisma-migration` or `/db-migration`) must run before delivery |
 
 3. Write the cross-cutting report to `docs/engineering/cross-cutting-analysis.md`:
 

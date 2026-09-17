@@ -1,64 +1,70 @@
 #!/usr/bin/env bash
 #
-# sync-shared.sh — keep nexa-claude-nextjs/shared in sync with nexa-claude-core/shared.
+# sync-shared.sh — keep every stack plugin's shared/ in sync with nexa-claude-core/shared.
 #
-# nexa-claude-core owns the shared readiness/tracking gate files. nexa-claude-nextjs
-# skills reference them via ${CLAUDE_PLUGIN_ROOT}/shared/... — but ${CLAUDE_PLUGIN_ROOT}
-# resolves to the *nextjs* plugin root, so each referenced file must also physically
-# exist inside nexa-claude-nextjs/shared. This script keeps those copies identical to
-# core. core is always the single source of truth — never edit the nextjs copies.
+# nexa-claude-core owns the shared readiness/tracking gate files. Stack plugin skills
+# (nexa-claude-nextjs, nexa-claude-go, ...) reference them via ${CLAUDE_PLUGIN_ROOT}/shared/...
+# — but ${CLAUDE_PLUGIN_ROOT} resolves to the *stack* plugin root, so each referenced file
+# must also physically exist inside <stack>/shared. This script keeps those copies identical
+# to core. core is always the single source of truth — never edit the stack copies.
 #
-# The set of files to mirror is derived automatically from the skills themselves: every
-# ${CLAUDE_PLUGIN_ROOT}/shared/... reference in nexa-claude-nextjs/skills is resolved
-# against core. No hand-maintained manifest.
+# Stack plugins are discovered as every nexa-claude-*/ directory except core. The set of
+# files to mirror is derived automatically from the skills themselves: every
+# ${CLAUDE_PLUGIN_ROOT}/shared/... reference in <stack>/skills is resolved against core.
+# No hand-maintained manifest.
 #
 # Usage:
-#   scripts/sync-shared.sh           # copy core -> nextjs (default)
+#   scripts/sync-shared.sh           # copy core -> every stack plugin (default)
 #   scripts/sync-shared.sh --check   # verify in sync; exit 1 on drift or dangling ref
 #
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CORE="$ROOT/nexa-claude-core"
-NEXT="$ROOT/nexa-claude-nextjs"
 
 MODE="sync"
 if [ "${1:-}" = "--check" ]; then MODE="check"; fi
 
-# Distinct shared/ files referenced by nextjs skills via ${CLAUDE_PLUGIN_ROOT}.
-refs="$(grep -rhoE '\$\{CLAUDE_PLUGIN_ROOT\}/shared/(readiness|tracking)/[A-Z_]+\.md' \
-  "$NEXT"/skills/*/SKILL.md 2>/dev/null \
-  | sed -E 's#\$\{CLAUDE_PLUGIN_ROOT\}/##' | sort -u || true)"
-
 fail=0
 synced=0
 
-for rel in $refs; do
-  core_f="$CORE/$rel"
-  next_f="$NEXT/$rel"
+for STACK in "$ROOT"/nexa-claude-*/; do
+  STACK="${STACK%/}"
+  [ "$STACK" = "$CORE" ] && continue
+  name="$(basename "$STACK")"
 
-  if [ -f "$core_f" ]; then
-    # core owns this file -> nextjs must hold a byte-identical copy
-    if [ "$MODE" = "check" ]; then
-      if ! cmp -s "$core_f" "$next_f"; then
-        echo "DRIFT     $rel (nextjs copy differs from core)"
-        fail=1
+  # Distinct shared/ files referenced by this stack's skills via ${CLAUDE_PLUGIN_ROOT}.
+  refs="$(grep -rhoE '\$\{CLAUDE_PLUGIN_ROOT\}/shared/(readiness|tracking)/[A-Z_]+\.md' \
+    "$STACK"/skills/*/SKILL.md 2>/dev/null \
+    | sed -E 's#\$\{CLAUDE_PLUGIN_ROOT\}/##' | sort -u || true)"
+
+  for rel in $refs; do
+    core_f="$CORE/$rel"
+    stack_f="$STACK/$rel"
+
+    if [ -f "$core_f" ]; then
+      # core owns this file -> the stack must hold a byte-identical copy
+      if [ "$MODE" = "check" ]; then
+        if ! cmp -s "$core_f" "$stack_f"; then
+          echo "DRIFT     $name/$rel (copy differs from core)"
+          fail=1
+        fi
+      else
+        if ! cmp -s "$core_f" "$stack_f" 2>/dev/null; then
+          mkdir -p "$(dirname "$stack_f")"
+          cp "$core_f" "$stack_f"
+          echo "synced    $name/$rel"
+          synced=$((synced + 1))
+        fi
       fi
+    elif [ -f "$stack_f" ]; then
+      # stack-owned shared file (no core counterpart) — e.g. PROJECT_READINESS.md
+      :
     else
-      if ! cmp -s "$core_f" "$next_f" 2>/dev/null; then
-        mkdir -p "$(dirname "$next_f")"
-        cp "$core_f" "$next_f"
-        echo "synced    $rel"
-        synced=$((synced + 1))
-      fi
+      echo "DANGLING  $name/$rel (referenced but missing in both core and $name)"
+      fail=1
     fi
-  elif [ -f "$next_f" ]; then
-    # nextjs-owned shared file (no core counterpart) — e.g. PROJECT_READINESS.md
-    :
-  else
-    echo "DANGLING  $rel (referenced but missing in both core and nextjs)"
-    fail=1
-  fi
+  done
 done
 
 if [ "$MODE" = "check" ]; then

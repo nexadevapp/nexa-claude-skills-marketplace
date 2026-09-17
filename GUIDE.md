@@ -38,7 +38,7 @@ That dependency data is what makes the next part parallel.
 
 ---
 
-*At this point, your use cases are elaborated. Now you build them (Next.js stack):*
+*At this point, your use cases are elaborated. Now you build them (Next.js stack shown; the `nexa-claude-go` plugin has the same steps with `/db-migration` for `/prisma-migration` and `/integration-test` for `/vitest-test`):*
 
 ---
 

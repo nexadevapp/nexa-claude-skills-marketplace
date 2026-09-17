@@ -6,6 +6,7 @@ The marketplace has a **two-layer architecture**:
 
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and parallel delivery. Requires `nexa-claude-core`.
+- **`nexa-claude-go`** — the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL): the same pipeline for Go. Requires `nexa-claude-core`.
 
 ---
 
@@ -17,6 +18,7 @@ Install directly from inside Claude Code:
 /plugin marketplace add nexadevapp/nexa-claude-skills-marketplace
 /plugin install nexa-claude-core
 /plugin install nexa-claude-nextjs        # optional — only if you build on Next.js
+/plugin install nexa-claude-go            # optional — only if you build on Go
 ```
 
 Once installed, the skills are available as slash commands and the agent will suggest the right one for each task. You don't need to memorize them — describe what you want, and Claude routes you to the correct skill.
@@ -29,6 +31,7 @@ New commits to this repo are picked up as new versions automatically (the git co
 /plugin marketplace update nexa-claude-marketplace
 /plugin update nexa-claude-core
 /plugin update nexa-claude-nextjs
+/plugin update nexa-claude-go
 ```
 
 If a skill still looks stale after updating (a known, still-open Claude Code plugin-cache bug — see [#14061](https://github.com/anthropics/claude-code/issues/14061) and [#17361](https://github.com/anthropics/claude-code/issues/17361)), remove the cache and reinstall: `rm -rf ~/.claude/plugins/cache`, then restart Claude Code and re-run the install commands above.
@@ -89,12 +92,40 @@ Uses the **Context7** and **Playwright** MCP servers.
 
 ---
 
+## `nexa-claude-go` — Go Stack
+
+The same implementation, testing, and delivery pipeline for Go: `net/http` (stdlib router), templ + htmx for server-rendered UI, sqlc + goose on PostgreSQL, Testcontainers for local and test databases. Requires `nexa-claude-core`.
+
+| Phase | Command | Description |
+|---|---|---|
+| **Setup** | `/setup-env-profiles` | Set up local/dev environment profiles, the config loader, and `cmd/dev` |
+| **Setup** | `/setup-web-middleware` | Build auth, RBAC, CSRF, security-headers, and panic-recovery middleware for `net/http` |
+| **Setup** | `/setup-playwright-ci` | Generate a GitHub Actions workflow for Playwright E2E tests |
+| **Setup** | `/setup-quality-ci` | Generate a GitHub Actions workflow for golangci-lint, generated-code drift, and coverage gates |
+| **Construction** | `/db-migration` | Create goose migrations and sqlc queries from the entity model |
+| **Construction** | `/implement` | Implement use cases — handlers, templ views, services, sqlc queries |
+| **Construction** | `/integration-test` | Create Go integration tests with testcontainers-go |
+| **Construction** | `/playwright-test` | Create Playwright for Go end-to-end tests, run with `go test -tags=e2e` |
+| **Construction** | `/code-quality` | Run golangci-lint (lint, gocyclo complexity) and gofumpt/goimports formatting |
+| **Construction** | `/mutation-test` | Run gremlins mutation testing on delivered business logic |
+| **Construction** | `/deliver-use-case` | Orchestrate the full per-use-case pipeline: spec → design → implement → mutation-test → test → evaluate |
+| **Delivery** | `/deliver-cluster` | Deliver a whole cluster: parallel worktrees in dependency order, then a serial merge queue |
+| **Delivery** | `/merge-use-case` | Rebase a use case branch onto main, run the full regression gate, and merge |
+| **Delivery** | `/merge-queue` | Land every ready branch and approved pull request from parallel agents, in dependency order, one at a time |
+| **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
+
+Not yet ported from the Next.js plugin: `/setup-i18n`, `/setup-arch-unit`, `/onboard-existing-app`, `/audit`.
+
+Uses the **Context7** and **Playwright** MCP servers.
+
+---
+
 ## Workflow at a Glance
 
 1. **Start with a vision** — a short `docs/vision.md` describing what you want to build.
 2. **Elaborate** — `/requirements` → `/entity-model` → `/use-case-diagram` → `/engineer-requirements`.
 3. **Specify** — `/use-case-spec` and `/design-screens`, or let `/deliver-use-case` write whichever is missing.
-4. **Build (Next.js)** — `/setup-*` infrastructure once, then `/implement`, `/vitest-test`, `/playwright-test`, `/code-quality`.
+4. **Build** — `/setup-*` infrastructure once, then `/implement`, `/playwright-test`, `/code-quality`, plus `/vitest-test` (Next.js) or `/integration-test` (Go).
 5. **Deliver** — `/deliver-cluster` delivers a whole cluster: it reads each use case's `Depends On` row, runs every unblocked use case at the same time in its own git worktree, and merges the green branches into `main` one at a time. `/deliver-use-case` does one use case; `/merge-use-case` runs the merge gate.
 6. **Verify** — `/code-review`, `/evaluate`, `/audit`, `/report-bug`.
 7. **Report** — `/dashboard` regenerates `docs/overview/`, which shows each cluster, what is delivered, and links to every specification, design, and acceptance test.

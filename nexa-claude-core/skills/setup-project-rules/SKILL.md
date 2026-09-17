@@ -75,8 +75,8 @@ never ask the user to choose.
 
 ### Rule 6: Never write code on main/master
 
-Never run code-writing skills (`/implement`, `/deliver-use-case`, `/prisma-migration`,
-`/vitest-test`, `/playwright-test`) on the `main` or `master` branch, and never in the primary
+Never run code-writing skills (`/implement`, `/deliver-use-case`, `/prisma-migration` or
+`/db-migration`, `/vitest-test` or `/go-test`, `/playwright-test`) on the `main` or `master` branch, and never in the primary
 checkout. Every work item gets its own git worktree on its own branch: `uc/UC-XXX` for a use
 case, `tt/TT-XXX` for a technical task, `bug/BUG-XXX` for a bug, `cr/CR-XXX` for a change
 request. The worktree is what lets several use cases be delivered at the same time.

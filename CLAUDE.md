@@ -56,6 +56,26 @@ nexa-claude-marketplace/
 │       ├── resolve-bug/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-go/                      # Go technology stack plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   ├── .mcp.json                 # Playwright
+│   └── skills/                   # All workflow steps as skills (slash commands)
+│       ├── setup-env-profiles/
+│       ├── setup-web-middleware/
+│       ├── db-migration/
+│       ├── implement/
+│       ├── integration-test/
+│       ├── playwright-test/
+│       ├── code-quality/
+│       ├── mutation-test/
+│       ├── deliver-use-case/
+│       ├── deliver-cluster/
+│       ├── merge-use-case/
+│       ├── merge-queue/
+│       ├── resolve-bug/
+│       ├── setup-playwright-ci/
+│       └── setup-quality-ci/
 └── README.md
 ```
 
@@ -65,6 +85,7 @@ nexa-claude-marketplace/
 
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
+- **nexa-claude-go** — Stack-specific: implementation, testing, and delivery for the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL). Requires nexa-claude-core.
 
 ### Marketplace Configuration
 
@@ -132,21 +153,41 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
 
+### Go (stack-specific)
+
+| Phase        | Skill (slash command)   | Description                                                        |
+|--------------|-------------------------|--------------------------------------------------------------------|
+| Setup        | `/setup-env-profiles`   | Set up local/dev environment profiles, the config loader, and `cmd/dev` |
+| Setup        | `/setup-web-middleware` | Build auth, RBAC, CSRF, security headers, and panic recovery middleware for `net/http` |
+| Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
+| Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for golangci-lint, generate drift, and coverage gates |
+| Construction | `/db-migration`         | Create goose migrations and sqlc queries from the entity model     |
+| Construction | `/implement`            | Implement use cases or technical tasks with net/http, templ, and htmx |
+| Construction | `/integration-test`     | Create Go integration tests with testcontainers-go                 |
+| Construction | `/playwright-test`      | Create Playwright for Go e2e tests (`go test -tags=e2e`)           |
+| Construction | `/code-quality`         | Run golangci-lint (lint, gocyclo complexity) and gofumpt/goimports formatting |
+| Construction | `/mutation-test`        | Run gremlins mutation testing on delivered business logic          |
+| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for one use case |
+| Construction | `/deliver-cluster`      | Deliver a cluster: parallel worktrees, dependency order, serial merge queue |
+| Construction | `/merge-use-case`       | Rebase a use case branch onto main, run the regression gate, merge |
+| Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
+| Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
+
 ## Shared gate files (cross-plugin sync)
 
-`nexa-claude-core/shared/` holds the readiness/tracking gate files (`DEFINITION_OF_*`, `WORKTREE_GATE.md`, `NEXA_RULES_GATE.md`, `TRACKING.md`, etc.). Next.js skills reference them via `${CLAUDE_PLUGIN_ROOT}/shared/...`, but that variable resolves to the *nextjs* plugin root — so each referenced file must also physically exist as a byte-identical copy in `nexa-claude-nextjs/shared/`.
+`nexa-claude-core/shared/` holds the readiness/tracking gate files (`DEFINITION_OF_*`, `WORKTREE_GATE.md`, `NEXA_RULES_GATE.md`, `TRACKING.md`, etc.). Stack plugin skills (Next.js, Go) reference them via `${CLAUDE_PLUGIN_ROOT}/shared/...`, but that variable resolves to the *stack* plugin root — so each referenced file must also physically exist as a byte-identical copy in `nexa-claude-nextjs/shared/` and `nexa-claude-go/shared/`.
 
-- **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under `nexa-claude-nextjs/shared/`.
-- To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated nextjs copy.
-- Exception: `nexa-claude-nextjs/shared/readiness/PROJECT_READINESS.md` is owned by the nextjs plugin (no core counterpart) and is edited there directly.
-- The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in nextjs skills — no hand-maintained manifest.
+- **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under a stack plugin's `shared/`.
+- To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated stack copies.
+- Exception: `<stack>/shared/readiness/PROJECT_READINESS.md` is owned by each stack plugin (no core counterpart) and is edited there directly.
+- Stack plugins are discovered as every `nexa-claude-*/` directory except core. The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in each stack's skills — no hand-maintained manifest.
 
 ## Commands
 
 This is a markdown plugin repo — there is no build, compile, or unit-test step. The one verification command:
 
-- `scripts/sync-shared.sh` — sync core shared files into nextjs.
-- `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references. Run this before committing changes to any `shared/` file or nextjs skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
+- `scripts/sync-shared.sh` — sync core shared files into every stack plugin.
+- `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references. Run this before committing changes to any `shared/` file or stack plugin skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
 
 To test a skill, install the repo as a local marketplace (`/plugin marketplace add /path/to/this/repo`), install the plugin, and invoke the slash command. See `CONTRIBUTING.md`.
 
@@ -154,9 +195,9 @@ To test a skill, install the repo as a local marketplace (`/plugin marketplace a
 
 Beyond `skills/`, each plugin may contain:
 
-- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`).
+- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`, `nexa-claude-go/agents/playwright-test.md`).
 - `hooks/` — e.g. `nexa-claude-core/hooks/` registers a `SessionStart` hook.
-- `.mcp.json` — MCP servers (core: context7; nextjs: Playwright).
+- `.mcp.json` — MCP servers (core: context7; nextjs and go: Playwright).
 
 ## When you add, rename, or remove a skill
 

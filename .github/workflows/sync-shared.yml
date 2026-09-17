@@ -1,15 +1,15 @@
 name: shared-sync
 
-# Guards the cross-plugin shared gate files: nexa-claude-nextjs must hold byte-identical
-# copies of the readiness/tracking files it references from nexa-claude-core. Fails if the
-# copies drift, or if a skill references a shared file that exists in neither plugin.
+# Guards the cross-plugin shared gate files: every stack plugin (nexa-claude-nextjs,
+# nexa-claude-go, ...) must hold byte-identical copies of the readiness/tracking files it
+# references from nexa-claude-core. Fails if the copies drift, or if a skill references a
+# shared file that exists in neither core nor the stack plugin.
 
 on:
   pull_request:
     paths:
-      - 'nexa-claude-core/shared/**'
-      - 'nexa-claude-nextjs/shared/**'
-      - 'nexa-claude-nextjs/skills/**'
+      - 'nexa-claude-*/shared/**'
+      - 'nexa-claude-*/skills/**'
       - 'scripts/sync-shared.sh'
       - '.github/workflows/sync-shared.yml'
   push:

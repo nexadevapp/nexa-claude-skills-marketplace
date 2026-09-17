@@ -68,6 +68,26 @@ nexa-claude-marketplace/
 │       ├── audit/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-go/                      # Go technology stack plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   ├── .mcp.json                 # Playwright
+│   └── skills/                   # All workflow steps as skills (slash commands)
+│       ├── setup-env-profiles/
+│       ├── setup-web-middleware/
+│       ├── db-migration/
+│       ├── implement/
+│       ├── integration-test/
+│       ├── playwright-test/
+│       ├── code-quality/
+│       ├── mutation-test/
+│       ├── deliver-use-case/
+│       ├── deliver-cluster/
+│       ├── merge-use-case/
+│       ├── merge-queue/
+│       ├── resolve-bug/
+│       ├── setup-playwright-ci/
+│       └── setup-quality-ci/
 └── README.md
 ```
 
@@ -207,3 +227,23 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, loading/error states |
+
+### Go (stack-specific)
+
+| Phase        | Skill (slash command)   | Description                                                        |
+|--------------|-------------------------|--------------------------------------------------------------------|
+| Setup        | `/setup-env-profiles`   | Set up local/dev environment profiles, the config loader, and `cmd/dev` |
+| Setup        | `/setup-web-middleware` | Build auth, RBAC, CSRF, security headers, and panic recovery middleware for `net/http` |
+| Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
+| Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for golangci-lint, generate drift, and coverage gates |
+| Construction | `/db-migration`         | Create goose migrations and sqlc queries from the entity model     |
+| Construction | `/implement`            | Implement use cases or technical tasks with net/http, templ, and htmx |
+| Construction | `/integration-test`     | Create Go integration tests with testcontainers-go                 |
+| Construction | `/playwright-test`      | Create Playwright for Go e2e tests (`go test -tags=e2e`)           |
+| Construction | `/code-quality`         | Run golangci-lint (lint, gocyclo complexity) and gofumpt/goimports formatting |
+| Construction | `/mutation-test`        | Run gremlins mutation testing on delivered business logic          |
+| Construction | `/deliver-use-case`     | Orchestrate full pipeline from spec to evaluation for one use case |
+| Construction | `/deliver-cluster`      | Deliver a cluster: parallel worktrees, dependency order, serial merge queue |
+| Construction | `/merge-use-case`       | Rebase a use case branch onto main, run the regression gate, merge |
+| Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
+| Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |

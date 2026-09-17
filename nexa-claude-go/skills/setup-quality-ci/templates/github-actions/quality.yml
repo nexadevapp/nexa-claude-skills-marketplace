@@ -1,0 +1,78 @@
+name: Code Quality & Coverage
+on:
+  push:
+    branches: ["{{BRANCH}}"]
+  pull_request:
+    branches: ["{{BRANCH}}"]
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: "{{GOLANGCI_LINT_VERSION}}"
+
+      - name: Check templ formatting
+        run: go tool templ fmt -fail .
+
+      - name: Setup sqlc
+        uses: sqlc-dev/setup-sqlc@v3
+        with:
+          sqlc-version: "{{SQLC_VERSION}}"
+
+      - name: Check generated code is up to date
+        run: |
+          go tool templ generate && sqlc generate
+          git diff --exit-code
+
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests with coverage
+        run: |
+          go test -tags=integration -coverpkg=./internal/... -coverprofile=coverage.out ./...
+          grep -v -e '/internal/db/' -e '/internal/testdb/' -e '_templ.go' coverage.out > coverage.filtered.out
+          go tool cover -html=coverage.filtered.out -o coverage.html
+
+      - name: Enforce 80% coverage
+        run: |
+          total=$(go tool cover -func=coverage.filtered.out | awk '/^total:/ { sub("%", "", $3); print $3 }')
+          echo "Total coverage: ${total}%"
+          awk -v t="$total" 'BEGIN { exit (t < 80) }'
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage.filtered.out
+            coverage.html
+          retention-days: 14

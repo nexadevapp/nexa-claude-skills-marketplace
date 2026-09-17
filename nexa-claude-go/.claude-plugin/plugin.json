@@ -1,0 +1,10 @@
+{
+  "name": "nexa-claude-go",
+  "description": "Nexa Agentic Engineering plugin for the Go stack (net/http, templ, htmx, sqlc, goose)",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  },
+  "license": "Apache-2.0"
+}

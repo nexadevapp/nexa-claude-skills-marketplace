@@ -143,7 +143,7 @@ Rules:
 - **Skip empty.** If `git status --porcelain` is empty, the step changed nothing — skip the commit
   silently, do not create an empty one.
 - **Stage everything the step produced**, including the delivery log: `git add -A`.
-- **Never `--no-verify`.** If a pre-commit hook fails (lint),
+- **Never `--no-verify`.** If a pre-commit hook fails (architecture rules from `/setup-arch-unit`, lint),
   that is a real finding. Fix the violation, re-run the step's verification, then commit.
 - **Subagents never commit.** `mutation-tester`, `playwright-test`, and `evaluate` run read-only
   against git. The main context is the only committer.
@@ -501,6 +501,8 @@ commit of the delivery; the terminal summary and GitHub comment below change no 
 Include a **What was built** section listing key artifacts (handlers, templ views, sqlc queries, services, tests)
 and links to `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS-traceability.md`,
 and `docs/delivery/$ARGUMENTS-mutation.md`.
+
+> To run a deep quality audit (i18n, accessibility, visual fidelity): `/audit $ARGUMENTS`
 
 The branch `uc/$ARGUMENTS` is green but not yet on `main`.
 

@@ -62,6 +62,9 @@ nexa-claude-marketplace/
 │   ├── .mcp.json                 # Playwright
 │   └── skills/                   # All workflow steps as skills (slash commands)
 │       ├── setup-env-profiles/
+│       ├── setup-i18n/
+│       ├── setup-arch-unit/
+│       ├── onboard-existing-app/
 │       ├── setup-web-middleware/
 │       ├── db-migration/
 │       ├── implement/
@@ -74,6 +77,7 @@ nexa-claude-marketplace/
 │       ├── merge-use-case/
 │       ├── merge-queue/
 │       ├── resolve-bug/
+│       ├── audit/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
 └── README.md
@@ -158,9 +162,12 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Phase        | Skill (slash command)   | Description                                                        |
 |--------------|-------------------------|--------------------------------------------------------------------|
 | Setup        | `/setup-env-profiles`   | Set up local/dev environment profiles, the config loader, and `cmd/dev` |
+| Setup        | `/setup-i18n`           | Set up server-side internationalization with go-i18n and embedded catalogs |
 | Setup        | `/setup-web-middleware` | Build auth, RBAC, CSRF, security headers, and panic recovery middleware for `net/http` |
 | Setup        | `/setup-playwright-ci`  | Generate GitHub Actions workflow for Playwright E2E tests          |
 | Setup        | `/setup-quality-ci`     | Generate GitHub Actions workflow for golangci-lint, generate drift, and coverage gates |
+| Setup        | `/setup-arch-unit`      | Set up architecture rules with golangci-lint depguard/forbidigo and a git pre-commit hook |
+| Setup        | `/onboard-existing-app` | Reverse-engineer requirements, entity model, and use cases from an existing Go codebase |
 | Construction | `/db-migration`         | Create goose migrations and sqlc queries from the entity model     |
 | Construction | `/implement`            | Implement use cases or technical tasks with net/http, templ, and htmx |
 | Construction | `/integration-test`     | Create Go integration tests with testcontainers-go                 |
@@ -172,6 +179,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/merge-use-case`       | Rebase a use case branch onto main, run the regression gate, merge |
 | Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
+| Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, htmx loading/error states |
 
 ## Shared gate files (cross-plugin sync)
 

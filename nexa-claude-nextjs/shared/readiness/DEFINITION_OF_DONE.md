@@ -48,7 +48,7 @@ tracking until the user either fixes the issues or explicitly waives the failing
 
 Always check whether the project uses internationalization — look for translation/message files,
 i18n configuration, locale directories, translation function imports, locale-based routing, or
-i18n libraries in `package.json`. If the project uses i18n:
+i18n libraries in the dependency manifest (`package.json`, `go.mod`). If the project uses i18n:
 
 - [ ] **No hardcoded user-facing strings** — Every user-facing string in new or modified components, pages, server actions, and API route handlers uses the project's translation pattern, not a hardcoded literal
 - [ ] **Translation keys added to all locales** — Every new translation key exists in all locale files, following the project's existing file structure and conventions

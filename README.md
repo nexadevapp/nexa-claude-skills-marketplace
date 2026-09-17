@@ -99,9 +99,12 @@ The same implementation, testing, and delivery pipeline for Go: `net/http` (stdl
 | Phase | Command | Description |
 |---|---|---|
 | **Setup** | `/setup-env-profiles` | Set up local/dev environment profiles, the config loader, and `cmd/dev` |
+| **Setup** | `/setup-i18n` | Set up server-side internationalization with go-i18n and embedded catalogs |
 | **Setup** | `/setup-web-middleware` | Build auth, RBAC, CSRF, security-headers, and panic-recovery middleware for `net/http` |
 | **Setup** | `/setup-playwright-ci` | Generate a GitHub Actions workflow for Playwright E2E tests |
 | **Setup** | `/setup-quality-ci` | Generate a GitHub Actions workflow for golangci-lint, generated-code drift, and coverage gates |
+| **Setup** | `/setup-arch-unit` | Set up architecture rules with golangci-lint depguard/forbidigo and a git pre-commit hook |
+| **Setup** | `/onboard-existing-app` | Reverse-engineer requirements, entity model, and use cases from an existing Go codebase |
 | **Construction** | `/db-migration` | Create goose migrations and sqlc queries from the entity model |
 | **Construction** | `/implement` | Implement use cases — handlers, templ views, services, sqlc queries |
 | **Construction** | `/integration-test` | Create Go integration tests with testcontainers-go |
@@ -113,8 +116,7 @@ The same implementation, testing, and delivery pipeline for Go: `net/http` (stdl
 | **Delivery** | `/merge-use-case` | Rebase a use case branch onto main, run the full regression gate, and merge |
 | **Delivery** | `/merge-queue` | Land every ready branch and approved pull request from parallel agents, in dependency order, one at a time |
 | **Construction** | `/resolve-bug` | Orchestrate the bugfix pipeline: reproduce → analyze + link requirements → fix |
-
-Not yet ported from the Next.js plugin: `/setup-i18n`, `/setup-arch-unit`, `/onboard-existing-app`, `/audit`.
+| **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, htmx loading/error states |
 
 Uses the **Context7** and **Playwright** MCP servers.
 

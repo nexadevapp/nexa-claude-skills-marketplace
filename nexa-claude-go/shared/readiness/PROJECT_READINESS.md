@@ -27,7 +27,7 @@ goose, or the chosen session library is unclear for the installed version.
 - [ ] **Server entry point** — `cmd/server/main.go` exists and calls `app.Run`
 - [ ] **Dev entry point** — `cmd/dev/main.go` exists and starts PostgreSQL through Testcontainers
 - [ ] **Router** — `internal/web/routes.go` registers every route on one `http.ServeMux`
-- [ ] **Shared layout** — `internal/web/layout.templ` exists and htmx is embedded from `internal/web/static/`
+- [ ] **Shared layout** — `internal/web/layout/layout.templ` (package `layout`) exists and htmx is embedded from `internal/web/static/`. The layout is its own package: feature views import it, and `internal/web` imports the features, so a layout inside `internal/web` is an import cycle
 
 ### Request Interception Layer (auth, routing, security headers)
 
@@ -67,9 +67,11 @@ localization, multi-language, i18n, or supported locales.
 
 If neither the marker nor the requirements mention i18n, skip this section entirely.
 
-If the requirements mention i18n and the marker is absent, report it as a failure. The Go
-plugin has no `/setup-i18n` skill yet, so the user must either set up i18n by hand (then add
-the marker to `CLAUDE.md`) or explicitly waive this item.
+If the requirements mention i18n and the marker is absent, report it as a failure — run
+`/setup-i18n`.
+
+- [ ] **i18n configured** — `<!-- NEXA_I18N_CONFIGURED -->` is in `CLAUDE.md`, `internal/i18n/`
+  exists, and `i18n.Middleware` is in the chain in `internal/web/routes.go`
 
 **Why this is checked early:** Adding i18n after features are built requires retrofitting
 every templ view and every user-facing message. Deciding before implementation avoids a costly
@@ -84,7 +86,7 @@ Report which checks failed and guide the user to the correct skill:
 | Auth / route rules / headers / CSRF / recover | `/setup-web-middleware` |
 | Environment files / config / `cmd/dev`        | `/setup-env-profiles`   |
 | Migrations or sqlc                            | `/db-migration`         |
-| Internationalization                          | set up by hand, or waive |
+| Internationalization                          | `/setup-i18n`           |
 
 Example failure message:
 

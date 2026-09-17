@@ -357,7 +357,8 @@ Route and auth constants:
   (`cfg.Env == "production"`)
 
 **htmx under this CSP.** htmx is vendored at `internal/web/static/htmx.min.js`. Add to the
-shared layout (`internal/web/layout.templ`):
+shared layout (`internal/web/layout/layout.templ`, package `layout` — feature views import it,
+and `internal/web` imports the features, so the layout cannot live in package `web`):
 
 ```html
 <meta name="htmx-config" content='{"includeIndicatorStyles":false,"allowEval":false,"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"[45]..","swap":false,"error":true}]}'>

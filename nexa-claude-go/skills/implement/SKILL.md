@@ -74,13 +74,13 @@ Read and follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/sh
 2. Read the entity model from `docs/entity_model.md` (if applicable)
 3. Read the design artifact from `docs/designs/` (if it exists for this UC). When a design artifact exists, the implementation must match the specified screens, layout, components, states, and navigation flow.
 4. Read project design rules from `docs/designs/DESIGN_RULES.md` (if it exists). These are project-specific constraints — e.g., shared layout elements (header, footer, sidebar), mandatory components, or navigation patterns — that every implementation must follow. Missing a shared element specified in design rules is a defect.
-5. Check existing code for patterns and conventions — read `internal/web/routes.go`, `internal/web/layout.templ`, and at least one existing `internal/<feature>/` package before writing a new one
+5. Check existing code for patterns and conventions — read `internal/web/routes.go`, `internal/web/layout/layout.templ`, and at least one existing `internal/<feature>/` package before writing a new one
 6. **i18n Detection** — check the project's `CLAUDE.md` for the marker `<!-- NEXA_I18N_CONFIGURED -->`,
-   then look for an existing translation setup (message catalogs, a localizer passed through
-   `context.Context`, `golang.org/x/text/message`, `go-i18n` in `go.mod`). If one exists, every
-   user-facing string in this implementation — including validation messages — MUST go through it,
-   and new keys go into **all** locale catalogs. If none exists, write plain strings; the Go plugin
-   has no `/setup-i18n` yet.
+   then look for an existing translation setup (`internal/i18n/`, message catalogs,
+   `golang.org/x/text/message`, `go-i18n` in `go.mod`). If one exists, every user-facing string in
+   this implementation — including validation messages — MUST go through it (`/setup-i18n`:
+   `i18n.T(ctx, "namespace.key")` in templ and handlers), and new keys go into **all** locale
+   catalogs. If none exists, write plain strings.
 7. Write the queries:
     - Add named queries to `db/queries/<entity>.sql` (`-- name: ListItems :many`, `:one`, `:exec`)
     - Every table and column must already exist in `db/migrations/` — if not, stop: the schema
@@ -92,7 +92,7 @@ Read and follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/sh
     - Return domain errors (`var ErrNotFound = errors.New(...)`) that handlers map to status codes
 9. Implement the form in `internal/<feature>/form.go`:
     - A struct per form, parsed from `r.PostForm`
-    - `func (f CreateItemForm) Validate() map[string]string` returning field -> message; empty map means valid
+    - `func (f CreateItemForm) Validate() map[string]string` returning field -> message (a message ID when i18n is active; the view translates it); empty map means valid
     - Mirror each server rule with an HTML5 attribute in the view (`required`, `maxlength`, `type="email"`, `pattern`) — client-side validation is a convenience, the server check is the authority
 10. Implement the handler in `internal/<feature>/handler.go`:
     - Methods with the `http.HandlerFunc` signature; read path values with `r.PathValue("id")`
@@ -105,7 +105,7 @@ Read and follow the **Before Implementation** steps in `${CLAUDE_PLUGIN_ROOT}/sh
     - Map service errors: not found -> `404`, forbidden -> `403`, anything else -> log with `slog` and `500`
     - Read the signed-in user with `auth.FromContext(r.Context())` — never read the cookie or the session store again
 11. Implement the views in `internal/<feature>/views.templ`:
-    - Pages wrap content in the shared layout from `internal/web/layout.templ`
+    - Pages wrap content in the shared layout from package `internal/web/layout` — never import `internal/web` from a feature (import cycle)
     - Every htmx target is its own templ component so handlers can render it alone
     - Loading state: `hx-indicator` on the triggering element
     - Error state: field errors next to their inputs, a summary for non-field errors

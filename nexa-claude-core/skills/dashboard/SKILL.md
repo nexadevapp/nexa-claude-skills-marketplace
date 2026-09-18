@@ -50,21 +50,25 @@ Read each source and take only what the table names:
 | `docs/use_cases/UC-*.md` | Use case name, **Status**, **User Interface**, **Depends On** |
 | `docs/designs/UC-*-design.html` | Whether a design exists |
 | `docs/delivery/UC-*-iterations.md` | Whether the use case is delivered — this file existing is the project-wide delivered marker |
-| `e2e/**/*.spec.ts` | The acceptance test file(s) for a delivered use case — found by the `uc('UC-XXX')` tag inside the file, **not** by the filename |
+| `e2e/**/*.spec.ts` (Next.js), `e2e/**/*_test.go` (Go) | The acceptance test file(s) for a delivered use case — found by the use case tag inside the file, **not** by the filename |
 | `docs/technical_tasks/TT-*.md` | Task name, **Status**, **Scope** |
 | `docs/requirements.md` | The project name, from the first heading |
 
 A use case listed in no cluster goes under **Unclustered**. A technical task whose **Scope** row
 is missing goes under **Umbrella**, with a note that its scope is undeclared.
 
-**Finding the acceptance tests.** `/playwright-test` anchors each use case with
-`test.describe('UC-XXX: ...', uc('UC-XXX'), ...)` and allows **several use cases in one file**
-when their journeys share a page, so the filename is not the link — the `uc()` tag is. Search
-the tag, not the name:
+**Finding the acceptance tests.** `/playwright-test` tags each use case inside the test file,
+and allows **several use cases in one file** when their journeys share a page. The filename is
+therefore not the link — the tag is. The tag depends on the stack:
 
-```bash
-grep -rl "uc('UC-XXX')" e2e --include=*.spec.ts
-```
+| Stack | Tag | Search |
+|-------|-----|--------|
+| Next.js | `test.describe('UC-XXX: ...', uc('UC-XXX'), ...)` | `grep -rl "uc('UC-XXX')" e2e --include='*.spec.ts'` |
+| Go | `useCase(t, "UC-XXX", "<scenario>", ...)` as a line of code | `grep -rlE '^[[:space:]]*useCase\(t, "UC-XXX"' e2e --include='*_test.go'` |
+
+Run both searches. A project matches only one of them. The Go pattern accepts only a line that
+starts with `useCase(`, because `e2e/trace_test.go` shows `useCase(t, "UC-007", ...)` in a
+comment. A comment line starts with `//`, so the pattern does not match it.
 
 A use case can therefore have more than one test file, and two use cases can share one. Set
 `tests` to the list of files the grep returns, and to `[]` when it returns nothing.
@@ -206,8 +210,9 @@ Name any use case that has no cluster, and any technical task with no **Scope** 
 5. A card with `delivered: true` says **Implemented**. Every other card says **Not implemented**.
 6. The **Design** link on a card with a design opens the use case on the Design tab, and the tab
    shows the design. A card with `ui: false` says **No screen**, not a broken design link.
-7. A use case whose `uc('UC-XXX')` tag appears in a spec file lists every such file on its
-   Acceptance tests tab; one with no tagged spec has no such tab.
+7. A use case whose tag appears in a test file lists every such file on its Acceptance tests
+   tab; one with no tagged test file has no such tab. In a Go project, `e2e/trace_test.go` is in
+   no use case's `tests`.
 8. At a 375 px width the sidebar hides behind the menu button and the page does not scroll
    sideways.
 9. `docs/index.html` redirects to the overview.

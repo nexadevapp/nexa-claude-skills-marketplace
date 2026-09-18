@@ -3,7 +3,7 @@ name: onboard-existing-app
 description: >
   Retrofits an existing Go web application into the Nexa Agentic Engineering methodology by
   reverse-engineering a requirements catalog, entity model, use case diagram, and use case
-  specs from the live code (handlers, templ views, services, SQL migrations, and sqlc queries),
+  specs from the live code (routes, handlers, views, services, SQL migrations, and queries),
   and from BMAD-method artifacts under `_bmad/`, when present. Then audits cross-cutting
   infrastructure and creates thin-pointer GitHub issues for already-shipped work. Use when the
   user asks to "onboard this codebase", "onboard this Go app", "onboard an existing app",
@@ -155,26 +155,47 @@ ONBOARDING: choose scan depth
 
 #### 0.5 Crawl the codebase (read-only)
 
-Read `go.mod` for the module path and dependencies. Then collect:
+Read `go.mod` for the module path and dependencies. Do not assume this plugin's layout
+(`internal/<feature>/`, templ, sqlc, goose): an existing app can keep its component packages at
+the module root, all handlers in one `web` package, and its own migration runner. Find each
+item below by what the code does, not by where this plugin would put it. Then collect:
 
 - **Routes** — every registration with its method and pattern: stdlib
   `mux.HandleFunc("GET /items/{id}", ...)` / `mux.Handle(...)`, or the third-party router
   equivalent (`r.Get("/items/{id}", ...)` in chi, `r.GET("/items/:id", ...)` in gin/echo,
   `r.HandleFunc(...).Methods("GET")` in gorilla/mux). Record which router is in use for Step 4.
-- **Handlers** — the functions those routes call (`internal/**/handler.go` or wherever they
-  live), including htmx fragment endpoints.
-- **Views** — `.templ` components, or `html/template` files (`*.html`, `*.tmpl`, `*.gohtml`) —
-  record `html/template` for Step 4.
-- **Services** — the business logic the handlers call.
+  Apps often register through a local helper that adds middleware, e.g.
+  `handle := func(p string, h http.HandlerFunc) { mux.Handle(p, auth.RequireAuth(h)) }` — find
+  every such helper first, then every call to it. For each route, record the full pattern
+  (add the prefix of an enclosing chi `Route`/`Mount`, gin/echo `Group`, or a sub-mux behind
+  `http.StripPrefix`) and the middleware its registration adds (a login or role check). That
+  middleware is evidence for a precondition in Step 3.
+- **Handlers** — the functions those routes call, wherever they live (one file per feature in a
+  `web` package, or a `handler.go` per feature), including htmx fragment endpoints.
+- **Views** — `.templ` components, or `html/template` files (`*.html`, `*.tmpl`, `*.gohtml`,
+  including partials and the `//go:embed` directive that loads them) — record `html/template`
+  for Step 4.
+- **Services** — the business logic the handlers call, in `internal/` or in top-level
+  component packages.
 - **Validation** — `Validate()` methods, `go-playground/validator` struct tags
-  (`validate:"required,email"`), and explicit `if` guards in handlers and services.
-- **Schema** — SQL migrations: goose `db/migrations/*.sql`, golang-migrate `*.up.sql`, or the
-  `schema` path in `sqlc.yaml`. If none exist but the app clearly uses a database (GORM,
-  ent, sqlx with no DDL in the repo), flag this prominently and skip Step 2 entirely — guessing
-  at a schema from ORM code is out of scope.
+  (`validate:"required,email"`), explicit `if` guards in handlers and services, and sentinel
+  domain errors that services return for a broken rule (`var ErrNameRequired = errors.New(...)`)
+  together with the handler branch that maps each one to a response.
+- **Schema** — every ordered stream of SQL DDL files. Find a stream by its content, not by its
+  tool: a directory of `.sql` files with a version prefix (`001_create_items.sql`,
+  `20240101120000_add_users.sql`, `000001_init.up.sql`) that contains `CREATE TABLE`. goose,
+  golang-migrate, atlas, the `schema` path in `sqlc.yaml`, and a custom runner all produce
+  this shape. For a custom runner, read the runner and the `//go:embed` directive that feeds
+  it: they give the apply order and the PostgreSQL schema each stream targets (e.g.
+  `migrations/app/` → `public`, `migrations/reference/` → `reference`). Record every
+  stream with its target schema. Exclude a stream that only inserts data (demo data, seed
+  files) — it has no `CREATE TABLE` or `ALTER TABLE`. If no stream exists but the app clearly
+  uses a database (GORM, ent, sqlx with no DDL in the repo), flag this prominently and skip
+  Step 2 entirely — guessing at a schema from ORM code is out of scope.
 - **Queries** — sqlc queries in `db/queries/*.sql` (or the `queries` path in `sqlc.yaml`), or
-  the SQL strings / ORM calls the services use.
-- **Tests** — existing `*_test.go` files and the `e2e/` directory.
+  the SQL strings the services pass to pgx or `database/sql`, or their ORM calls.
+- **Tests** — existing `*_test.go` files (handler tests that drive a flow through `httptest`
+  are evidence of intended behavior for Step 3) and the `e2e/` directory, if present.
 
 #### 0.6 Cluster
 
@@ -182,6 +203,11 @@ For every route/handler not already matched to a BMAD story (0.1), group into ca
 cases by user-facing goal, not by file — e.g. `GET /checkout` + `POST /checkout` +
 `POST /discount-codes/apply` (htmx fragment) → one "Checkout with Discount" cluster. Inspired
 by how `engineer-requirements` clusters *existing* UC docs; here the input is raw code.
+
+Put routes that call the same handler in the same cluster: `GET /items` and
+`GET /api/items` served by one handler are one use case with an HTML and a JSON response,
+not two use cases. Do not cluster routes that no user goal needs — health checks, metrics,
+static files. List them in the Step 6 report as not user-facing.
 
 ---
 
@@ -206,32 +232,54 @@ many clusters and per-item interactive dialogue doesn't scale.
 
 ### Step 2: Entity Model
 
-Skip entirely if no SQL DDL was found (Step 0.5). Otherwise build the final schema by replaying
-the up migrations in order (`CREATE TABLE`, then every later `ALTER TABLE`, `DROP`, and
-`RENAME`). Ignore down migrations and goose `-- +goose Down` sections. Then author
-`docs/entity_model.md` directly, following its documented format exactly: a Mermaid
-`erDiagram` block (relationships only, no attributes inside entity nodes) plus one `###
-ENTITY_NAME` section per table with a 5-column attribute table (Attribute, Description, Data
-Type, Length/Precision, Validation Rules).
+Skip entirely if no SQL DDL was found (Step 0.5). Otherwise build the final schema of each
+stream by replaying its up migrations in the order its runner applies them — normally the
+version prefix (`CREATE TABLE`, then every later `ALTER TABLE`, `DROP`, and `RENAME`). Ignore
+down migrations and goose `-- +goose Down` sections. Then author `docs/entity_model.md`
+directly, following its documented format exactly: a Mermaid `erDiagram` block (relationships
+only, no attributes inside entity nodes) plus one `### ENTITY_NAME` section per table with a
+5-column attribute table (Attribute, Description, Data Type, Length/Precision, Validation
+Rules). When the streams target more than one PostgreSQL schema, qualify every table outside
+`public` with its schema (`reference.countries`), and keep foreign keys across schemas in the
+diagram.
 
 Map PostgreSQL types to the fixed vocabulary:
 
-| PostgreSQL type | Data Type | Length/Precision |
-|---|---|---|
-| `bigint`, `bigserial`, `int8` | Long | — |
-| `integer`, `int`, `smallint`, `serial`, `smallserial` | Integer | — |
-| `text`, `varchar(n)`, `char(n)`, `uuid`, `citext` | String | `n` where declared (`uuid` → 36) |
-| `numeric(p,s)`, `decimal(p,s)` | Decimal | `p,s` |
-| `boolean` | Boolean | — |
-| `date` | Date | — |
-| `timestamp`, `timestamptz` | DateTime | — |
+| PostgreSQL type | Data Type | Length/Precision | Validation Rules add |
+|---|---|---|---|
+| `bigint`, `bigserial`, `int8` | Long | 19 | — |
+| `integer`, `int`, `smallint`, `serial`, `smallserial` | Integer | 10 | — |
+| `text`, `varchar(n)`, `char(n)`, `citext` | String | `n` where declared | — |
+| `uuid` | String | 36 | Format: UUID |
+| `numeric(p,s)`, `decimal(p,s)` | Decimal | `p,s` | — |
+| `real`, `double precision` | Decimal | — | — |
+| `boolean` | Boolean | 1 | — |
+| `date` | Date | — | — |
+| `timestamp`, `timestamptz` | DateTime | — | — |
+| `jsonb`, `json` | String | — | Format: JSON |
+| `bytea` | String | — | Format: Binary |
+| `T[]` (array) | the Data Type of `T` | as for `T` | List |
+| enum (`CREATE TYPE ... AS ENUM`) | String | — | Values: A, B, C |
 
-Map `PRIMARY KEY`, `UNIQUE`, `NOT NULL`, `CHECK`, and `DEFAULT` to Validation Rules. Map each
-`FOREIGN KEY` to Mermaid cardinality: a plain foreign key is many-to-one; a foreign key that is
-also `UNIQUE` is one-to-one. A join table with two foreign keys as its primary key is
-many-to-many. Skip infrastructure tables that are not part of the domain (`goose_db_version`,
-`schema_migrations`, `sessions`) and name them in the Step 6 report. Every entity must trace to
-a real `CREATE TABLE` — never invented.
+For a type with no row, use the nearest Data Type, write the PostgreSQL type in Validation
+Rules, and name it in the Step 6 report.
+
+Map `PRIMARY KEY`, `UNIQUE`, `NOT NULL`, `CHECK`, and `DEFAULT` to Validation Rules. A
+single-column `CHECK (col IN ('a', 'b'))` is an enum: write `Values: a, b`. Write any other
+single-column `CHECK` as its condition. Write a `CHECK` that spans columns as a
+**Constraints:** line after the table, per the entity model format. Map each `FOREIGN KEY` to
+Mermaid cardinality: a plain foreign key is many-to-one; a foreign key that is also `UNIQUE`
+is one-to-one. A join table with two foreign keys as its primary key is many-to-many.
+
+Skip tables that are not part of the domain, and name them in the Step 6 report:
+
+- migration tracking tables of every stream (`goose_db_version`, `schema_migrations`,
+  or the tracking table of a seed stream) — a runner can keep one per schema
+- a session store — a table whose columns are only a key, a session token or its hash, a user
+  reference or a session payload, and timestamps. Decide by the columns, not by the name: a `sessions` table
+  of a training or booking domain is a domain entity.
+
+Every entity must trace to a real `CREATE TABLE` — never invented.
 
 ---
 
@@ -251,7 +299,8 @@ Step 2 parallel pair). Invoke via the Agent tool with
 `subagent_type: "nexa-claude-go:use-case-archaeologist"`. Prompt per agent:
 
 > Write the use case spec for cluster "[name]" — primary actor [actor], implemented in
-> [routes with method and pattern; handler, templ view, service, and sqlc query files]. [If
+> [routes with method, full pattern, and the middleware each registration adds; handler,
+> view, service, query, and handler test files]. [If
 > matched: BMAD story at [path], FR-N [n], claimed Status [status] — verify, don't transcribe.]
 >
 > Follow your operating manual (`onboard-existing-app/SKILL.md` Step 3, loaded as your
@@ -283,11 +332,12 @@ plus every item in `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`
 
   | Found in the app | Plugin convention |
   |---|---|
+  | component packages at the module root, all handlers in one `web` package, routes registered outside `internal/web/routes.go` | `internal/<feature>/` packages, routes in `internal/web/routes.go` |
   | chi, gin, echo, or gorilla/mux router | one `http.ServeMux` in `internal/web/routes.go` |
   | `gorilla/csrf` or another CSRF token library | `http.CrossOriginProtection` |
   | `html/template` views | templ + htmx |
-  | GORM, sqlx, or raw `database/sql` | sqlc over pgx |
-  | golang-migrate or atlas | goose |
+  | GORM, sqlx, raw `database/sql`, or hand-written SQL over pgx | sqlc over pgx |
+  | golang-migrate, atlas, or a custom migration runner | goose |
   | `godotenv` loading env files | env files sourced by the shell, read in `internal/config` |
   | zap, zerolog, or logrus | `log/slog` JSON handler |
   | an i18n library other than go-i18n | go-i18n via `/setup-i18n` |
@@ -295,6 +345,12 @@ plus every item in `${CLAUDE_PLUGIN_ROOT}/shared/readiness/PROJECT_READINESS.md`
   A mismatch is not a defect in the app. It means the plugin's skills (`/implement`,
   `/integration-test`, `/playwright-test`) assume a structure the app does not have. List what
   that costs for future work, so the user can decide to migrate or to adapt.
+
+  Many `PROJECT_READINESS.md` items check an exact path (`cmd/dev/main.go`,
+  `internal/web/routes.go`, `db/migrations/`, `sqlc.yaml`, `.env`). When the app has its own
+  layout, do not report each of these items as a separate gap. Report them as one **Layout**
+  mismatch row that names the app's equivalent for each item. Report an item as Missing only
+  when the app has no equivalent at all.
 - **Genuinely missing:** list as a recommended follow-up (e.g. "Run `/setup-i18n` — no i18n
   detected"). **Never auto-run any `setup-*` skill** — each one makes opinionated decisions
   (auth strategy, locale list, RBAC model) that could conflict with how this specific existing
@@ -340,13 +396,17 @@ Write `docs/onboarding/ONBOARDING_REPORT.md`:
 | UC-002 | ... | Review | Code archaeology | [what couldn't be confirmed, e.g. error path in internal/invoice/service.go:88 unreachable] |
 
 ## Entity Model
-[coverage: N tables mapped from M migrations, infrastructure tables skipped, or "skipped — no SQL DDL, schema lives in GORM models"]
+[coverage: N tables mapped from M migrations in S streams (one line per stream: directory → schema), infrastructure tables skipped, types with no row in the map, or "skipped — no SQL DDL, schema lives in GORM models"]
+
+## Routes Not Clustered
+[routes that serve no user goal — health checks, metrics, static files]
 
 ## Infrastructure Gaps
 | Concern | Status | Recommended Action |
 |---------|--------|---------------------|
 | i18n | Missing | Run /setup-i18n |
 | Web Middleware | Mismatch — chi router + gorilla/csrf | Review: migrate to ServeMux + CrossOriginProtection, or adapt |
+| Layout | Mismatch — routes outside internal/web/routes.go, a custom migration runner, html/template | Review: migrate to the plugin layout, or adapt the skills |
 | Environment Profiles | Configured | — |
 
 ## Deferred Work (BMAD, informational only)
@@ -367,6 +427,9 @@ authoritative.
 - Confirm the Nexa Rules Gate (`<!-- NEXA_RULES_CONFIGURED v2 -->`) now passes.
 - Confirm `git status` shows changes only under `docs/`, `CLAUDE.md`, and nothing in Go,
   templ, or SQL files.
+- Confirm every route found in Step 0.5 is in exactly one cluster or in the report's Routes Not
+  Clustered list. Count the registrations in the code again, including the calls to every
+  registration helper — a route that is in neither place was missed by the crawl.
 - Spot-check at least one generated `UC-XXX.md` against the live handler/view it claims to
   describe — MSS steps should match actual code behavior, not paraphrase intent.
 - Spot-check at least one entity in `docs/entity_model.md` against the final migration that

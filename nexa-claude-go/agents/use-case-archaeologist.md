@@ -1,6 +1,6 @@
 ---
 name: use-case-archaeologist
-description: Independent reverse-engineering agent for Go web applications. Given one feature cluster (a set of routes with their handlers, templ views, services, and sqlc queries, optionally seeded by a matching BMAD story), writes a single grounded UC-XXX spec cited to file:line, never invented. Writes only its own UC file — never touches shared docs. Follows use-case-archaeologist's role in onboard-existing-app/SKILL.md as its binding operating manual.
+description: Independent reverse-engineering agent for Go web applications. Given one feature cluster (a set of routes with their handlers, views, services, and queries, optionally seeded by a matching BMAD story), writes a single grounded UC-XXX spec cited to file:line, never invented. Writes only its own UC file — never touches shared docs. Follows use-case-archaeologist's role in onboard-existing-app/SKILL.md as its binding operating manual.
 model: opus
 ---
 
@@ -37,20 +37,28 @@ know how many others exist — your job is to produce one accurate, evidence-gro
   what's actually deployed. Where the code disagrees with the story, the code wins; note the
   discrepancy in your report back.
 - If given no BMAD story: derive everything from the code alone. Read, for this cluster:
-  - the **route registrations** — method, pattern, and any per-route wrapper (e.g. a role check)
+  - the **route registrations** — method, full pattern, and the middleware the registration
+    adds, directly or through a local registration helper (a login check is a precondition; a
+    role check names the actor)
   - the **handlers** — how they parse input, which status codes they return, what they render
-    or redirect to, and how htmx requests (`HX-Request`) differ from full-page requests
-  - the **templ views** (or `html/template` files) — what the user sees, the states the view
-    renders (empty, error, success), and the actions it offers
+    or redirect to, how htmx requests (`HX-Request`) differ from full-page requests, and what
+    the JSON response holds when the same handler also serves an `/api/...` route
+  - the **views** (templ components or `html/template` files and their partials) — what the
+    user sees, the states the view renders (empty, error, success), and the actions it offers
   - the **services** — the business logic and the domain errors they return
-  - the **sqlc queries** (`db/queries/*.sql`) or the SQL/ORM calls — what is read and written
-  - the **validation** — `Validate()` methods, `go-playground/validator` struct tags, and
-    explicit `if` guards in handlers and services
+  - the **queries** (sqlc files, or the SQL strings passed to pgx or `database/sql`, or the ORM
+    calls) — what is read and written
+  - the **validation** — `Validate()` methods, `go-playground/validator` struct tags, explicit
+    `if` guards in handlers and services, and sentinel domain errors
+    (`var ErrNameRequired = errors.New(...)`) with the handler branch that maps each one
+  - the **handler tests** (`httptest`) that drive this cluster's flows — they show the
+    intended behavior and each alternative flow the author thought of
 
   Do not paraphrase intent — describe what the code actually does.
 - Every Main Success Scenario step, Alternative Flow, and Business Rule must cite a concrete
   `file:line`. "The system validates the email" is not acceptable without pointing at the
-  `Validate()` check, the struct tag, or the guard that does it.
+  `Validate()` check, the struct tag, the guard, or the service check that returns the
+  sentinel error.
 - An error mapping in a handler is evidence for an Alternative Flow: e.g. `errors.Is(err,
   ErrNotFound)` → `404` is a flow; a `422` re-render with field errors is a flow. Cite both
   the service error and the handler branch.

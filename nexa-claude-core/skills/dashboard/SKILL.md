@@ -147,6 +147,11 @@ Copy both templates verbatim into `docs/overview/`:
 Do not modify them. They read `manifest.json` at load time, so a data change needs no page
 change. A later plugin update may bring fixes to them.
 
+The page opens on an overview of all clusters. Each cluster shows a grid of use case cards. A
+card is marked **Implemented** or **Not implemented** from `delivered`, and links to the
+specification, the design, the acceptance tests, and the delivery log. A use case page shows these
+in tabs: Specification, Design, Acceptance tests, Delivery Log.
+
 Create `docs/index.html` if it does not exist:
 
 ```html
@@ -196,8 +201,13 @@ Name any use case that has no cluster, and any technical task with no **Scope** 
 1. `docs/overview/manifest.json` parses as JSON.
 2. Every use case in `docs/use_cases/` appears exactly once — in a cluster or under Unclustered.
 3. Every technical task in `docs/technical_tasks/` appears exactly once.
-4. Opening `docs/overview/index.html` shows the clusters in the sidebar, with a delivered count
-   on each.
-5. A use case whose `uc('UC-XXX')` tag appears in a spec file shows a link to every such file; one with no tagged spec shows none.
-6. A use case with `ui: false` shows the no-user-interface line, not a broken design link.
-7. `docs/index.html` redirects to the overview.
+4. Opening `docs/overview/index.html` shows every cluster on the overview, with a card for each
+   of its use cases, and a delivered count on each cluster in the sidebar.
+5. A card with `delivered: true` says **Implemented**. Every other card says **Not implemented**.
+6. The **Design** link on a card with a design opens the use case on the Design tab, and the tab
+   shows the design. A card with `ui: false` says **No screen**, not a broken design link.
+7. A use case whose `uc('UC-XXX')` tag appears in a spec file lists every such file on its
+   Acceptance tests tab; one with no tagged spec has no such tab.
+8. At a 375 px width the sidebar hides behind the menu button and the page does not scroll
+   sideways.
+9. `docs/index.html` redirects to the overview.

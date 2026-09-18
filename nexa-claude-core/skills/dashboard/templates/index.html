@@ -5,115 +5,184 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Overview</title>
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #ffffff; --panel: #f7f8fa; --border: #e2e5ea; --text: #1a1d23;
-  --muted: #666e7a; --accent: #2563eb; --done: #157f4b; --done-bg: #e6f4ec;
-  --open: #8a6d00; --open-bg: #fdf5d9; --radius: 8px;
+  --bg: #f8f9fb; --card-bg: #ffffff; --panel: #f8fafc; --text: #1e293b; --muted: #64748b;
+  --border: #e2e8f0; --accent: #3b82f6; --red: #ef4444;
+  --done: #10b981; --done-bg: #ecfdf5; --done-text: #065f46;
+  --open: #94a3b8; --open-bg: #f1f5f9; --open-text: #475569;
+  --sidebar-bg: #1a1d23; --sidebar-text: #b0b8c9; --sidebar-hover: #2a2e37; --sidebar-active: #3b82f6;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,.1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14171c; --panel: #1c2027; --border: #2c323b; --text: #e6e9ee;
-    --muted: #99a1ad; --accent: #6b9bff; --done: #55d093; --done-bg: #13301f;
-    --open: #e0bd4a; --open-bg: #332b0f;
+    --bg: #14171c; --card-bg: #1c2027; --panel: #20252d; --text: #e6e9ee; --muted: #99a1ad;
+    --border: #2c323b; --accent: #6b9bff;
+    --done: #55d093; --done-bg: #13301f; --done-text: #8fe3b6;
+    --open: #6b7482; --open-bg: #262b33; --open-text: #b5bdc9;
+    --sidebar-bg: #0f1115; --sidebar-hover: #1f232a;
+    --shadow: none; --shadow-lg: 0 4px 12px rgba(0,0,0,.4);
   }
 }
-* { box-sizing: border-box; }
 body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  display: flex; min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh;
 }
 a { color: var(--accent); }
 
 /* Sidebar */
-#sidebar {
-  width: 290px; flex: 0 0 290px; background: var(--panel);
-  border-right: 1px solid var(--border); padding: 20px 0; overflow-y: auto;
-  height: 100vh; position: sticky; top: 0;
+.sidebar {
+  width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text);
+  position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; z-index: 100;
+  transition: transform .3s ease;
 }
-#sidebar h1 { font-size: 16px; margin: 0 20px 4px; }
-#sidebar .sub { margin: 0 20px 18px; color: var(--muted); font-size: 12px; }
-.section { margin: 0 0 6px; }
-.section > .section-title {
-  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--muted); padding: 12px 20px 6px; font-weight: 600;
+.sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.sidebar-header h1 { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.sidebar-header p { font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-section-title {
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
+  color: rgba(255,255,255,.35); padding: 0 8px; margin-bottom: 6px;
 }
-.cluster > summary {
-  list-style: none; cursor: pointer; padding: 7px 20px;
-  display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px;
+  cursor: pointer; font-size: 13px; color: var(--sidebar-text); user-select: none;
+  width: 100%; background: none; border: 0; font-family: inherit; text-align: left;
 }
-.cluster > summary::-webkit-details-marker { display: none; }
-.cluster > summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
-.cluster[open] > summary::before { content: "▾"; }
-.cluster > summary:hover { background: var(--border); }
-.count { margin-left: auto; font-weight: 500; font-size: 12px; color: var(--muted); }
-.count.complete { color: var(--done); }
-.item {
-  display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
-  background: none; border: 0; color: inherit; font: inherit;
-  padding: 5px 20px 5px 40px; cursor: pointer;
+.nav-item:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+.nav-item.active { background: rgba(59,130,246,.15); color: var(--sidebar-active); font-weight: 500; }
+.nav-item .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.nav-item .icon { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.nav-item .nid { font-variant-numeric: tabular-nums; opacity: .7; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600;
+  background: rgba(59,130,246,.2); color: var(--sidebar-active); flex-shrink: 0;
+  max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.item:hover { background: var(--border); }
-.item.active { background: var(--border); font-weight: 600; }
-.item .id { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
-.item.done .dot { background: var(--done); }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .55; flex: 0 0 7px; }
-.item .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.subhead { padding: 8px 20px 2px 40px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.nav-item .badge.complete { background: rgba(16,185,129,.2); color: #10b981; }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #64748b; flex-shrink: 0; }
+.dot.done { background: #10b981; border-color: #10b981; }
 
 /* Main */
-#main { flex: 1; min-width: 0; padding: 32px 40px; }
-#main h2 { margin: 0 0 6px; font-size: 24px; }
-.meta { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
-.badge {
-  display: inline-block; padding: 2px 9px; border-radius: 999px;
-  font-size: 12px; font-weight: 600; background: var(--open-bg); color: var(--open);
+.main { margin-left: 280px; padding: 32px 40px; max-width: 1120px; min-width: 0; }
+.page-header { margin-bottom: 24px; }
+.page-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.page-header p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.page-header .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+h3 { font-size: 16px; margin: 28px 0 10px; }
+.cluster-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 28px 0 10px; }
+.cluster-head h3 { margin: 0; cursor: pointer; }
+.cluster-head h3:hover { color: var(--accent); }
+.cluster-head span { color: var(--muted); font-size: 13px; }
+
+/* Status pills */
+.status {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500;
+  padding: 3px 10px; border-radius: 12px; background: var(--open-bg); color: var(--open-text); white-space: nowrap;
 }
-.badge.done { background: var(--done-bg); color: var(--done); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.status .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--open); }
+.status.done { background: var(--done-bg); color: var(--done-text); }
+.status.done .status-dot { background: var(--done); }
+.spec-status { font-size: 11px; color: var(--muted); }
+
+/* Use case cards */
+.uc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 8px; }
+.uc-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--open);
+  border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all .15s ease;
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+}
+.uc-card.done { border-left-color: var(--done); }
+.uc-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); }
+.uc-card.done:hover { border-left-color: var(--done); }
+.uc-card .uc-id { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: .03em; }
+.uc-card .uc-name { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.uc-card .uc-status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.uc-links { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; font-size: 12px; }
+.uc-link { color: var(--accent); cursor: pointer; }
+.uc-link:hover { text-decoration: underline; }
+.uc-note { color: var(--muted); }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
 .chip {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 999px;
-  padding: 2px 10px; font-size: 12px; font-variant-numeric: tabular-nums;
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 999px;
+  padding: 1px 10px; font-size: 12px; color: var(--text); cursor: pointer; font-variant-numeric: tabular-nums;
 }
-.links { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 26px; }
-.links a, .note {
-  display: inline-block; padding: 7px 14px; border-radius: var(--radius);
-  border: 1px solid var(--border); background: var(--panel);
-  text-decoration: none; font-size: 14px;
+.chip.done { border-color: var(--done); }
+.chip:hover { border-color: var(--accent); }
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); margin: 20px 0 16px; overflow-x: auto; }
+.tab {
+  padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer;
+  border: 0; border-bottom: 2px solid transparent; background: none; font-family: inherit; white-space: nowrap;
 }
-.links a:hover { border-color: var(--accent); }
-.note { color: var(--muted); }
-table { border-collapse: collapse; width: 100%; margin: 8px 0 26px; font-size: 14px; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.note { color: var(--muted); font-size: 14px; margin: 8px 0; }
+
+/* Content frames */
+.content-frame-container { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; background: var(--card-bg); }
+.content-frame-toolbar {
+  background: var(--panel); border-bottom: 1px solid var(--border); padding: 8px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--muted);
+}
+.content-frame-toolbar a { text-decoration: none; font-weight: 500; white-space: nowrap; }
+.content-frame { width: 100%; min-height: 400px; border: none; display: block; background: var(--card-bg); }
+.content-frame.design { height: 75vh; }
+
+/* Tables and lists */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); }
 th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 td.id { font-variant-numeric: tabular-nums; white-space: nowrap; }
-iframe { width: 100%; height: 78vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
-pre { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; overflow-x: auto; font-size: 13px; }
-.empty { color: var(--muted); }
-#toggle {
-  display: none; position: fixed; top: 12px; left: 12px; z-index: 10;
-  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 7px 11px; cursor: pointer; color: inherit; font: inherit;
+tr.link { cursor: pointer; }
+tr.link:hover td { background: var(--panel); }
+.file-list { list-style: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); }
+.file-list li { padding: 10px 16px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.file-list li:last-child { border-bottom: 0; }
+.puml-content {
+  background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: var(--radius);
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace; font-size: 13px; white-space: pre-wrap; overflow-x: auto;
 }
-@media (max-width: 860px) {
-  #toggle { display: block; }
-  #sidebar { position: fixed; z-index: 9; height: 100vh; transform: translateX(-100%); transition: transform .2s; }
-  body.nav-open #sidebar { transform: none; }
-  #main { padding: 60px 20px 32px; }
+.empty { color: var(--muted); padding: 40px 0; }
+
+/* Mobile */
+.menu-toggle {
+  display: none; position: fixed; top: 12px; left: 12px; z-index: 200; width: 40px; height: 40px;
+  background: var(--sidebar-bg); color: #fff; border: none; border-radius: 8px; font-size: 20px;
+  cursor: pointer; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);
+}
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 90; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  body.nav-open .sidebar { transform: none; }
+  body.nav-open .sidebar-overlay { display: block; }
+  .menu-toggle { display: flex; }
+  .main { margin-left: 0; padding: 60px 16px 24px; }
+  .uc-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
-<button id="toggle" aria-label="Toggle navigation">☰</button>
-<nav id="sidebar"><h1 id="project">Loading…</h1><p class="sub" id="generated"></p><div id="nav"></div></nav>
-<main id="main"><p class="empty">Loading the manifest…</p></main>
+<button class="menu-toggle" id="toggle" aria-label="Toggle navigation">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header"><h1 id="project">Loading…</h1><p id="generated">Project overview</p></div>
+  <nav id="nav"></nav>
+</aside>
+<main class="main" id="main"><p class="empty">Loading the manifest…</p></main>
 
 <script>
-const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstChild; };
-const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Manifest values become href/src. Allow only relative paths — never javascript:, data:, or an absolute URL.
-const url = (s) => (typeof s === 'string' && !/^[a-z][a-z0-9+.-]*:/i.test(s) && !s.startsWith('//')) ? esc(s) : '';
-let M = null;
+const url = (s) => (typeof s === 'string' && s && !/^[a-z][a-z0-9+.-]*:/i.test(s) && !s.startsWith('//')) ? esc(s) : '';
+const mdUrl = (file) => url(file) ? 'md-viewer.html?file=' + encodeURIComponent(file) : '';
+let M = null, CL = [];
 
 fetch('manifest.json')
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -128,181 +197,217 @@ fetch('manifest.json')
     }
   })
   .catch(e => {
+    if (M) return;
     document.getElementById('main').innerHTML =
       '<h2>No manifest</h2><p class="empty">Could not read <code>manifest.json</code> (' + esc(e.message) +
-      '). Run <code>/dashboard</code> to generate it. Serve this directory over HTTP — opening the file directly blocks the fetch.</p>';
+      '). Run <code>/dashboard</code> to generate it. Serve the project root over HTTP — opening the file directly blocks the fetch.</p>';
   });
+
+const UC = (id) => M.useCases[id] || { name: '(missing)' };
+const TT = (id) => M.technicalTasks[id] || { name: '(missing)' };
+const tests = (uc) => Array.isArray(uc.tests) ? uc.tests : (uc.tests ? [uc.tests] : []);
+const doneCount = (ids) => ids.filter(id => UC(id).delivered).length;
 
 function render() {
   // Normalise once so no call site has to guard. A partial manifest renders empty, never blank.
   M.useCases = M.useCases || {};
   M.technicalTasks = M.technicalTasks || {};
-  M.clusters = M.clusters || [];
   M.documents = M.documents || [];
   M.umbrella = M.umbrella || {};
+  CL = (M.clusters || []).map(c => ({ name: c.name, useCases: c.useCases || [], technicalTasks: c.technicalTasks || [] }));
+  const unclustered = Object.keys(M.useCases).filter(id => !CL.some(c => c.useCases.includes(id)));
+  if (unclustered.length) CL.push({ name: 'Unclustered', useCases: unclustered, technicalTasks: [] });
+
   document.getElementById('project').textContent = M.project || 'Project Overview';
-  document.getElementById('generated').textContent = M.generated ? 'Updated ' + M.generated : '';
-  const nav = document.getElementById('nav');
+  document.title = (M.project ? M.project + ' — ' : '') + 'Project Overview';
+  if (M.generated) document.getElementById('generated').textContent = 'Updated ' + M.generated;
 
-  const clusters = M.clusters || [];
-  const unclustered = Object.keys(M.useCases || {}).filter(id => !clusters.some(c => (c.useCases || []).includes(id)));
-  if (unclustered.length) clusters.push({ name: 'Unclustered', useCases: unclustered, technicalTasks: [] });
-
-  nav.appendChild($('<div class="section-title">Clusters</div>'));
-  clusters.forEach((c, i) => nav.appendChild(clusterNode(c, i === 0)));
-
-  const umb = (M.umbrella && M.umbrella.technicalTasks) || [];
-  if (umb.length) {
-    nav.appendChild($('<div class="section-title">Umbrella</div>'));
-    umb.forEach(id => nav.appendChild(ttNode(id)));
-  }
-
-  nav.appendChild($('<div class="section-title">Documents</div>'));
-  (M.documents || []).forEach(d => {
-    const b = $('<button class="item"><span class="dot"></span><span class="label">' + esc(d.name) + '</span></button>');
-    b.onclick = () => select(b, () => showDoc(d));
-    nav.appendChild(b);
+  let h = '<div class="sidebar-section"><div class="sidebar-section-title">Clusters</div>' +
+    navItem('home', '', '<span class="icon">&#9673;</span><span class="label">Overview</span>');
+  CL.forEach((c, i) => {
+    const done = doneCount(c.useCases);
+    const full = c.useCases.length && done === c.useCases.length;
+    h += navItem('cluster', i, '<span class="icon">&#9881;</span><span class="label">' + esc(c.name) +
+      '</span><span class="badge' + (full ? ' complete' : '') + '">' + done + '/' + c.useCases.length + '</span>');
   });
-  if (M.wireframe) {
-    const b = $('<button class="item"><span class="dot"></span><span class="label">Wireframe</span></button>');
-    b.onclick = () => select(b, () => showFrame('Wireframe', M.wireframe));
-    nav.appendChild(b);
+  h += '</div><div class="sidebar-section"><div class="sidebar-section-title">Use cases</div>';
+  CL.forEach(c => c.useCases.forEach(id => {
+    h += navItem('uc', id, '<span class="dot' + (UC(id).delivered ? ' done' : '') + '"></span><span class="nid">' + esc(id) +
+      '</span><span class="label">' + esc(UC(id).name) + '</span>');
+  }));
+  h += '</div>';
+  const umb = M.umbrella.technicalTasks || [];
+  if (umb.length) {
+    h += '<div class="sidebar-section"><div class="sidebar-section-title">Umbrella</div>';
+    umb.forEach(id => { h += navItem('tt', id, '<span class="dot' + (TT(id).status === 'Done' ? ' done' : '') +
+      '"></span><span class="nid">' + esc(id) + '</span><span class="label">' + esc(TT(id).name) + '</span>'); });
+    h += '</div>';
   }
+  h += '<div class="sidebar-section"><div class="sidebar-section-title">Documents</div>';
+  M.documents.forEach((d, i) => { h += navItem('doc', i, '<span class="icon">&#9776;</span><span class="label">' + esc(d.name) + '</span>'); });
+  if (url(M.wireframe)) h += navItem('wireframe', '', '<span class="icon">&#9634;</span><span class="label">Wireframe</span>');
+  h += '</div>';
+  document.getElementById('nav').innerHTML = h;
 
-  showSummary(clusters);
+  go('home', '');
 }
 
-function clusterNode(c, open) {
-  const ucs = c.useCases || [];
-  const done = ucs.filter(id => (M.useCases[id] || {}).delivered).length;
-  const cls = ucs.length && done === ucs.length ? ' complete' : '';
-  const d = $('<details class="cluster"' + (open ? ' open' : '') + '><summary><span>' + esc(c.name) +
-    '</span><span class="count' + cls + '">' + done + '/' + ucs.length + '</span></summary></details>');
-  d.querySelector('summary').addEventListener('click', () => setTimeout(() => showCluster(c), 0));
-  ucs.forEach(id => d.appendChild(ucNode(id)));
-  const tts = c.technicalTasks || [];
-  if (tts.length) {
-    d.appendChild($('<div class="subhead">Technical tasks</div>'));
-    tts.forEach(id => d.appendChild(ttNode(id)));
-  }
-  return d;
+function navItem(view, id, inner) {
+  return '<button class="nav-item" data-go="' + view + '" data-id="' + esc(id) + '">' + inner + '</button>';
 }
 
-function ucNode(id) {
-  const uc = M.useCases[id] || { name: '(missing)' };
-  const b = $('<button class="item' + (uc.delivered ? ' done' : '') + '"><span class="dot"></span>' +
-    '<span class="id">' + esc(id) + '</span><span class="label">' + esc(uc.name) + '</span></button>');
-  b.onclick = () => select(b, () => showUC(id));
-  return b;
-}
+// Every clickable element carries data-go (and data-id, data-tab). One listener routes them all.
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-go]');
+  if (!el || !M) return;
+  go(el.dataset.go, el.dataset.id, el.dataset.tab);
+});
 
-function ttNode(id) {
-  const tt = (M.technicalTasks || {})[id] || { name: '(missing)' };
-  const done = tt.status === 'Done';
-  const b = $('<button class="item' + (done ? ' done' : '') + '"><span class="dot"></span>' +
-    '<span class="id">' + esc(id) + '</span><span class="label">' + esc(tt.name) + '</span></button>');
-  b.onclick = () => select(b, () => showTT(id));
-  return b;
-}
-
-function select(btn, fn) {
-  document.querySelectorAll('.item.active').forEach(e => e.classList.remove('active'));
-  btn.classList.add('active');
+function go(view, id, tab) {
+  document.querySelectorAll('.nav-item').forEach(n =>
+    n.classList.toggle('active', n.dataset.go === view && n.dataset.id === String(id)));
   document.body.classList.remove('nav-open');
-  fn();
+  if (view === 'home') showHome();
+  else if (view === 'cluster') showCluster(CL[id]);
+  else if (view === 'uc') showUC(id, tab);
+  else if (view === 'tt') showTT(id);
+  else if (view === 'doc') showDoc(M.documents[id]);
+  else if (view === 'wireframe') page('<div class="page-header"><h2>Wireframe</h2></div>' + htmlFrame('Wireframe', M.wireframe));
+  window.scrollTo(0, 0);
 }
 
-function main(html) { document.getElementById('main').innerHTML = html; }
+function page(html) { document.getElementById('main').innerHTML = html; }
 
-function showSummary(clusters) {
-  const rows = clusters.map(c => {
-    const ucs = c.useCases || [];
-    const done = ucs.filter(id => (M.useCases[id] || {}).delivered).length;
-    const tts = (c.technicalTasks || []).join(', ') || '—';
-    return '<tr><td>' + esc(c.name) + '</td><td>' + done + '</td><td>' + ucs.length + '</td><td class="id">' + esc(tts) + '</td></tr>';
-  }).join('');
-  const all = Object.values(M.useCases || {});
-  const del = all.filter(u => u.delivered).length;
-  main('<h2>' + esc(M.project || 'Project') + '</h2><p class="meta">' + del + ' of ' + all.length +
-    ' use cases delivered</p><table><thead><tr><th>Cluster</th><th>Delivered</th><th>Total</th><th>Technical tasks</th></tr></thead><tbody>' +
-    rows + '</tbody></table><p class="empty">Select a use case to see its specification, its design, and its acceptance tests.</p>');
+function pill(uc) {
+  return uc.delivered
+    ? '<span class="status done"><span class="status-dot"></span>Implemented</span>'
+    : '<span class="status"><span class="status-dot"></span>Not implemented</span>' +
+      (uc.status ? '<span class="spec-status">Spec: ' + esc(uc.status) + '</span>' : '');
+}
+
+function card(id) {
+  const uc = UC(id);
+  const link = (tab, label) => '<span class="uc-link" data-go="uc" data-id="' + esc(id) + '" data-tab="' + tab + '">' + label + '</span>';
+  let links = uc.spec ? link('spec', 'Spec') : '';
+  if (uc.ui === false) links += '<span class="uc-note">No screen</span>';
+  else if (url(uc.design)) links += link('design', 'Design');
+  else links += '<span class="uc-note">No design yet</span>';
+  if (tests(uc).length) links += link('tests', 'Tests');
+  if (uc.delivery) links += link('delivery', 'Delivery');
+  return '<div class="uc-card' + (uc.delivered ? ' done' : '') + '" data-go="uc" data-id="' + esc(id) + '">' +
+    '<div class="uc-id">' + esc(id) + '</div><div class="uc-name">' + esc(uc.name) + '</div>' +
+    '<div class="uc-status">' + pill(uc) + '</div><div class="uc-links">' + links + '</div></div>';
+}
+
+function grid(ids) {
+  return ids.length ? '<div class="uc-grid">' + ids.map(card).join('') + '</div>' : '<p class="note">No use cases.</p>';
+}
+
+function showHome() {
+  const all = Object.keys(M.useCases);
+  let h = '<div class="page-header"><h2>' + esc(M.project || 'Project') + '</h2><p>' + doneCount(all) + ' of ' +
+    all.length + ' use cases implemented' + (M.generated ? ' &middot; updated ' + esc(M.generated) : '') + '</p></div>';
+  CL.forEach((c, i) => {
+    h += '<div class="cluster-head"><h3 data-go="cluster" data-id="' + i + '">' + esc(c.name) + '</h3><span>' +
+      doneCount(c.useCases) + ' of ' + c.useCases.length + ' implemented</span></div>' + grid(c.useCases);
+  });
+  if (!CL.length) h += '<p class="empty">No use cases yet.</p>';
+  page(h);
+}
+
+function ttTable(ids) {
+  if (!ids.length) return '';
+  return '<div class="table-wrap"><table><thead><tr><th>ID</th><th>Task</th><th>Status</th></tr></thead><tbody>' +
+    ids.map(id => { const tt = TT(id); return '<tr class="link" data-go="tt" data-id="' + esc(id) + '"><td class="id">' + esc(id) +
+      '</td><td>' + esc(tt.name) + '</td><td><span class="status' + (tt.status === 'Done' ? ' done' : '') +
+      '"><span class="status-dot"></span>' + esc(tt.status || 'Open') + '</span></td></tr>'; }).join('') +
+    '</tbody></table></div>';
 }
 
 function showCluster(c) {
-  const rows = (c.useCases || []).map(id => {
-    const uc = M.useCases[id] || {};
-    return '<tr><td class="id">' + esc(id) + '</td><td>' + esc(uc.name) + '</td><td><span class="badge' +
-      (uc.delivered ? ' done">Delivered' : '">' + esc(uc.status || 'Open')) + '</span></td><td>' +
-      (uc.ui === false ? 'no screen' : (uc.design ? 'design' : '—')) + '</td><td>' +
-      ((Array.isArray(uc.tests) ? uc.tests.length : (uc.tests ? 1 : 0)) ? 'tests' : '—') + '</td></tr>';
-  }).join('');
-  const tts = (c.technicalTasks || []).map(id => {
-    const tt = (M.technicalTasks || {})[id] || {};
-    return '<tr><td class="id">' + esc(id) + '</td><td>' + esc(tt.name) + '</td><td><span class="badge' +
-      (tt.status === 'Done' ? ' done' : '') + '">' + esc(tt.status || 'Open') + '</span></td></tr>';
-  }).join('');
-  main('<h2>' + esc(c.name) + '</h2><table><thead><tr><th>ID</th><th>Use case</th><th>Status</th><th>Design</th><th>Tests</th></tr></thead><tbody>' +
-    (rows || '<tr><td colspan="5" class="empty">No use cases.</td></tr>') + '</tbody></table>' +
-    (tts ? '<h3>Technical tasks</h3><table><thead><tr><th>ID</th><th>Task</th><th>Status</th></tr></thead><tbody>' + tts + '</tbody></table>' : ''));
+  if (!c) return showHome();
+  page('<div class="page-header"><h2>' + esc(c.name) + '</h2><p>' + doneCount(c.useCases) + ' of ' +
+    c.useCases.length + ' use cases implemented</p></div>' + grid(c.useCases) +
+    (c.technicalTasks.length ? '<h3>Technical tasks</h3>' + ttTable(c.technicalTasks) : ''));
 }
 
-function showUC(id) {
-  const uc = M.useCases[id] || {};
-  const deps = (uc.dependsOn || []).length
-    ? '<div class="chips">' + uc.dependsOn.map(d => '<span class="chip">' + esc(d) + '</span>').join('') + '</div>'
-    : '<span class="empty">None — this use case can be delivered on its own.</span>';
-  let links = '';
-  if (uc.spec) links += '<a href="md-viewer.html?file=' + encodeURIComponent(uc.spec) + '" target="_blank">Specification</a>';
-  if (uc.ui === false) links += '<span class="note">No user interface — this use case has no screen.</span>';
-  else if (uc.design) links += '<a href="' + url(uc.design) + '" target="_blank">Design</a>';
-  else links += '<span class="note">Design not created yet.</span>';
-  // tests is a list — a use case can be covered by several spec files, and two can share one.
-  const tests = Array.isArray(uc.tests) ? uc.tests : (uc.tests ? [uc.tests] : []);
-  if (tests.length) tests.forEach((t, i) => {
-    links += '<a href="' + url(t) + '" target="_blank">Acceptance tests' +
-             (tests.length > 1 ? ' (' + (i + 1) + ')' : '') + '</a>';
-  });
-  else links += '<span class="note">Acceptance tests appear once the use case is delivered.</span>';
-  if (uc.delivery) links += '<a href="md-viewer.html?file=' + encodeURIComponent(uc.delivery) + '" target="_blank">Delivery log</a>';
+function showUC(id, tab) {
+  const uc = UC(id);
+  const t = tests(uc);
+  const tabs = [
+    { key: 'spec', label: 'Specification', show: !!uc.spec },
+    { key: 'design', label: 'Design', show: uc.ui !== false && !!url(uc.design) },
+    { key: 'tests', label: 'Acceptance tests', show: t.length > 0 },
+    { key: 'delivery', label: 'Delivery Log', show: !!uc.delivery },
+  ].filter(x => x.show);
+  const cur = tabs.find(x => x.key === tab) || tabs[0];
 
-  main('<h2>' + esc(id) + ' — ' + esc(uc.name) + '</h2>' +
-    '<p class="meta"><span class="badge' + (uc.delivered ? ' done">Delivered' : '">' + esc(uc.status || 'Open')) + '</span></p>' +
-    '<h3>Depends on</h3>' + deps + '<div class="links">' + links + '</div>' +
-    (uc.ui !== false && uc.design ? '<iframe src="' + url(uc.design) + '" title="Design"></iframe>' : ''));
+  const deps = (uc.dependsOn || []).length
+    ? uc.dependsOn.map(d => '<span class="chip' + (UC(d).delivered ? ' done' : '') + '" data-go="uc" data-id="' + esc(d) + '">' + esc(d) + '</span>').join('')
+    : 'none';
+  let note = '';
+  if (uc.ui === false) note = '<p class="note">No user interface — this use case has no screen.</p>';
+  else if (!url(uc.design)) note = '<p class="note">Design not created yet.</p>';
+  if (!t.length) note += '<p class="note">Acceptance tests appear once the use case is delivered.</p>';
+
+  let body = '';
+  if (!cur) body = '<p class="empty">No files for this use case.</p>';
+  else if (cur.key === 'spec') body = mdFrame(id + ' Specification', uc.spec);
+  else if (cur.key === 'design') body = htmlFrame(id + ' Screen Design', uc.design);
+  else if (cur.key === 'delivery') body = mdFrame(id + ' Delivery Log', uc.delivery);
+  // Test files are code, not markdown — link to them. A use case can have several, and two can share one.
+  else if (cur.key === 'tests') body = '<ul class="file-list">' + t.map(f => '<li>' +
+    (url(f) ? '<a href="' + url(f) + '" target="_blank">' + esc(f.replace(/^(\.\.\/)+/, '')) + '</a>' : esc(f)) + '</li>').join('') + '</ul>';
+
+  page('<div class="page-header"><h2>' + esc(id) + ': ' + esc(uc.name) + '</h2><div class="row">' + pill(uc) +
+    '</div><div class="row chips">Depends on: ' + deps + '</div></div>' + note +
+    '<div class="tabs">' + tabs.map(x => '<button class="tab' + (x === cur ? ' active' : '') + '" data-go="uc" data-id="' +
+      esc(id) + '" data-tab="' + x.key + '">' + x.label + '</button>').join('') + '</div>' + body);
 }
 
 function showTT(id) {
-  const tt = (M.technicalTasks || {})[id] || {};
-  main('<h2>' + esc(id) + ' — ' + esc(tt.name) + '</h2>' +
-    '<p class="meta"><span class="badge' + (tt.status === 'Done' ? ' done' : '') + '">' + esc(tt.status || 'Open') +
-    '</span> · Scope: ' + esc(tt.scope || 'undeclared') + '</p>' +
-    (tt.spec ? '<iframe src="md-viewer.html?file=' + encodeURIComponent(tt.spec) + '" title="Task"></iframe>' : ''));
+  const tt = TT(id);
+  page('<div class="page-header"><h2>' + esc(id) + ': ' + esc(tt.name) + '</h2><div class="row"><span class="status' +
+    (tt.status === 'Done' ? ' done' : '') + '"><span class="status-dot"></span>' + esc(tt.status || 'Open') +
+    '</span><span class="spec-status">Scope: ' + esc(tt.scope || 'undeclared') + '</span></div></div>' +
+    (tt.spec ? mdFrame(id + ' Technical Task', tt.spec) : ''));
 }
 
 function showDoc(d) {
+  if (!d) return showHome();
+  const head = '<div class="page-header"><h2>' + esc(d.name) + '</h2></div>';
   if (/\.puml$/i.test(d.file)) {
-    main('<h2>' + esc(d.name) + '</h2><pre id="puml" class="empty">Loading…</pre>');
-    fetch(d.file).then(r => r.text())
-      .then(t => { const p = document.getElementById('puml'); p.className = ''; p.textContent = t; })
-      .catch(() => { document.getElementById('puml').textContent = 'Could not read ' + d.file; });
+    page(head + '<div class="puml-content" id="puml">Loading…</div>');
+    if (!url(d.file)) return;
+    fetch(d.file).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(t => { document.getElementById('puml').textContent = t; })
+      .catch(e => { document.getElementById('puml').textContent = 'Could not read ' + d.file + ' (' + e.message + ')'; });
     return;
   }
-  if (/\.html?$/i.test(d.file)) return showFrame(d.name, d.file);
-  main('<h2>' + esc(d.name) + '</h2><iframe src="md-viewer.html?file=' + encodeURIComponent(d.file) + '" title="' + esc(d.name) + '"></iframe>');
+  page(head + (/\.html?$/i.test(d.file) ? htmlFrame(d.name, d.file) : mdFrame(d.name, d.file)));
 }
 
-function showFrame(title, file) {
-  main('<h2>' + esc(title) + '</h2><iframe src="' + url(file) + '" title="' + esc(title) + '"></iframe>');
+function frame(label, src, cls) {
+  if (!src) return '<p class="note">Could not open ' + esc(label) + '.</p>';
+  return '<div class="content-frame-container"><div class="content-frame-toolbar"><span>' + esc(label) +
+    '</span><a href="' + src + '" target="_blank">Open in new tab &#8599;</a></div>' +
+    '<iframe class="content-frame' + cls + '" src="' + src + '" title="' + esc(label) + '"></iframe></div>';
 }
+const mdFrame = (label, file) => frame(label, mdUrl(file), '');
+const htmlFrame = (label, file) => frame(label, url(file), ' design');
 
-// The markdown viewer posts its height; grow the iframe to fit instead of scrolling inside it.
+// The markdown viewer posts its height; grow its iframe to fit instead of scrolling inside it.
+// Use the height as posted: the viewer measures scrollHeight, which is never less than the frame,
+// so any extra padding here makes the viewer report a taller frame on every resize, without end.
 addEventListener('message', (e) => {
   if (!e.data || e.data.type !== 'md-viewer-height' || !Number.isFinite(e.data.height)) return;
-  const frame = document.querySelector('#main iframe[src^="md-viewer.html"]');
-  if (frame) frame.style.height = (e.data.height + 24) + 'px';
+  for (const f of document.querySelectorAll('.content-frame')) {
+    if (f.contentWindow === e.source) { f.style.height = e.data.height + 'px'; break; }
+  }
 });
 
 document.getElementById('toggle').onclick = () => document.body.classList.toggle('nav-open');
+document.getElementById('overlay').onclick = () => document.body.classList.remove('nav-open');
 </script>
 </body>
 </html>

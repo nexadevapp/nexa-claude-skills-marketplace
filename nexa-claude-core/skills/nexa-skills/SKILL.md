@@ -95,8 +95,13 @@ nexa-claude-marketplace/
 ├── nexa-claude-audit/                   # Repository audit plugin (any stack)
 │   ├── .claude-plugin/
 │   │   └── plugin.json
+│   ├── shared/                   # AUDIT_CONTRACT.md (shared by all audit skills)
 │   └── skills/
-│       └── software-engineering-report/
+│       ├── qa-audit/
+│       ├── requirements-traceability-audit/
+│       ├── architecture-audit/
+│       ├── infra-audit/
+│       └── cicd-audit/
 └── README.md
 ```
 
@@ -265,4 +270,8 @@ These are the subtle errors that look like productivity but create problems:
 
 | Phase        | Skill (slash command)          | Description                                                        |
 |--------------|--------------------------------|--------------------------------------------------------------------|
-| Reporting    | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: traceability, test pyramid, architecture diagrams, infrastructure, CI/CD. Explicit invocation only |
+| Reporting    | `/qa-audit` | Inventory every test and put it in one category (unit, integration, E2E, misc); smoke tags; skipped tests. Explicit invocation only |
+| Reporting    | `/requirements-traceability-audit` | Use case catalog, use case → test matrix by explicit ID, gaps, external references. Explicit invocation only |
+| Reporting    | `/architecture-audit` | Existing docs and ADRs; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace. Explicit invocation only |
+| Reporting    | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure. Explicit invocation only |
+| Reporting    | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps. Explicit invocation only |

@@ -7,7 +7,7 @@ The marketplace has a **two-layer architecture**:
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and parallel delivery. Requires `nexa-claude-core`.
 - **`nexa-claude-go`** — the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL): the same pipeline for Go. Requires `nexa-claude-core`.
-- **`nexa-claude-audit`** — a dated software engineering report for any repository, Nexa or not. Standalone.
+- **`nexa-claude-audit`** — five read-only audits (QA, requirements traceability, architecture, infrastructure, CI/CD) for any repository, Nexa or not. Each writes a dated report. Standalone.
 
 ---
 
@@ -20,7 +20,7 @@ Install directly from inside Claude Code:
 /plugin install nexa-claude-core
 /plugin install nexa-claude-nextjs        # optional — only if you build on Next.js
 /plugin install nexa-claude-go            # optional — only if you build on Go
-/plugin install nexa-claude-audit         # optional — software engineering report for any repository
+/plugin install nexa-claude-audit         # optional — audit reports for any repository
 ```
 
 Once installed, the skills are available as slash commands and the agent will suggest the right one for each task. You don't need to memorize them — describe what you want, and Claude routes you to the correct skill.
@@ -131,7 +131,13 @@ Audits any repository, whatever its stack, and whether or not it follows the Nex
 
 | Phase | Command | Description |
 |---|---|---|
-| **Reporting** | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: requirements traceability, the testing pyramid, existing architecture documents, generated C4 / 4+1 / sequence / ER diagrams in Mermaid, infrastructure, and CI/CD. Runs only when you invoke it |
+| **Reporting** | `/qa-audit` | Inventory every test and put it in one category (unit, integration, E2E, misc); smoke tags; skipped tests |
+| **Reporting** | `/requirements-traceability-audit` | Use case catalog, use case → test matrix by explicit ID, gaps, external references |
+| **Reporting** | `/architecture-audit` | Existing docs and ADRs; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace |
+| **Reporting** | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure |
+| **Reporting** | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps |
+
+Each skill runs only when you invoke it, reads the repository only, and writes one new report to `docs/audit/<skill>/<skill>-YYYY-MM-DD-<short-hash>.md`. The shared rules are in [`nexa-claude-audit/shared/AUDIT_CONTRACT.md`](nexa-claude-audit/shared/AUDIT_CONTRACT.md).
 
 ---
 

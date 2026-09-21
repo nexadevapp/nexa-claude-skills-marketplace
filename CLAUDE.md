@@ -83,8 +83,13 @@ nexa-claude-marketplace/
 ├── nexa-claude-audit/                   # Repository audit plugin (any stack)
 │   ├── .claude-plugin/
 │   │   └── plugin.json
+│   ├── shared/                   # AUDIT_CONTRACT.md (shared by all audit skills)
 │   └── skills/
-│       └── software-engineering-report/
+│       ├── qa-audit/
+│       ├── requirements-traceability-audit/
+│       ├── architecture-audit/
+│       ├── infra-audit/
+│       └── cicd-audit/
 └── README.md
 ```
 
@@ -95,7 +100,7 @@ nexa-claude-marketplace/
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
 - **nexa-claude-go** — Stack-specific: implementation, testing, and delivery for the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL). Requires nexa-claude-core.
-- **nexa-claude-audit** — Stack-agnostic repository audit: a dated software engineering report for any repository. Standalone; does not require nexa-claude-core.
+- **nexa-claude-audit** — Stack-agnostic repository audit: five read-only skills, each writes a dated report to `docs/audit/<skill>/`. Standalone; does not require nexa-claude-core.
 
 ### Marketplace Configuration
 
@@ -191,7 +196,11 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 
 | Phase        | Skill (slash command)          | Description                                                        |
 |--------------|--------------------------------|--------------------------------------------------------------------|
-| Reporting    | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: traceability, test pyramid, architecture diagrams, infrastructure, CI/CD. Explicit invocation only |
+| Reporting    | `/qa-audit` | Inventory every test and put it in one category (unit, integration, E2E, misc); smoke tags; skipped tests. Explicit invocation only |
+| Reporting    | `/requirements-traceability-audit` | Use case catalog, use case → test matrix by explicit ID, gaps, external references. Explicit invocation only |
+| Reporting    | `/architecture-audit` | Existing docs and ADRs; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace. Explicit invocation only |
+| Reporting    | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure. Explicit invocation only |
+| Reporting    | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps. Explicit invocation only |
 
 ## Shared gate files (cross-plugin sync)
 
@@ -200,6 +209,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 - **`nexa-claude-core/shared/` is the single source of truth.** Never edit the copies under a stack plugin's `shared/`.
 - To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated stack copies.
 - Exception: `<stack>/shared/readiness/PROJECT_READINESS.md` is owned by each stack plugin (no core counterpart) and is edited there directly.
+- Exception: `nexa-claude-audit/shared/AUDIT_CONTRACT.md` is owned by the audit plugin (no core counterpart, not synced) and is edited there directly.
 - Stack plugins are discovered as every `nexa-claude-*/` directory except core. The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in each stack's skills — no hand-maintained manifest.
 
 ## Commands

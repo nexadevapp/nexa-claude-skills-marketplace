@@ -5,7 +5,9 @@ description: >
   the AI agent from bypassing the methodology. Ensures the agent never skips the
   requirements-to-spec pipeline, never proposes jumping straight to implementation,
   always checks for duplicate use cases, and always uses the next available use case
-  number. Run once at project inception; re-run if rules need updating.
+  number. Also installs the delivery-trail pre-commit gate, which rejects a commit that
+  marks a work item Done without its delivery trail.
+  Run once at project inception; re-run if rules need updating.
   Use when the user asks to "set up project rules", "enforce workflow rules",
   "configure CLAUDE.md rules", "add Nexa rules to the project", or mentions
   project rules, workflow enforcement, or CLAUDE.md setup.
@@ -15,9 +17,9 @@ description: >
 
 ## Instructions
 
-Write Nexa workflow enforcement rules into the target project's `CLAUDE.md` file. These
-rules ensure that the AI agent follows the Nexa Agentic Engineering methodology and never
-bypasses the structured workflow.
+Write Nexa workflow enforcement rules into the target project's `CLAUDE.md` file, and
+install the delivery-trail pre-commit gate. The rules tell the agent what the methodology
+requires; the gate makes one of those requirements impossible to skip.
 
 If `CLAUDE.md` does not exist, create it with the rules section. If it already exists,
 append the rules section — but first check whether a `## Nexa Workflow Rules` section
@@ -36,7 +38,7 @@ Append the following section to the project's `CLAUDE.md`:
 ~~~markdown
 ## Nexa Workflow Rules
 
-<!-- NEXA_RULES_CONFIGURED v2 -->
+<!-- NEXA_RULES_CONFIGURED v3 -->
 
 These rules are enforced by the Nexa Agentic Engineering methodology. Do not remove or
 weaken them.
@@ -111,12 +113,60 @@ under `docs/use_cases/`, `docs/change_requests/`, and `docs/bugs/` — a typo'd
 Legacy specs predating helper adoption may be listed in `e2e/.tracedignore`
 (gitignore-style, one path per line) to opt out of enforcement; new specs must
 not be added to that list.
+
+### Rule 8: A work item reaches Done only with its delivery trail
+
+No use case, technical task, bug, or change request reaches its terminal status
+(`Done`, or `Fixed` for a bug) without `docs/delivery/<ID>-traceability.md` — the
+delivery trail. The trail ties every requirement to the code and the test that proves
+it, and records the decisions taken during delivery that the specification does not
+state.
+
+The `pre-commit` hook enforces this. When it rejects a commit with:
+
+```
+The delivery documents for the task [UC-XXX] are not present
+```
+
+spawn the `delivery-trail` agent with that ID, let it write the trail, stage the file,
+and commit again. Never use `git commit --no-verify` to get past this gate, and never
+write the trail by hand in the main context — the agent reads the diff and the delivery
+log that the main context has already compacted away.
 ~~~
 
 ## Marker
 
-The HTML comment `<!-- NEXA_RULES_CONFIGURED v2 -->` inside the `## Nexa Workflow Rules`
+The HTML comment `<!-- NEXA_RULES_CONFIGURED v3 -->` inside the `## Nexa Workflow Rules`
 section serves as the machine-readable marker that the Nexa Rules Gate checks for.
+
+## The Delivery Trail Gate
+
+The script `${CLAUDE_PLUGIN_ROOT}/skills/setup-project-rules/hooks/delivery-trail.sh` is the
+pre-commit gate for Rule 8. It reads the **staged** content of every spec file in the commit,
+and rejects the commit when a spec carries a terminal status and its
+`docs/delivery/<ID>-traceability.md` is not in the index.
+
+Install it into the target project:
+
+1. Copy the script to `.nexa/hooks/delivery-trail.sh` and `chmod +x` it. Overwrite an
+   existing copy — the plugin owns this file.
+2. Find the project's hook manager, in this order: `lefthook.yml` / `lefthook.yaml`,
+   `.pre-commit-config.yaml`, `git config core.hooksPath`, `.husky/`. None found → plain
+   git hooks in `.githooks/`, and set `git config core.hooksPath .githooks`.
+3. Wire one line into that manager's `pre-commit` stage, inside a block marked
+   `# nexa: delivery-trail` so a re-run replaces it and nothing else:
+   ```sh
+   bash .nexa/hooks/delivery-trail.sh
+   ```
+   For lefthook, add a `nexa-delivery-trail` command under `pre-commit.commands`. For
+   `pre-commit`, add a `repo: local` hook with `language: system` and
+   `entry: bash .nexa/hooks/delivery-trail.sh`, `pass_filenames: false`.
+4. Create the hook file executable (`chmod +x`) when you create it, and never touch any
+   other hook manager's configuration beyond the marked block.
+
+The gate is committed to the project, so every clone and every parallel worktree runs it.
+A fresh clone of a `.githooks/` project still needs `git config core.hooksPath .githooks` —
+say so in the summary.
 
 ## Workflow
 
@@ -130,13 +180,19 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
      everything from that heading down to the next heading of the same level (or the end of the
      file) and put the new section there. Never append a second one.
    - If no such section exists, append the new section to the end of the file.
-5. Verify:
-   - The marker `<!-- NEXA_RULES_CONFIGURED v2 -->` is present
+5. Install the delivery trail gate — see "The Delivery Trail Gate" above
+6. Verify:
+   - The marker `<!-- NEXA_RULES_CONFIGURED v3 -->` is present
    - `## Nexa Workflow Rules` appears **exactly once**
    - The words `sprint branch` and `/sprint-` appear nowhere in the file. A project that
      previously ran an older version of this skill carries the sprint-branch rule; leaving it
      behind means the agent reads a rule that points at deleted skills
-6. Inform the user:
+   - The gate runs and passes on a clean tree: `bash .nexa/hooks/delivery-trail.sh`
+   - The gate actually fires: stage a spec edited to `| **Status** | Done |` whose trail does
+     not exist, run the hook, confirm it prints
+     `The delivery documents for the task [<ID>] are not present`, then restore the spec.
+     A gate nobody has seen fail is a gate nobody knows is wired
+7. Inform the user:
    ```
    ## Nexa Workflow Rules — Configured
 
@@ -149,6 +205,10 @@ section serves as the machine-readable marker that the Nexa Rules Gate checks fo
    5. Always use the next available sequential number
    6. Never write code on main/master — use a work item worktree
    7. E2E tests must be tagged via the traceability helper (uc() on test.describe, meta() on test, bug() for pure regressions)
+   8. A work item reaches Done only with its delivery trail
 
-   These rules are enforced by the Nexa Rules Gate on every skill invocation.
+   Rules 1-7 are enforced by the Nexa Rules Gate on every skill invocation.
+   Rule 8 is enforced by the pre-commit hook [hook location], which runs
+   .nexa/hooks/delivery-trail.sh. When it rejects a commit, run the delivery-trail
+   agent for the named ID.
    ```

@@ -133,6 +133,8 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Verification | `/report-bug`         | Create structured bug report documents                             |
 | Verification | `/change-request`     | Create structured change request documents for intentional modifications to implemented use cases |
 
+The `delivery-trail` agent (`nexa-claude-core/agents/delivery-trail.md`) writes `docs/delivery/<ID>-traceability.md`. `/setup-project-rules` installs the pre-commit gate that requires it before a work item reaches Done.
+
 ### Next.js (stack-specific)
 
 | Phase        | Skill (slash command)   | Description                                                        |
@@ -195,6 +197,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 This is a markdown plugin repo — there is no build, compile, or unit-test step. The one verification command:
 
 - `scripts/sync-shared.sh` — sync core shared files into every stack plugin.
+- `scripts/test-hooks.sh` — run every `*.test.sh` under a `hooks/` directory (the plan-saving hook, the delivery-trail pre-commit gate).
 - `scripts/sync-shared.sh --check` — verify no drift and no dangling `shared/...` references. Run this before committing changes to any `shared/` file or stack plugin skill; CI (`.github/workflows/sync-shared.yml`) runs it on every PR.
 
 To test a skill, install the repo as a local marketplace (`/plugin marketplace add /path/to/this/repo`), install the plugin, and invoke the slash command. See `CONTRIBUTING.md`.
@@ -203,7 +206,7 @@ To test a skill, install the repo as a local marketplace (`/plugin marketplace a
 
 Beyond `skills/`, each plugin may contain:
 
-- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-nextjs/agents/playwright-test.md`, `nexa-claude-go/agents/playwright-test.md`).
+- `agents/` — subagent definitions for skills that run in isolation (e.g. `nexa-claude-core/agents/evaluate.md`, `nexa-claude-core/agents/delivery-trail.md`, `nexa-claude-nextjs/agents/playwright-test.md`, `nexa-claude-go/agents/playwright-test.md`).
 - `hooks/` — e.g. `nexa-claude-core/hooks/` registers a `SessionStart` hook.
 - `.mcp.json` — MCP servers (core: context7; nextjs and go: Playwright).
 

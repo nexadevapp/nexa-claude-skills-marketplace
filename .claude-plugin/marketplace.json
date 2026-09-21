@@ -23,6 +23,12 @@
       "source": "./nexa-claude-go",
       "description": "Nexa Agentic Engineering plugin for the Go stack (net/http, templ, htmx, sqlc, goose)",
       "license": "Apache-2.0"
+    },
+    {
+      "name": "nexa-claude-audit",
+      "source": "./nexa-claude-audit",
+      "description": "Nexa Agentic Engineering audit plugin: a dated software engineering report for any repository",
+      "license": "Apache-2.0"
     }
   ]
 }

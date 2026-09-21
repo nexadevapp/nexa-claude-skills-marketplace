@@ -7,6 +7,7 @@ The marketplace has a **two-layer architecture**:
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and parallel delivery. Requires `nexa-claude-core`.
 - **`nexa-claude-go`** — the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL): the same pipeline for Go. Requires `nexa-claude-core`.
+- **`nexa-claude-audit`** — a dated software engineering report for any repository, Nexa or not. Standalone.
 
 ---
 
@@ -19,6 +20,7 @@ Install directly from inside Claude Code:
 /plugin install nexa-claude-core
 /plugin install nexa-claude-nextjs        # optional — only if you build on Next.js
 /plugin install nexa-claude-go            # optional — only if you build on Go
+/plugin install nexa-claude-audit         # optional — software engineering report for any repository
 ```
 
 Once installed, the skills are available as slash commands and the agent will suggest the right one for each task. You don't need to memorize them — describe what you want, and Claude routes you to the correct skill.
@@ -32,6 +34,7 @@ New commits to this repo are picked up as new versions automatically (the git co
 /plugin update nexa-claude-core
 /plugin update nexa-claude-nextjs
 /plugin update nexa-claude-go
+/plugin update nexa-claude-audit
 ```
 
 If a skill still looks stale after updating (a known, still-open Claude Code plugin-cache bug — see [#14061](https://github.com/anthropics/claude-code/issues/14061) and [#17361](https://github.com/anthropics/claude-code/issues/17361)), remove the cache and reinstall: `rm -rf ~/.claude/plugins/cache`, then restart Claude Code and re-run the install commands above.
@@ -119,6 +122,16 @@ The same implementation, testing, and delivery pipeline for Go: `net/http` (stdl
 | **Verification** | `/audit` | Deep quality audit: DoD, i18n, accessibility, visual fidelity, htmx loading/error states |
 
 Uses the **Context7** and **Playwright** MCP servers.
+
+---
+
+## `nexa-claude-audit` — Repository Audit
+
+Audits any repository, whatever its stack, and whether or not it follows the Nexa methodology. Does not require `nexa-claude-core`.
+
+| Phase | Command | Description |
+|---|---|---|
+| **Reporting** | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: requirements traceability, the testing pyramid, existing architecture documents, generated C4 / 4+1 / sequence / ER diagrams in Mermaid, infrastructure, and CI/CD. Runs only when you invoke it |
 
 ---
 

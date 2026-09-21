@@ -12,6 +12,7 @@ Which plugin should this live in?
 - [ ] `nexa-claude-core` (stack-agnostic)
 - [ ] `nexa-claude-nextjs` (Next.js stack)
 - [ ] `nexa-claude-go` (Go stack)
+- [ ] `nexa-claude-audit` (repository audit reports)
 - [ ] A new stack plugin
 
 ## Phase

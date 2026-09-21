@@ -9,6 +9,7 @@ The marketplace is a **two-layer** design:
 - **`nexa-claude-core`** — stack-agnostic SDLC methodology (vision → requirements → specs → designs → verification). It must never depend on a specific tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack (implementation, testing, quality, delivery). It builds on `nexa-claude-core`.
 - **`nexa-claude-go`** — the Go stack (`net/http`, templ + htmx, sqlc + goose). Same pipeline as Next.js. It builds on `nexa-claude-core`.
+- **`nexa-claude-audit`** — stack-agnostic repository audit reports. Standalone: it does not depend on `nexa-claude-core`.
 
 When adding a skill, decide which layer it belongs to. Anything stack-specific goes in a stack plugin (`nexa-claude-nextjs`, `nexa-claude-go`, or a future one), never in core.
 
@@ -24,6 +25,8 @@ nexa-claude-nextjs/
   ... same structure ...
 nexa-claude-go/
   ... same structure ...
+nexa-claude-audit/
+  ... same structure (no .mcp.json) ...
 ```
 
 ## Anatomy of a skill
@@ -63,7 +66,7 @@ Do **not** add a `version` field to any `.claude-plugin/plugin.json`. It is omit
 
 1. Add this repo as a local marketplace in Claude Code:
    `/plugin marketplace add /path/to/nexa-claude-skills-marketplace`
-2. Install the plugin you changed: `/plugin install nexa-claude-core` (and/or `nexa-claude-nextjs`, `nexa-claude-go`).
+2. Install the plugin you changed: `/plugin install nexa-claude-core` (and/or `nexa-claude-nextjs`, `nexa-claude-go`, `nexa-claude-audit`).
    - For fast iteration, prefer `claude --plugin-dir /path/to/nexa-claude-skills-marketplace` and `/reload-plugins` after each edit — it loads skills straight from the source tree and sidesteps the directory-source cache staleness that a normal install can hit.
 3. Invoke your skill as a slash command and confirm it behaves as documented.
 4. Make sure no documentation references a skill that no longer exists, and that any new skill appears in `README.md`, `CLAUDE.md`, and the `nexa-skills` orchestrator index.

@@ -92,6 +92,11 @@ nexa-claude-marketplace/
 │       ├── audit/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-audit/                   # Repository audit plugin (any stack)
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   └── skills/
+│       └── software-engineering-report/
 └── README.md
 ```
 
@@ -255,3 +260,9 @@ These are the subtle errors that look like productivity but create problems:
 | Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, htmx loading/error states |
+
+### Audit (any stack)
+
+| Phase        | Skill (slash command)          | Description                                                        |
+|--------------|--------------------------------|--------------------------------------------------------------------|
+| Reporting    | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: traceability, test pyramid, architecture diagrams, infrastructure, CI/CD. Explicit invocation only |

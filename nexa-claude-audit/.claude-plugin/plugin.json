@@ -1,0 +1,10 @@
+{
+  "name": "nexa-claude-audit",
+  "description": "Nexa Agentic Engineering audit plugin: a dated software engineering report for any repository",
+  "author": {
+    "name": "Marius Achim",
+    "email": "marius@nexadev.app",
+    "url": "https://nexadev.app"
+  },
+  "license": "Apache-2.0"
+}

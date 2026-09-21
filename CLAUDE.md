@@ -80,6 +80,11 @@ nexa-claude-marketplace/
 │       ├── audit/
 │       ├── setup-playwright-ci/
 │       └── setup-quality-ci/
+├── nexa-claude-audit/                   # Repository audit plugin (any stack)
+│   ├── .claude-plugin/
+│   │   └── plugin.json
+│   └── skills/
+│       └── software-engineering-report/
 └── README.md
 ```
 
@@ -90,6 +95,7 @@ nexa-claude-marketplace/
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
 - **nexa-claude-go** — Stack-specific: implementation, testing, and delivery for the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL). Requires nexa-claude-core.
+- **nexa-claude-audit** — Stack-agnostic repository audit: a dated software engineering report for any repository. Standalone; does not require nexa-claude-core.
 
 ### Marketplace Configuration
 
@@ -180,6 +186,12 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Construction | `/merge-queue`          | Land every ready branch and approved PR from parallel agents, in dependency order |
 | Construction | `/resolve-bug`          | Orchestrate the bugfix pipeline: reproduce, analyze, link requirements, fix |
 | Verification | `/audit`                | Deep quality audit: DoD, i18n, accessibility, visual fidelity, htmx loading/error states |
+
+### Audit (any stack)
+
+| Phase        | Skill (slash command)          | Description                                                        |
+|--------------|--------------------------------|--------------------------------------------------------------------|
+| Reporting    | `/software-engineering-report` | Add a dated entry to `docs/software-engineering-report.md`: traceability, test pyramid, architecture diagrams, infrastructure, CI/CD. Explicit invocation only |
 
 ## Shared gate files (cross-plugin sync)
 

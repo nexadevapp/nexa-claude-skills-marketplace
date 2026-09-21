@@ -56,19 +56,30 @@ The specification file in `docs/` is the single source of truth. The GitHub issu
 ## After Implementation
 
 1. Re-read the use case specification and the implementation
-2. **Update the Status field** in the specification document to reflect completion:
+2. **Write the delivery trail before any terminal status.** A work item reaches its terminal
+   status (`Done`, or `Fixed` for a bug) only when `docs/delivery/<ID>-traceability.md` exists.
+   Spawn the `delivery-trail` agent with the ID and let it write that file; never write it by
+   hand, and never `git commit --no-verify` past the pre-commit gate that checks it.
+
+   The gate rejects the commit with `The delivery documents for the task [<ID>] are not
+   present` when the trail is missing. That message is the instruction to run the agent.
+
+   A non-terminal status (`Implemented`) needs no trail — the trail is written at the step that
+   advances the item to `Done`.
+
+3. **Update the Status field** in the specification document to reflect completion:
    - For **UC-XXX** (`docs/use_cases/UC-XXX.md`): Set `Status` to `Implemented`
      (evaluation is still pending — the UC pipeline will advance it to `Done` upon successful evaluation)
    - For **TT-XXX** (`docs/technical_tasks/TT-XXX.md`): Set `Status` to `Done`
    - For **BUG-XXX** (`docs/bugs/BUG-XXX.md`): Set `Status` to `Fixed`
    - For **CR-XXX** (`docs/change_requests/CR-XXX.md`): Set `Status` to `Implemented`
      (live doc updates and evaluation still pending — status advances to `Done` once those are complete)
-3. Add a comment summarizing what was implemented:
+4. Add a comment summarizing what was implemented:
    - `gh issue comment <issue-number> --body "Implemented: <brief summary of what was done>"`
-4. If the Definition of Done is satisfied, close the issue:
+5. If the Definition of Done is satisfied, close the issue:
    - `gh issue close <issue-number>`
-5. If the Definition of Done is not yet satisfied, leave the issue open and inform the user what remains
-6. Commit the implementation with the `conventional-commit` skill. That skill owns the message format; this list owns only which type goes with which ID, and the ID always goes in the scope:
+6. If the Definition of Done is not yet satisfied, leave the issue open and inform the user what remains
+7. Commit the implementation with the `conventional-commit` skill. That skill owns the message format; this list owns only which type goes with which ID, and the ID always goes in the scope:
    - **UC** → `feat(UC-XXX): <description>`
    - **TT** → `chore(TT-XXX): <description>`
    - **BUG** → `fix(BUG-XXX): <description>`

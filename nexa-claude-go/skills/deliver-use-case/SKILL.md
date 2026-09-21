@@ -157,7 +157,7 @@ Rules:
 | 3. Mutation Testing | `go test ./...` (only if assertions were added in Phase 2) | `test($ARGUMENTS): kill surviving mutants (NN.N%)` |
 | 4. E2E Tests | `go test -tags=e2e ./e2e/...` verified in main context — `ok`, no `FAIL`, no `SKIP` | `test($ARGUMENTS): e2e coverage` |
 | 5. Coverage Evaluation | gap-fix tests pass the same Step 4 Phase 2 verification | `test($ARGUMENTS): close coverage gaps` |
-| Completion | spec status, traceability report, mutation report written | `docs($ARGUMENTS): mark Done + traceability` |
+| Completion | spec status, delivery trail, mutation report written | `docs($ARGUMENTS): mark Done + delivery trail` |
 
 Step 4 and 5 fix loops may patch implementation code — when they do, re-run Build and
 `go test ./...` before committing (Step 4's fix loop already requires this).
@@ -465,23 +465,25 @@ This is the only point in the workflow where a UC is marked Done — it requires
 passing implementation (set to Implemented by TRACKING.md after implementation) and a
 passing coverage evaluation (this step).
 
-### 2. Traceability Report
+### 2. Delivery Trail
 
-Generate `docs/delivery/$ARGUMENTS-traceability.md`:
+Spawn the `delivery-trail` agent with `$ARGUMENTS`. It writes
+`docs/delivery/$ARGUMENTS-traceability.md` — every requirement traced to the code and the
+test that proves it, plus the decisions taken during this delivery.
 
-```markdown
-# Traceability Report: $ARGUMENTS
+> Write the delivery trail for $ARGUMENTS. Read the spec, `docs/requirements.md`,
+> `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS-mutation.md`, and the
+> branch diff (`git diff main...HEAD`). Follow your operating manual.
 
-| Requirement | Spec Flow | Test File | Verdict |
-|-------------|-----------|-----------|---------|
-| FR-XXX      | MSS Step N| `e2e/ucXXX_test.go:24` | VERIFIED |
-| BR-XXX      | AF-YYY    | `e2e/ucXXX_test.go:45` | VERIFIED |
-```
+Do not write this file in the main context. The agent reads the whole branch diff, which
+the pipeline has long since compacted away.
 
-To find line numbers, grep the test file for BR/FR annotations introduced in the tests.
+If the agent reports a `GAP`, treat it as a coverage failure: fix it and re-run the
+evaluation. `ASSERTED` rows pass — record them and continue.
 
-**Commit:** see Commit Discipline — `docs($ARGUMENTS): mark Done + traceability`. This is the last
-commit of the delivery; the terminal summary and GitHub comment below change no files.
+**Commit:** see Commit Discipline — `docs($ARGUMENTS): mark Done + delivery trail`. This is
+the last commit of the delivery; the terminal summary and GitHub comment below change no
+files. The pre-commit gate rejects this commit if the trail is missing.
 
 ### 3. Terminal Summary
 
@@ -499,7 +501,8 @@ commit of the delivery; the terminal summary and GitHub comment below change no 
 ```
 
 Include a **What was built** section listing key artifacts (handlers, templ views, sqlc queries, services, tests)
-and links to `docs/delivery/$ARGUMENTS-iterations.md`, `docs/delivery/$ARGUMENTS-traceability.md`,
+and links to `docs/delivery/$ARGUMENTS-iterations.md`, the delivery trail
+`docs/delivery/$ARGUMENTS-traceability.md`,
 and `docs/delivery/$ARGUMENTS-mutation.md`.
 
 > To run a deep quality audit (i18n, accessibility, visual fidelity): `/audit $ARGUMENTS`

@@ -8,7 +8,7 @@ Nexa workflow enforcement rules.
 ## How to Check
 
 1. Read `CLAUDE.md` at the project root
-2. Search for the marker `<!-- NEXA_RULES_CONFIGURED v2 -->`
+2. Search for the marker `<!-- NEXA_RULES_CONFIGURED v3 -->`
 
 ## On Pass
 
@@ -16,7 +16,8 @@ The marker is present. Proceed with the skill.
 
 ## On Failure
 
-The marker is missing, or it is the older `<!-- NEXA_RULES_CONFIGURED -->` without a version.
+The marker is missing, or it is an older version (`<!-- NEXA_RULES_CONFIGURED -->`,
+`<!-- NEXA_RULES_CONFIGURED v2 -->`).
 **Stop immediately** and report:
 
 ```
@@ -29,8 +30,9 @@ bypasses the requirements → specification → design → implementation pipeli
 Run /setup-project-rules first, then re-run this skill.
 ```
 
-An unversioned marker means the project still carries the sprint-branch rule, which no
-longer matches how work is delivered. Re-running `/setup-project-rules` replaces it.
+An older marker means the project misses current rules — an unversioned marker still carries
+the sprint-branch rule, and `v2` has no delivery trail gate. Re-running `/setup-project-rules`
+replaces the section and installs the missing enforcement.
 
 Do not proceed with the skill until the user runs `/setup-project-rules` or explicitly
 waives this gate.

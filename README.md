@@ -133,7 +133,7 @@ Audits any repository, whatever its stack, and whether or not it follows the Nex
 |---|---|---|
 | **Reporting** | `/qa-audit` | Inventory every test and put it in one category (unit, integration, E2E, misc); smoke tags; skipped tests |
 | **Reporting** | `/requirements-traceability-audit` | Use case catalog, use case → test matrix by explicit ID, gaps, external references |
-| **Reporting** | `/architecture-audit` | Existing docs and ADRs; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace |
+| **Reporting** | `/architecture-audit` | Existing docs and ADRs; dependencies from the implementation; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace |
 | **Reporting** | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure |
 | **Reporting** | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps |
 

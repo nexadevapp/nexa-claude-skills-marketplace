@@ -2,9 +2,10 @@
 name: architecture-audit
 description: >
   Writes a dated architecture audit report for the current repository: links to the existing
-  architecture documents, diagrams, and ADRs; C4 context, container, and component diagrams,
-  sequence diagrams, and entity relationship diagrams in Mermaid, drawn from the code; a 4+1 view
-  coverage map; and a trace of the non-functional requirements. Works on any repository and any
+  architecture documents, diagrams, and ADRs; the dependencies found in the implementation;
+  C4 context, container, and component diagrams, sequence diagrams, and entity relationship
+  diagrams in Mermaid, drawn from the code; a 4+1 view coverage map; and a trace of the
+  non-functional requirements. Works on any repository and any
   tech stack. Writes only docs/audit/architecture-audit/architecture-audit-YYYY-MM-DD-<hash>.md.
   This skill must only be invoked explicitly via /architecture-audit — never inferred from user
   messages.
@@ -48,7 +49,30 @@ definitions), the module boundaries, the data layer (ORM models, migrations, SQL
 external clients (HTTP clients, SDKs, queues, env vars such as `*_API_URL`), and the deployment
 files (`Dockerfile*`, `docker-compose*.yml`, `k8s/`, `*.tf`).
 
-### 4. Draw the discovered diagrams
+### 4. List the dependencies
+
+List the dependencies that the implementation uses. Read the manifest files from the contract
+(`package.json`, `go.mod`, `pyproject.toml`, `requirements.txt`, `pom.xml`, `build.gradle*`,
+`Cargo.toml`, `*.csproj`, `Gemfile`, `composer.json`) and the lock files next to them. Then
+confirm each dependency in the code: search the import statements (`import`, `require`, `use`,
+`using`, `from … import`) outside the excluded folders.
+
+For each dependency, record:
+
+- the name and the version that the manifest declares;
+- the scope: `runtime`, `dev`, or `test`, as the manifest states it;
+- the role in the architecture: `framework`, `database`, `http client`, `auth`, `messaging`,
+  `i18n`, `logging`, `testing`, `build`, or `other`;
+- the first file that imports it, as evidence. Write `not imported` when no file imports it.
+
+Also list the dependencies that the code imports but no manifest declares (a transitive import or
+a missing declaration). Report the dependencies of a `Dockerfile` or a `docker-compose*.yml`
+(base images, service images) in the same table with the scope `infrastructure`.
+
+Group the table by manifest when the repository has more than one (a monorepo, a frontend and a
+backend). Do not run an install or a package manager command.
+
+### 5. Draw the discovered diagrams
 
 Draw every diagram in Mermaid. Base every element on the code or the docs. Do not draw an
 element that has no source. Under each diagram, add a `Sources:` line with the files that
@@ -70,23 +94,24 @@ support it.
    modules. Show the keys (`PK`, `FK`, `UK`) and the cardinality. Mark the entities that two
    clusters share. Keep each diagram small enough to read.
 
-### 5. Map the 4+1 views
+### 6. Map the 4+1 views
 
 Do not draw extra diagrams for the 4+1 model. Map each view to the diagram that covers it.
 Mark a view `Not covered` when no diagram in the report supports it.
 
-### 6. Trace the non-functional requirements
+### 7. Trace the non-functional requirements
 
 Sources: requirement documents, ADRs, and configuration that expresses a quality attribute
 (timeouts, rate limits, caching, retries, auth, logging, monitoring, i18n, accessibility).
 For each NFR, find the evidence in the code. Status is `implemented`, `partial`, or `not found`.
 Also list the quality attributes that the code implements but no document requires.
 
-### 7. Write the report
+### 8. Write the report
 
 Use this template after the contract header, `## Summary`, and `## Gaps`. Gaps include, for
 example, views that are `Not covered`, NFRs with status `not found`, documents that disagree with
-the code, and ADRs with no status.
+the code, ADRs with no status, dependencies that are `not imported`, and imports that no
+manifest declares.
 
 ```markdown
 ## Existing documentation
@@ -105,6 +130,20 @@ the code, and ADRs with no status.
 
 | ADR | Title | Status |
 |-----|-------|--------|
+
+## Dependencies
+
+(One table per manifest file.)
+
+### `<manifest path>`
+
+| Dependency | Version | Scope | Role | Evidence in code |
+|------------|---------|-------|------|------------------|
+
+### Imported but not declared
+
+| Import | Imported in | Note |
+|--------|-------------|------|
 
 ## Discovered diagrams
 
@@ -140,6 +179,7 @@ the code, and ADRs with no status.
 
 Confirm the contract checklist, then:
 
+- [ ] Every dependency row comes from a manifest file or an import statement in the repository.
 - [ ] Every diagram has a `Sources:` line, and each listed file exists.
 - [ ] No diagram element lacks a source in the code or the docs.
 - [ ] The report states how the sequence diagram workflows were chosen.

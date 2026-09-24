@@ -7,7 +7,7 @@ The marketplace has a **two-layer architecture**:
 - **`nexa-claude-core`** — stack-agnostic methodology, from a vision document to detailed use case specifications and designs. Works with any tech stack.
 - **`nexa-claude-nextjs`** — the Next.js stack: implementation, testing, quality gates, and parallel delivery. Requires `nexa-claude-core`.
 - **`nexa-claude-go`** — the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL): the same pipeline for Go. Requires `nexa-claude-core`.
-- **`nexa-claude-audit`** — five read-only audits (QA, requirements traceability, architecture, infrastructure, CI/CD) for any repository, Nexa or not. Each writes a dated report. Standalone.
+- **`nexa-claude-audit`** — seven audits (QA, requirements traceability, architecture, infrastructure, CI/CD, code metrics, test efficacy) for any repository, Nexa or not. Each writes a dated report. Standalone.
 
 ---
 
@@ -136,8 +136,10 @@ Audits any repository, whatever its stack, and whether or not it follows the Nex
 | **Reporting** | `/architecture-audit` | Existing docs and ADRs; dependencies from the implementation; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace |
 | **Reporting** | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure |
 | **Reporting** | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps |
+| **Reporting** | `/code-metrics-audit` | Cyclomatic complexity, duplicated code %, CBO, and DIT against fixed thresholds; static analysis only |
+| **Reporting** | `/test-efficacy-audit` | Baseline unit test run with coverage, time-boxed mutation run, second test run; line coverage and mutation score against fixed thresholds |
 
-Each skill runs only when you invoke it, reads the repository only, and writes one new report to `docs/audit/<skill>/<skill>-YYYY-MM-DD-<short-hash>.md`. The shared rules are in [`nexa-claude-audit/shared/AUDIT_CONTRACT.md`](nexa-claude-audit/shared/AUDIT_CONTRACT.md).
+Each skill runs only when you invoke it and writes one new report to `docs/audit/<skill>/<skill>-YYYY-MM-DD-<short-hash>.md`. The skills read the repository only. Two exceptions: `/code-metrics-audit` runs static analysers, and `/test-efficacy-audit` runs the tests and the mutation tool in a temporary git worktree. Neither changes the working tree. The shared rules are in [`nexa-claude-audit/shared/AUDIT_CONTRACT.md`](nexa-claude-audit/shared/AUDIT_CONTRACT.md).
 
 ---
 

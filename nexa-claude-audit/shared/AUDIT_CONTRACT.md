@@ -15,6 +15,8 @@ specific to that skill. When the two disagree, the skill's `SKILL.md` wins.
 - Do not call an external service (GitHub, Jira, Linear, Confluence, a CI server, a cloud API).
   Mention an external reference; never resolve it.
 - The only file a skill writes is its report.
+- A skill can state a scope exception in its `SKILL.md` (for example, to run an analyser or the
+  tests in a temporary git worktree). The rule "the only file a skill writes is its report" stays.
 - Exclude generated, vendored, and dependency folders from every search: `node_modules/`,
   `vendor/`, `.git/`, `dist/`, `build/`, `.next/`, `target/`, `coverage/`, `.venv/`, `docs/audit/`,
   and any path in `.gitignore`.

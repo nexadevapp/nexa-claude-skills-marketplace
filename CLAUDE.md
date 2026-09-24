@@ -89,7 +89,9 @@ nexa-claude-marketplace/
 │       ├── requirements-traceability-audit/
 │       ├── architecture-audit/
 │       ├── infra-audit/
-│       └── cicd-audit/
+│       ├── cicd-audit/
+│       ├── code-metrics-audit/
+│       └── test-efficacy-audit/
 └── README.md
 ```
 
@@ -100,7 +102,7 @@ nexa-claude-marketplace/
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
 - **nexa-claude-go** — Stack-specific: implementation, testing, and delivery for the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL). Requires nexa-claude-core.
-- **nexa-claude-audit** — Stack-agnostic repository audit: five read-only skills, each writes a dated report to `docs/audit/<skill>/`. Standalone; does not require nexa-claude-core.
+- **nexa-claude-audit** — Stack-agnostic repository audit: seven skills, each writes a dated report to `docs/audit/<skill>/`. `/code-metrics-audit` runs static analysers; `/test-efficacy-audit` runs the tests in a temporary git worktree; the others only read. Standalone; does not require nexa-claude-core.
 
 ### Marketplace Configuration
 
@@ -201,6 +203,8 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Reporting    | `/architecture-audit` | Existing docs and ADRs; dependencies from the implementation; C4, sequence, and ER diagrams from the code; 4+1 coverage; NFR trace. Explicit invocation only |
 | Reporting    | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure. Explicit invocation only |
 | Reporting    | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps. Explicit invocation only |
+| Reporting    | `/code-metrics-audit` | Cyclomatic complexity, duplicated code %, CBO, and DIT against fixed thresholds; static analysis only. Explicit invocation only |
+| Reporting    | `/test-efficacy-audit` | Baseline unit test run with coverage, time-boxed mutation run, second test run; line coverage and mutation score. Runs in a temporary worktree. Explicit invocation only |
 
 ## Shared gate files (cross-plugin sync)
 

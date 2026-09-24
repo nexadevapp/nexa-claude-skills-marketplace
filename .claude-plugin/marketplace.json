@@ -27,7 +27,7 @@
     {
       "name": "nexa-claude-audit",
       "source": "./nexa-claude-audit",
-      "description": "Nexa Agentic Engineering audit plugin: QA, requirements traceability, architecture, infrastructure, and CI/CD audit reports for any repository",
+      "description": "Nexa Agentic Engineering audit plugin: QA, requirements traceability, architecture, infrastructure, CI/CD, code metrics, and test efficacy audit reports for any repository",
       "license": "Apache-2.0"
     }
   ]

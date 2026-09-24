@@ -78,7 +78,11 @@ Every report starts with:
 | Branch | <branch> |
 | Commit | <full hash> |
 | Uncommitted changes | yes / no |
+| Glossary | https://github.com/nexadevapp/nexa-claude-skills-marketplace/blob/main/nexa-claude-audit/glossary/<skill name>.md |
 ```
+
+The glossary file explains the terms of the report to the human reader. Do not read it; write
+the link only.
 
 Then a `## Summary` section (at most 10 lines), then a `## Gaps` list, then the detail sections of
 the skill in the order that the skill gives.
@@ -110,6 +114,7 @@ Before you finish, confirm each item, then the skill-specific items:
 - [ ] Only the new report file changed (`git status --porcelain`).
 - [ ] The file path and name follow the report path rule.
 - [ ] The header table, `## Summary` (at most 10 lines), and `## Gaps` come first.
+- [ ] The `Glossary` row links to the glossary file of this skill.
 - [ ] Every section of the skill's report template is present, with findings or `Not found`
       and the places searched.
 - [ ] Every relative link resolves. From the report folder, check each one with `test -e`.

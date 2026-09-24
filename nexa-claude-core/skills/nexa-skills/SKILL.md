@@ -96,6 +96,7 @@ nexa-claude-marketplace/
 │   ├── .claude-plugin/
 │   │   └── plugin.json
 │   ├── shared/                   # AUDIT_CONTRACT.md (shared by all audit skills)
+│   ├── glossary/                 # One glossary per audit skill, for the human reader of a report
 │   └── skills/
 │       ├── qa-audit/
 │       ├── requirements-traceability-audit/

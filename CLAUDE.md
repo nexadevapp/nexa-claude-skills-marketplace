@@ -84,6 +84,7 @@ nexa-claude-marketplace/
 │   ├── .claude-plugin/
 │   │   └── plugin.json
 │   ├── shared/                   # AUDIT_CONTRACT.md (shared by all audit skills)
+│   ├── glossary/                 # One glossary per audit skill, for the human reader of a report
 │   └── skills/
 │       ├── qa-audit/
 │       ├── requirements-traceability-audit/
@@ -214,6 +215,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 - To change a synced gate file: edit it in core, then run `scripts/sync-shared.sh` from the repo root, then commit both the core change and the regenerated stack copies.
 - Exception: `<stack>/shared/readiness/PROJECT_READINESS.md` is owned by each stack plugin (no core counterpart) and is edited there directly.
 - Exception: `nexa-claude-audit/shared/AUDIT_CONTRACT.md` is owned by the audit plugin (no core counterpart, not synced) and is edited there directly.
+- `nexa-claude-audit/glossary/<skill>.md` explains the terms of one audit report to the human reader. Each report links to it. The skills do not read it. When a skill adds or renames a term in its report, update its glossary file.
 - Stack plugins are discovered as every `nexa-claude-*/` directory except core. The set of files to mirror is derived automatically from the `${CLAUDE_PLUGIN_ROOT}/shared/...` references in each stack's skills — no hand-maintained manifest.
 
 ## Commands

@@ -205,7 +205,7 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Reporting    | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure. Explicit invocation only |
 | Reporting    | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps. Explicit invocation only |
 | Reporting    | `/code-metrics-audit` | Cyclomatic complexity, duplicated code %, CBO, and DIT against fixed thresholds; static analysis only. Explicit invocation only |
-| Reporting    | `/test-efficacy-audit` | Baseline unit test run with coverage, time-boxed mutation run, second test run; line coverage and mutation score. Runs in a temporary worktree. Explicit invocation only |
+| Reporting    | `/test-efficacy-audit` | Serial baseline test run (unit and Testcontainers integration) with coverage, time-boxed mutation run on the core logic first, second test run; line coverage and mutation score. Runs in a temporary worktree. Explicit invocation only |
 
 ## Shared gate files (cross-plugin sync)
 

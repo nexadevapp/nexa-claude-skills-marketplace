@@ -12,17 +12,19 @@ rules and the thresholds that the audit applies are in the
 | Test | One test case (`it`, `test`, `def test_…`, `@Test`, `func TestX`, `t.Run`), not a test file. | All counts in the report are counts of tests. |
 | Worktree | A temporary copy of the repository at one commit, made with `git worktree`. | The audit runs everything in the worktree, so your working tree does not change. |
 | Measured commit | The commit (`HEAD`) that the audit measured. | Uncommitted changes are not measured. |
-| Baseline test run | The first run of the unit tests, before the mutation run. | The mutation run needs a green baseline. When a test fails, the audit does not run the mutation tool. |
-| Post test run | The second run of the unit tests, after the mutation run. | It must give the same result as the baseline. |
+| Baseline test run | The first run of the unit tests and the integration tests, before the mutation run. | The mutation run needs a green baseline. When a test fails, the audit does not run the mutation tool. |
+| Post test run | The second run of the unit tests and the integration tests, after the mutation run. | It must give the same result as the baseline. |
 | Flaky test | A test that passes in one run and fails in another run with the same code. | A different result between the baseline and the post test run shows a flaky test, or a mutation that the tool did not remove. It is a gap. |
-| Excluded tests | The tests that the audit did not run: E2E tests and integration tests that need Docker or a real service. | The mutation tool runs the tests once for each mutant, so slow tests are excluded. |
+| Integration tests | Tests that use Testcontainers to start a real database or service in Docker. | The coverage includes them. The mutation tool does not run them, because a container start for each mutant is too slow. |
+| Excluded tests | The tests that the audit did not run: E2E tests and tests that need a live external service. | The report gives the filter and the reason. |
+| Serial run | The audit runs one test process at a time, with one worker. | It keeps the load low on a machine with limited resources. The run takes longer. |
 
 ## Coverage
 
 | Term | Meaning | How to read it in the report |
 |------|---------|------------------------------|
-| Line coverage | The percentage of source lines that the unit tests run. | A covered line is not always a checked line. Read coverage together with the mutation score. |
-| Branch coverage | The percentage of decision outcomes (the true side and the false side of each `if`) that the unit tests run. | It is stricter than line coverage. It has no threshold. |
+| Line coverage | The percentage of source lines that the unit tests and the integration tests run. | A covered line is not always a checked line. Read coverage together with the mutation score. |
+| Branch coverage | The percentage of decision outcomes (the true side and the false side of each `if`) that the tests run. | It is stricter than line coverage. It has no threshold. |
 | Coverage by folder | The line coverage of each top-level source folder. | It shows which parts of the code the tests do not reach. |
 
 ## Mutation testing
@@ -38,6 +40,7 @@ rules and the thresholds that the audit applies are in the
 | Excluded | A mutant that did not compile or could not run. | It is not in the score. |
 | Mutation score | Detected / (Detected + Survived + No coverage), on the mutated files. | The percentage of changes that the tests detect. |
 | Scope | The files that the audit can mutate: the business logic, or the paths that the user gave. | The score is for the scope, not for the whole repository. |
+| Core logic | The code that computes the results of the product: engines, matchers, calculators, rate computation, rules. | The audit mutates it first, so that the budget reaches it. |
 | Time budget | The maximum time for the mutation run (default: 30 minutes). | The audit mutates the files in batches and stops at the budget. |
 | Files not reached | Files in the scope that the budget did not reach. | The score does not include them. A larger budget reaches more files. |
 

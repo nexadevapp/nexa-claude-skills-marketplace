@@ -92,7 +92,8 @@ nexa-claude-marketplace/
 │       ├── infra-audit/
 │       ├── cicd-audit/
 │       ├── code-metrics-audit/
-│       └── test-efficacy-audit/
+│       ├── test-efficacy-audit/
+│       └── mutation-audit/
 └── README.md
 ```
 
@@ -103,7 +104,7 @@ nexa-claude-marketplace/
 - **nexa-claude-core** — Stack-agnostic methodology: from vision to use case specification. Works with any tech stack.
 - **nexa-claude-nextjs** — Stack-specific: implementation, testing, and delivery for the Next.js stack. Requires nexa-claude-core.
 - **nexa-claude-go** — Stack-specific: implementation, testing, and delivery for the Go stack (`net/http`, templ + htmx, sqlc + goose, PostgreSQL). Requires nexa-claude-core.
-- **nexa-claude-audit** — Stack-agnostic repository audit: seven skills, each writes a dated report to `docs/audit/<skill>/`. `/code-metrics-audit` runs static analysers; `/test-efficacy-audit` runs the tests in a temporary git worktree; the others only read. Standalone; does not require nexa-claude-core.
+- **nexa-claude-audit** — Stack-agnostic repository audit: eight skills, each writes a dated report to `docs/audit/<skill>/`. `/code-metrics-audit` runs static analysers; `/test-efficacy-audit` and `/mutation-audit` run the tests in a temporary git worktree; the others only read. Standalone; does not require nexa-claude-core.
 
 ### Marketplace Configuration
 
@@ -205,7 +206,8 @@ Skills follow the Nexa Agentic Engineering phases: Inception, Elaboration, Const
 | Reporting    | `/infra-audit` | Infrastructure definitions, environments, secret references (names only), local dev infrastructure. Explicit invocation only |
 | Reporting    | `/cicd-audit` | CI/CD system, pipelines, main pipeline flowchart, quality gates, gaps. Explicit invocation only |
 | Reporting    | `/code-metrics-audit` | Cyclomatic complexity, duplicated code %, CBO, and DIT against fixed thresholds; static analysis only. Explicit invocation only |
-| Reporting    | `/test-efficacy-audit` | Serial baseline test run (unit and Testcontainers integration) with coverage, time-boxed mutation run on the core logic first, second test run; line coverage and mutation score. Runs in a temporary worktree. Explicit invocation only |
+| Reporting    | `/test-efficacy-audit` | Serial test run (unit and Testcontainers integration) with coverage; line coverage. Runs in a temporary worktree. Explicit invocation only |
+| Reporting    | `/mutation-audit` | Serial unit test run, time-boxed mutation run on the core logic first, second unit test run; mutation score. Runs in a temporary worktree. Explicit invocation only |
 
 ## Shared gate files (cross-plugin sync)
 

@@ -1,6 +1,6 @@
 {
   "name": "nexa-claude-audit",
-  "description": "Nexa Agentic Engineering audit plugin: QA, requirements traceability, architecture, infrastructure, CI/CD, code metrics, and test efficacy audit reports for any repository",
+  "description": "Nexa Agentic Engineering audit plugin: QA, requirements traceability, architecture, infrastructure, CI/CD, code metrics, test efficacy, and mutation audit reports for any repository",
   "author": {
     "name": "Marius Achim",
     "email": "marius@nexadev.app",

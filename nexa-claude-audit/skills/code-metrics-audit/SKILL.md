@@ -18,7 +18,7 @@ disable-model-invocation: true
 - Never run this skill on your own initiative, and never from another skill.
 
 This skill owns the static code metrics. It does not run tests, and it does not measure coverage
-or mutation score; `/test-efficacy-audit` does that.
+or mutation score; `/test-efficacy-audit` and `/mutation-audit` do that.
 
 ## Scope exception
 
